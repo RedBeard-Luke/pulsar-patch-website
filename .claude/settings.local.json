@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vite:*)",
+      "WebSearch",
+      "Bash(curl -sL -o margarita.jpg \"https://images.unsplash.com/photo-1544145945-f90425340c7e?w=1200&q=80\")",
+      "Bash(curl -sL -o old-fashioned.jpg \"https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=1200&q=80\")",
+      "Bash(curl -sL -o wine-dinner.jpg \"https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1200&q=80\")",
+      "Bash(curl -sL -o science-lab.jpg \"https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1200&q=80\")",
+      "Bash(curl -sL -o friends-bar.jpg \"https://images.unsplash.com/photo-1529516548873-9ce57c8f155e?w=1200&q=80\")",
+      "Bash(curl -sL -o cocktails-bar.jpg \"https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=1200&q=80\")",
+      "Bash(curl -sL -o morning-bed.jpg \"https://images.unsplash.com/photo-1531353826977-0941b4779a1c?w=1200&q=80\")",
+      "Bash(curl -sL -o patch-arm.jpg \"https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&q=80\")",
+      "Bash(curl -sL -o monday-coffee.jpg \"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=80\")",
+      "Bash(curl -sL -o ginger.jpg \"https://images.unsplash.com/photo-1615485500704-8e990f9900f7?w=1200&q=80\")",
+      "WebFetch(domain:www.instagram.com)",
+      "Bash(gh auth:*)",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(/usr/local/bin/gh auth:*)"
+    ]
+  }
+}
