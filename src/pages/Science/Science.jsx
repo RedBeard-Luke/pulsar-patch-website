@@ -5,7 +5,6 @@ import iconVitB9 from '../../assets/icon-vitamin-b9.svg'
 import iconGlutathione from '../../assets/icon-glutathione.svg'
 import iconNac from '../../assets/icon-nac.svg'
 import iconGinger from '../../assets/icon-ginger.svg'
-import iconArrow from '../../assets/icon-arrow.svg'
 import iconSimple1 from '../../assets/Stupid simple_1.svg'
 import iconSimple2 from '../../assets/Stupid simple_2.svg'
 import iconSmile from '../../assets/Smile_Icon_3.svg'
@@ -57,10 +56,10 @@ export default function Science() {
       {/* ═══════════════════════════════════════════════════════════
          1. HERO — Full image with title overlay
          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative w-full min-h-[80vh] bg-[#555555] flex items-center overflow-hidden" id="science-hero">
-        <div className="relative z-10 max-w-[1920px] mx-auto px-[140px] w-full">
-          <h1 className="font-futura font-bold text-[54px] leading-[1.1] uppercase tracking-wide text-white mb-4">
-            LETS GET NERDY...<br />THE SCIENCE
+      <section className="relative w-full min-h-[70vh] bg-pulsar-blue flex items-center overflow-hidden" id="science-hero">
+        <div className="relative z-10 max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] w-full">
+          <h1 className="font-futura font-bold text-[clamp(2.25rem,7vw,3.5rem)] leading-[1.1] uppercase tracking-wide text-white mb-4">
+            LET'S GET NERDY...<br />THE SCIENCE
           </h1>
           <p className="font-inter text-[18px] leading-[1.6] text-white/80 max-w-[500px]">
             We don't hide behind hype. Here's exactly what's in a Pulsar Patch, how it works, and why it works.
@@ -79,20 +78,20 @@ export default function Science() {
          2. WHAT'S INSIDE — Ingredients
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white py-[100px]" id="ingredients">
-        <div className="max-w-[1920px] mx-auto px-[140px]">
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <div className="text-center mb-16">
             <div className="bg-pulsar-pink text-white px-4 py-1 inline-block mb-2">
-              <h2 className="font-futura font-bold text-[42px] leading-none uppercase tracking-wide">WHAT'S INSIDE</h2>
+              <h2 className="font-futura font-bold text-[clamp(1.75rem,5vw,3rem)] leading-none uppercase tracking-wide">WHAT'S INSIDE</h2>
             </div>
             <div className="bg-pulsar-pink text-white px-4 py-1 inline-block">
-              <h2 className="font-futura font-bold text-[42px] leading-none uppercase tracking-wide">THE PATCH?</h2>
+              <h2 className="font-futura font-bold text-[clamp(1.75rem,5vw,3rem)] leading-none uppercase tracking-wide">THE PATCH?</h2>
             </div>
             <p className="font-inter text-[16px] leading-[1.6] text-pulsar-dark/70 max-w-[600px] mx-auto mt-6">
               Six clinically-backed ingredients delivered transdermally: no pills, no powders, no B.S.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             {ingredients.map((item, i) => (
               <div key={i} className="flex flex-col items-center text-center p-8 rounded-[24px] border-2 border-gray-100 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg hover:border-pulsar-blue/30">
                 <img src={item.icon} alt={item.name} className="w-[60px] h-[60px] object-contain mb-6" />
@@ -129,12 +128,12 @@ export default function Science() {
           </svg>
         </div>
 
-        <div className="max-w-[1920px] mx-auto w-full px-[140px] flex flex-col">
-          <h2 className="font-futura font-bold text-[36px] text-white uppercase tracking-wide mb-16 text-left max-w-[500px] leading-[1.1]">
+        <div className="max-w-[1920px] mx-auto w-full px-5 sm:px-8 lg:px-16 xl:px-[140px] flex flex-col">
+          <h2 className="font-futura font-bold text-[clamp(1.75rem,5vw,3rem)] text-white uppercase tracking-wide mb-16 text-left max-w-[500px] leading-[1.1]">
             IT'S STUPID<br/>SIMPLE TO USE!
           </h2>
 
-          <div className="grid grid-cols-3 gap-16">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-16">
             {/* Step 1 */}
             <div className="flex flex-col items-center text-center">
               <h3 className="font-futura font-bold text-[48px] text-white mb-6">1</h3>
@@ -178,15 +177,15 @@ export default function Science() {
          5. WHY A PATCH — Two column
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white py-[100px]" id="transdermal">
-        <div className="max-w-[1920px] mx-auto px-[140px] flex items-center gap-[80px]">
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] flex flex-col lg:flex-row lg:items-center gap-[40px] lg:gap-[80px]">
           {/* Left: Image */}
-          <div className="flex-[0_0_45%]">
-            <div className="w-full aspect-[4/5] bg-[#555555] rounded-[30px] shadow-2xl"></div>
+          <div className="w-full lg:flex-[0_0_45%]">
+            <div className="w-full aspect-[4/5] bg-pulsar-light-blue-bg rounded-[30px] shadow-2xl"></div>
           </div>
 
           {/* Right: Content */}
-          <div className="flex-1">
-            <h2 className="font-futura font-bold text-[42px] leading-[1.1] text-pulsar-pink uppercase tracking-wide mb-6">
+          <div className="w-full lg:flex-1">
+            <h2 className="font-futura font-bold text-[clamp(1.75rem,5vw,3rem)] leading-[1.1] text-pulsar-pink uppercase tracking-wide mb-6">
               WHY A PATCH?
             </h2>
             <p className="font-futura font-[700] text-[18px] leading-[1.5] text-pulsar-blue mb-6">
@@ -199,7 +198,7 @@ export default function Science() {
               That means higher bioavailability, no upset stomach, and no remembering to chug something before bed. Just peel, stick, and forget about it.
             </p>
 
-            <div className="flex gap-10">
+            <div className="flex flex-wrap gap-x-10 gap-y-3">
               <h3 className="font-futura font-bold text-[15px] text-pulsar-blue uppercase whitespace-nowrap">NO PILLS</h3>
               <h3 className="font-futura font-bold text-[15px] text-pulsar-blue uppercase whitespace-nowrap">6 INGREDIENTS</h3>
               <h3 className="font-futura font-bold text-[15px] text-pulsar-blue uppercase whitespace-nowrap">3 EASY STEPS</h3>
@@ -220,8 +219,8 @@ export default function Science() {
             backgroundPosition: 'center',
           }}
         ></div>
-        <div className="relative z-10 max-w-[1920px] mx-auto px-[140px] flex flex-col items-center gap-8">
-          <h2 className="font-futura font-bold text-[48px] leading-none text-white uppercase tracking-wide text-center">
+        <div className="relative z-10 max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] flex flex-col items-center gap-8">
+          <h2 className="font-futura font-bold text-[clamp(1.75rem,5vw,3rem)] leading-none text-white uppercase tracking-wide text-center">
             READY TO TRY IT?
           </h2>
           <Link to="/shop" className="inline-flex items-center gap-3 bg-white text-pulsar-pink font-futura font-bold text-[15px] uppercase tracking-[1px] px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-pulsar-dark hover:text-white hover:-translate-y-0.5 group">
@@ -237,7 +236,7 @@ export default function Science() {
          7. DISCLAIMERS
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white py-[60px] border-t border-gray-200">
-        <div className="max-w-[1920px] mx-auto px-[140px]">
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <div className="max-w-[900px]">
             <p className="font-inter text-[11px] leading-[1.6] text-gray-400 mb-4">
               <span className="font-[600] text-gray-500">Disclaimer:</span> "Hangover Defense Patch" is a product descriptor only and does not imply prevention, treatment, or cure of hangovers or intoxication. Results may vary. Statements have not been evaluated by the FDA.

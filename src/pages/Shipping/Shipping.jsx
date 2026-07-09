@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import squigleBg from '../../assets/footer_Squigle.svg'
 
 export default function Shipping() {
@@ -7,8 +8,8 @@ export default function Shipping() {
       {/* Hero */}
       <section className="relative w-full bg-pulsar-pink pb-[120px] overflow-hidden">
         <img src={squigleBg} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 opacity-[0.05]" />
-        <div className="relative z-10 max-w-[1920px] mx-auto px-[140px] pt-[140px] pb-[20px]">
-          <h1 className="font-futura font-bold text-[54px] text-white uppercase tracking-wide">
+        <div className="relative z-10 max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] pt-14 pb-8">
+          <h1 className="font-futura font-bold text-[clamp(2.25rem,7vw,3.5rem)] text-white uppercase tracking-wide">
             SHIPPING POLICY
           </h1>
         </div>
@@ -21,36 +22,32 @@ export default function Shipping() {
 
       {/* Content */}
       <section className="bg-white py-[80px]">
-        <div className="max-w-[1920px] mx-auto px-[140px]">
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <div className="max-w-[900px]">
 
-            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">I just placed an order. When will it ship?</h2>
+            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Where does my order ship from?</h2>
             <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
-              Please allow 3–7 business days of processing and production time for your order to ship out.
+              Everything ships from right here in the US. Pulsar Patch is made in America, and your order goes out from our warehouse.
             </p>
 
-            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">How long is the shipping time?</h2>
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-4">
-              Our orders will be shipped depending on the fulfillment center the product is from.
-            </p>
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-4">
-              Average transit times to United States: 3 – 10 business days.
-            </p>
+            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">When will my order ship?</h2>
             <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
-              There are circumstances that are out of control (natural disasters, holidays, weather, etc.) that may cause shipping postponements. While most packages will arrive on time, there may be circumstances and delays that our carriers may experience. For this reason, we do not guarantee the exact delivery time; the delivery issue is the responsibility of the shipping company.
+              We move fast. Orders ship within 1–2 business days of being placed. Once it's on its way, standard delivery usually lands in about 3–7 business days.
             </p>
 
-            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Will I receive a tracking number?</h2>
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-4">
-              We provide tracking for every order. Tracking will be available once your product is shipped. Each individual product may be shipped from different fulfillment centers across the globe as our product research team spends the time to source quality yet affordable products.
-            </p>
+            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">How much is shipping?</h2>
             <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
-              When you receive your tracking number, if you need help tracking your order, you can go to our order tracking page.
+              Shipping is free on every order over $35. That's it. No fine print.
             </p>
 
-            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Can I cancel my order?</h2>
+            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Will I get a tracking number?</h2>
+            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
+              Yep. We email you a tracking number the moment your order ships, so you can follow it right to your door. Got a question about your tracking? Just <Link to="/contact" className="text-pulsar-blue underline hover:text-pulsar-pink transition-colors">reach out</Link> and we'll help.
+            </p>
+
+            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Something went wrong with my delivery?</h2>
             <p className="font-inter text-[15px] leading-[1.8] text-gray-700">
-              You are able to cancel your order with no penalty! You must cancel your order 12 hours after creating it for the cancellation to be applied. If the item has already shipped, please contact us via our Contact Us page. All you need to do is send us an email with the subject line "cancel".
+              It happens. If your package is lost, late, or shows up looking rough, <Link to="/contact" className="text-pulsar-blue underline hover:text-pulsar-pink transition-colors">contact us</Link> and we'll make it right.
             </p>
 
           </div>

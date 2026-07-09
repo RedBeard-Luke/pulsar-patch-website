@@ -14,7 +14,7 @@ export default function BlogPost() {
       {/* ═══════════════════════════════════════════════════════════
          1. HERO IMAGE
          ═══════════════════════════════════════════════════════════ */}
-      <section className="relative w-full h-[55vh] bg-[#555555] overflow-hidden">
+      <section className="relative w-full h-[55vh] bg-pulsar-light-blue-bg overflow-hidden">
         <div className="absolute bottom-0 left-0 w-full leading-none z-10">
           <svg className="block w-full h-[120px]" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 80 Q 120 0, 240 80 T 480 80 T 720 80 T 960 80 T 1200 80 T 1440 80 L 1440 120 L 0 120 Z" fill="white" />
@@ -26,7 +26,7 @@ export default function BlogPost() {
          2. ARTICLE CONTENT
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white py-[60px]">
-        <div className="max-w-[1920px] mx-auto px-[140px]">
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <article className="max-w-[800px] mx-auto">
 
             {/* Category tag + Date */}
@@ -38,7 +38,7 @@ export default function BlogPost() {
             </div>
 
             {/* Title */}
-            <h1 className="font-futura font-bold text-[48px] leading-[1.1] text-pulsar-blue uppercase tracking-wide mb-6">
+            <h1 className="font-futura font-bold text-[clamp(2rem,6vw,48px)] leading-[1.1] text-pulsar-blue uppercase tracking-wide mb-6">
               {post.title}
             </h1>
 
@@ -54,7 +54,7 @@ export default function BlogPost() {
             {post.content.map((block, i) => {
               if (block.type === 'heading') {
                 return (
-                  <h2 key={i} className="font-futura font-bold text-[28px] leading-[1.2] text-pulsar-blue uppercase tracking-wide mt-10 mb-4">
+                  <h2 key={i} className="font-futura font-bold text-[clamp(1.5rem,4vw,28px)] leading-[1.2] text-pulsar-blue uppercase tracking-wide mt-10 mb-4">
                     {block.body}
                   </h2>
                 )
@@ -69,7 +69,7 @@ export default function BlogPost() {
               if (block.type === 'image') {
                 return (
                   <div key={i} className="my-10">
-                    <div className="w-full aspect-[16/9] bg-[#555555] rounded-[24px] shadow-lg overflow-hidden">
+                    <div className="w-full aspect-[16/9] bg-pulsar-light-blue-bg rounded-[24px] shadow-lg overflow-hidden">
                       {block.img && (
                         <img src={block.img} alt="" className="w-full h-full object-cover" />
                       )}
@@ -104,7 +104,7 @@ export default function BlogPost() {
             <div className="w-full h-[2px] bg-gray-200 mt-6 mb-10"></div>
 
             {/* Back + CTA */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-4 sm:justify-between">
               <Link to="/blog" className="font-futura font-bold text-[14px] text-pulsar-blue uppercase tracking-wide hover:text-pulsar-pink transition-colors">
                 &larr; BACK TO ALL POSTS
               </Link>

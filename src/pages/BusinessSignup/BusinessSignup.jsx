@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { submitLead, isEmail, isPhone, required } from '../../lib/forms'
 
 const establishmentTypes = [
   'DIVE BAR', 'COCKTAIL BAR', 'BREWERY / TAP HOUSE', 'RESTAURANT',
@@ -16,6 +17,8 @@ const heardAboutOptions = [
 
 export default function BusinessSignup() {
   const [submitted, setSubmitted] = useState(false)
+  const [status, setStatus] = useState('idle') // idle | loading | error
+  const [error, setError] = useState('')
   const [form, setForm] = useState({
     businessName: '',
     contactName: '',
@@ -48,37 +51,53 @@ export default function BusinessSignup() {
     }))
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    setSubmitted(true)
-    window.scrollTo(0, 0)
+    // Native `required` on the key fields covers empties; double-check email/phone here.
+    if (!required(form.businessName) || !required(form.contactName)) { setError('Please add your business and contact name.'); return }
+    if (!isEmail(form.email)) { setError('Enter a valid email address.'); return }
+    if (!isPhone(form.phone)) { setError('Enter a valid phone number.'); return }
+    if (!form.privacyAgreed) { setError('Please agree to the privacy terms to submit.'); return }
+    setError('')
+    setStatus('loading')
+    try {
+      await submitLead('wholesale-application', form)
+      setSubmitted(true)
+      window.scrollTo(0, 0)
+    } catch {
+      setStatus('error')
+      setError('Something went wrong. Email hello@pulsarpatch.com and we will get you set up.')
+    }
   }
 
   if (submitted) {
     return (
       <div className="w-full bg-white flex flex-col" id="business-signup-thanks">
         {/* Hero */}
-        <section className="relative w-full h-[50vh] bg-[#555555] overflow-hidden flex items-center">
-          <div className="relative z-10 max-w-[1920px] mx-auto px-[140px]">
-            <h1 className="font-futura font-bold text-[54px] text-white uppercase tracking-wide leading-[1.1]">
-              THANK YOU<br />FOR SUBMITTING<br />YOUR APPLICATION!
+        <section className="relative w-full bg-pulsar-blue overflow-hidden flex items-center pt-16 pb-24 px-5 sm:px-8 lg:px-16 xl:px-[140px]">
+          <div className="relative z-10 max-w-[1920px] mx-auto w-full">
+            <h1 className="font-futura font-[900] text-[clamp(2.25rem,7vw,3.5rem)] text-white uppercase tracking-wide leading-[1.1]">
+              Thanks for<br />applying!
             </h1>
           </div>
         </section>
 
         {/* Message */}
-        <section className="bg-white py-[80px]">
-          <div className="max-w-[1920px] mx-auto px-[140px]">
+        <section className="bg-white py-16 lg:py-[80px] px-5 sm:px-8 lg:px-16 xl:px-[140px]">
+          <div className="max-w-[1920px] mx-auto">
             <div className="max-w-[700px]">
               <p className="font-inter text-[16px] leading-[1.8] text-gray-700 mb-6">
-                Thank you for submitting your application to join Pulsar Patch's Wholesale family. We will reach out to you once we have received and reviewed it. Watch your email and check your junk mail just in case.
+                Thanks for applying to carry Pulsar. We'll review your application and reach out within 24 hours with pricing and next steps. Keep an eye on your inbox, and check spam just in case.
               </p>
-              <p className="font-inter text-[16px] leading-[1.8] text-gray-700 mb-10">
-                We hope to talk to you soon!
-              </p>
-              <Link to="/" className="inline-flex items-center bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest px-10 py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark">
-                BACK TO PULSAR HOME
-              </Link>
+              <p className="font-inter text-[16px] leading-[1.8] text-gray-700 mb-10">Talk soon.</p>
+              <div className="flex flex-wrap gap-3">
+                <Link to="/" className="inline-flex items-center bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest px-10 py-4 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark">
+                  Back to home
+                </Link>
+                <Link to="/wholesale" className="inline-flex items-center border-2 border-pulsar-blue text-pulsar-blue font-futura font-bold text-[14px] uppercase tracking-widest px-10 py-4 rounded-full transition-all hover:-translate-y-0.5 hover:bg-pulsar-blue/5">
+                  Wholesale details
+                </Link>
+              </div>
             </div>
           </div>
         </section>
@@ -90,17 +109,19 @@ export default function BusinessSignup() {
     <div className="w-full bg-white flex flex-col" id="business-signup-page">
 
       {/* Hero */}
-      <section className="relative w-full h-[50vh] bg-[#555555] overflow-hidden">
-        <div className="absolute bottom-0 left-0 w-full leading-none z-10">
-          <svg className="block w-full h-[120px]" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 80 Q 120 0, 240 80 T 480 80 T 720 80 T 960 80 T 1200 80 T 1440 80 L 1440 120 L 0 120 Z" fill="white" />
-          </svg>
+      <section className="relative w-full bg-pulsar-blue overflow-hidden pt-14 pb-[120px] px-5 sm:px-8 lg:px-16 xl:px-[140px]">
+        <div className="relative z-10 max-w-[1920px] mx-auto">
+          <Link to="/wholesale" className="font-inter text-[13px] text-white/70 hover:text-white transition-colors">← Back to wholesale</Link>
+          <h1 className="font-futura font-[900] text-[clamp(2rem,7vw,3.25rem)] text-white uppercase tracking-wide leading-[1.05] mt-3">Become a Pulsar<br />retailer</h1>
+        </div>
+        <div className="absolute bottom-0 left-0 w-full leading-none z-10 pointer-events-none">
+          <svg className="block w-full h-[120px]" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0 80 Q 120 0, 240 80 T 480 80 T 720 80 T 960 80 T 1200 80 T 1440 80 L 1440 120 L 0 120 Z" fill="white" /></svg>
         </div>
       </section>
 
       {/* Form */}
       <section className="bg-white py-[80px]">
-        <div className="max-w-[1920px] mx-auto px-[140px]">
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <div className="max-w-[700px]">
 
             <h2 className="font-futura font-bold text-[28px] text-pulsar-dark uppercase tracking-wide mb-4">
@@ -149,7 +170,7 @@ export default function BusinessSignup() {
                       <input type="url" name="websiteUrl" value={form.websiteUrl} onChange={handleChange} className="w-full bg-gray-100 rounded-[8px] px-4 py-3 font-inter text-[14px] text-gray-800 outline-none focus:ring-2 focus:ring-pulsar-blue/30 transition-all" />
                     </div>
                     <div>
-                      <span className="font-inter text-[12px] text-gray-500 block mb-1">Instagram *</span>
+                      <span className="font-inter text-[12px] text-gray-500 block mb-1">Instagram</span>
                       <div className="flex items-center gap-2">
                         <div className="w-[36px] h-[36px] bg-pulsar-pink rounded-[8px] flex items-center justify-center shrink-0">
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="white" strokeWidth="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="white" strokeWidth="2"/><circle cx="17.5" cy="6.5" r="1" fill="white"/></svg>
@@ -158,7 +179,7 @@ export default function BusinessSignup() {
                       </div>
                     </div>
                     <div>
-                      <span className="font-inter text-[12px] text-gray-500 block mb-1">Tiktok *</span>
+                      <span className="font-inter text-[12px] text-gray-500 block mb-1">TikTok</span>
                       <div className="flex items-center gap-2">
                         <div className="w-[36px] h-[36px] bg-pulsar-pink rounded-[8px] flex items-center justify-center shrink-0">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V9.18a8.16 8.16 0 004.76 1.52v-3.4a4.85 4.85 0 01-1-.61z"/></svg>
@@ -288,7 +309,7 @@ export default function BusinessSignup() {
                   <div>
                     <span className="font-inter font-[700] text-[13px] text-pulsar-pink uppercase block mb-1">RECEIVE MARKETING COMMUNICATION AND UPDATES</span>
                     <span className="font-inter text-[11px] text-gray-500 leading-[1.5] block">
-                      Check this box to receive important news and notifications from the Pulsar Patch Team, including program updates, campaign opportunities, product launches, and other resources to help you succeed as a Pulsar affiliate. This can be unsubscribed at any time by emailing hello@pulsarpatch.com. Consent is not a condition of purchase or participation. Messages and data rates may apply. Message frequency varies. Reply HELP for help or STOP to cancel at any time. By submitting, you agree to the Terms of Service and Privacy Policy provided by Pulsar Patch.
+                      Check this box to receive important news and notifications from the Pulsar Patch Team, including program updates, campaign opportunities, product launches, and other resources to help you succeed as a Pulsar wholesale partner. Unsubscribe any time by emailing hello@pulsarpatch.com. Consent is not a condition of purchase or participation. Messages and data rates may apply. Message frequency varies. Reply HELP for help or STOP to cancel at any time. By submitting, you agree to the Terms of Service and Privacy Policy provided by Pulsar Patch.
                     </span>
                   </div>
                 </label>
@@ -308,11 +329,13 @@ export default function BusinessSignup() {
               </div>
 
               {/* Submit */}
+              {error && <p className="text-red-500 text-[14px] font-inter mb-4" role="alert">{error}</p>}
               <button
                 type="submit"
-                className="w-full bg-pulsar-pink text-white font-futura font-bold text-[16px] uppercase tracking-widest py-5 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark"
+                disabled={status === 'loading'}
+                className="w-full bg-pulsar-pink text-white font-futura font-bold text-[16px] uppercase tracking-widest py-5 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60 disabled:hover:translate-y-0"
               >
-                SUBMIT
+                {status === 'loading' ? 'Submitting…' : 'Submit application'}
               </button>
 
             </form>

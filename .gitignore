@@ -7,3 +7,8 @@ dist
 *.pdf
 *.xd
 *.indd
+
+# macOS metadata
+._*
+.DS_Store
+.agents

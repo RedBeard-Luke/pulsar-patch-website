@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import squigleBg from '../../assets/footer_Squigle.svg'
 
 const faqs = [
@@ -69,9 +70,9 @@ export default function FAQ() {
       {/* Hero */}
       <section className="relative w-full bg-pulsar-pink pb-[120px] overflow-hidden">
         <img src={squigleBg} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 opacity-[0.05]" />
-        <div className="relative z-10 max-w-[1920px] mx-auto px-[140px] pt-[140px] pb-[20px]">
-          <h1 className="font-futura font-bold text-[54px] text-white uppercase tracking-wide">
-            FAQ'S
+        <div className="relative z-10 max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] pt-14 pb-8">
+          <h1 className="font-futura font-bold text-[clamp(2rem,7vw,54px)] text-white uppercase tracking-wide">
+            FAQS
           </h1>
         </div>
         <div className="absolute bottom-0 left-0 w-full leading-none z-10">
@@ -83,7 +84,7 @@ export default function FAQ() {
 
       {/* Content */}
       <section className="bg-white py-[80px]">
-        <div className="max-w-[1920px] mx-auto px-[140px]">
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <div className="w-full">
             <div className="flex flex-col border-t border-pulsar-blue/30">
               {faqs.map((faq, index) => (
@@ -101,13 +102,37 @@ export default function FAQ() {
                       +
                     </span>
                   </div>
-                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndex === index ? 'max-h-[400px] opacity-100 pb-6' : 'max-h-0 opacity-0'}`}>
+                  <div className={`overflow-hidden transition-all duration-300 ease-in-out ${activeIndex === index ? 'max-h-[600px] opacity-100 pb-6' : 'max-h-0 opacity-0'}`}>
                     <p className="font-inter text-[14px] leading-[1.8] text-gray-600">
                       {faq.a}
                     </p>
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Closing CTA */}
+          <div className="mt-16 bg-pulsar-light-blue-bg rounded-[24px] px-6 sm:px-10 py-12 text-center">
+            <h2 className="font-futura font-bold text-[clamp(1.5rem,4vw,32px)] text-pulsar-blue uppercase tracking-wide mb-3">
+              STILL HAVE QUESTIONS?
+            </h2>
+            <p className="font-inter text-[15px] leading-[1.7] text-gray-600 max-w-[520px] mx-auto mb-8">
+              Grab a pack and see for yourself, or reach out and we'll sort you out.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                to="/shop"
+                className="inline-flex items-center justify-center bg-pulsar-pink text-white font-futura font-bold text-[13px] uppercase tracking-[1px] px-8 py-3 rounded-full transition-all duration-300 hover:bg-pulsar-pink-dark hover:-translate-y-0.5"
+              >
+                Shop patches
+              </Link>
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center bg-white text-pulsar-blue border-2 border-pulsar-blue font-futura font-bold text-[13px] uppercase tracking-[1px] px-8 py-3 rounded-full transition-all duration-300 hover:bg-pulsar-blue hover:text-white hover:-translate-y-0.5"
+              >
+                Still stuck? Contact us
+              </Link>
             </div>
           </div>
         </div>

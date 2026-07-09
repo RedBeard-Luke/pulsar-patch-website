@@ -7,8 +7,8 @@ export default function Refunds() {
       {/* Hero */}
       <section className="relative w-full bg-pulsar-pink pb-[120px] overflow-hidden">
         <img src={squigleBg} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 opacity-[0.05]" />
-        <div className="relative z-10 max-w-[1920px] mx-auto px-[140px] pt-[140px] pb-[20px]">
-          <h1 className="font-futura font-bold text-[54px] text-white uppercase tracking-wide">
+        <div className="relative z-10 max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] pt-14 pb-8">
+          <h1 className="font-futura font-bold text-[clamp(2.25rem,7vw,3.5rem)] text-white uppercase tracking-wide">
             REFUND POLICY
           </h1>
         </div>
@@ -21,51 +21,26 @@ export default function Refunds() {
 
       {/* Content */}
       <section className="bg-white py-[80px]">
-        <div className="max-w-[1920px] mx-auto px-[140px]">
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <div className="max-w-[900px]">
 
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-4">
-              We have a 30-day return policy, which means you have 30 days after receiving your item to request a return.
-            </p>
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-4">
-              To be eligible for a return, your item must be in the same condition that you received it, unworn or unused, with tags, and in its original packaging. You'll also need the receipt or proof of purchase.
-            </p>
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-4">
-              To start a return, you can contact us at hello@pulsarpatch.com
-            </p>
             <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
-              If your return is accepted, we'll send you a return shipping label, as well as instructions on how and where to send your package. Items sent back to us without first requesting a return will not be accepted.
-            </p>
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
-              You can always contact us for any return question at hello@pulsarpatch.com
+              Not happy with your patches? No stress. You've got 30 days from the day your order arrives to send back any unopened patches for a full refund.
             </p>
 
-            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Damages and issues</h2>
+            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">How to start a return</h2>
             <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
-              Please inspect your order upon reception and contact us immediately if the item is defective, damaged or if you receive the wrong item, so that we can evaluate the issue and make it right.
+              Just email us at <a href="mailto:hello@pulsarpatch.com" className="text-pulsar-blue underline hover:text-pulsar-pink transition-colors">hello@pulsarpatch.com</a> and we'll walk you through it. Please make sure the patches are unopened and in their original packaging so we can process your refund.
             </p>
 
-            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Non-returnable items</h2>
+            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Damaged or wrong order?</h2>
             <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
-              Unfortunately, we cannot accept returns on sale items or gift cards.
-            </p>
-
-            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Exchanges</h2>
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
-              The fastest way to ensure you get what you want is to return the item you have, and once the return is accepted, make a separate purchase for the new item.
-            </p>
-
-            <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">European Union 14 day cooling off period</h2>
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-10">
-              Notwithstanding the above, if the merchandise is being shipped into the European Union, you have the right to cancel or return your order within 14 days, for any reason and without a justification. As above, your item must be in the same condition that you received it, unworn or unused, with tags, and in its original packaging. You'll also need the receipt or proof of purchase.
+              If your order shows up damaged, or you got something you didn't order, that's on us. Email <a href="mailto:hello@pulsarpatch.com" className="text-pulsar-blue underline hover:text-pulsar-pink transition-colors">hello@pulsarpatch.com</a> and we'll make it right, fast.
             </p>
 
             <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">Refunds</h2>
-            <p className="font-inter text-[15px] leading-[1.8] text-gray-700 mb-4">
-              We will notify you once we've received and inspected your return, and let you know if the refund was approved or not. If approved, you'll be automatically refunded on your original payment method within 10 business days. Please remember it can take some time for your bank or credit card company to process and post the refund too.
-            </p>
             <p className="font-inter text-[15px] leading-[1.8] text-gray-700">
-              If more than 15 business days have passed since we've approved your return, please contact us at aaron@pulsarpatch.com
+              Once we get your return and check it over, we'll refund your original payment method. It usually lands within a few business days, though your bank or card company may take a little longer to post it. Questions? Hit us up any time at <a href="mailto:hello@pulsarpatch.com" className="text-pulsar-blue underline hover:text-pulsar-pink transition-colors">hello@pulsarpatch.com</a>.
             </p>
 
           </div>

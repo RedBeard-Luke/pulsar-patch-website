@@ -1,12 +1,33 @@
-import { createContext, useContext, useState } from 'react'
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 const AuthContext = createContext()
+const STORAGE_KEY = 'pulsar-user-v1'
+
+function loadUser() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null) // null = logged out
+  const [user, setUser] = useState(loadUser) // null = logged out
 
-  function login(userData) {
+  useEffect(() => {
+    try {
+      if (user) localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
+      else localStorage.removeItem(STORAGE_KEY)
+    } catch {
+      /* storage unavailable */
+    }
+  }, [user])
+
+  const login = useCallback((userData) => {
     setUser({
+      accountType: 'personal', // 'personal' | 'business'
       name: userData.name || 'Pulsar User',
       email: userData.email || 'user@example.com',
       phone: userData.phone || '',
@@ -19,15 +40,13 @@ export function AuthProvider({ children }) {
       emailOptIn: true,
       ...userData,
     })
-  }
+  }, [])
 
-  function logout() {
-    setUser(null)
-  }
+  const logout = useCallback(() => setUser(null), [])
 
-  function updateUser(updates) {
+  const updateUser = useCallback((updates) => {
     setUser(prev => prev ? { ...prev, ...updates } : null)
-  }
+  }, [])
 
   return (
     <AuthContext.Provider value={{ user, login, logout, updateUser, isLoggedIn: !!user }}>

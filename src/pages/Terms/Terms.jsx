@@ -7,8 +7,8 @@ export default function Terms() {
       {/* Hero */}
       <section className="relative w-full bg-pulsar-pink pb-[120px] overflow-hidden">
         <img src={squigleBg} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0 opacity-[0.05]" />
-        <div className="relative z-10 max-w-[1920px] mx-auto px-[140px] pt-[140px] pb-[20px]">
-          <h1 className="font-futura font-bold text-[54px] text-white uppercase tracking-wide">
+        <div className="relative z-10 max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] pt-14 pb-8">
+          <h1 className="font-futura font-bold text-[clamp(2.25rem,7vw,3.5rem)] text-white uppercase tracking-wide">
             TERMS OF SERVICE
           </h1>
         </div>
@@ -21,7 +21,7 @@ export default function Terms() {
 
       {/* Content */}
       <section className="bg-white py-[80px]">
-        <div className="max-w-[1920px] mx-auto px-[140px]">
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <div className="max-w-[900px]">
 
             <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">OVERVIEW</h2>
@@ -159,7 +159,7 @@ export default function Terms() {
 
             <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-4">SECTION 20 - CONTACT INFORMATION</h2>
             <p className="font-inter text-[15px] leading-[1.8] text-gray-700">
-              Questions about the Terms of Service should be sent to us at hello@pulsarpatch.com. Our contact information is posted below: hello@pulsarpatch.com
+              Questions about the Terms of Service should be sent to us at <a href="mailto:hello@pulsarpatch.com" className="text-pulsar-blue underline hover:text-pulsar-pink transition-colors">hello@pulsarpatch.com</a>. Our contact information is posted below: <a href="mailto:hello@pulsarpatch.com" className="text-pulsar-blue underline hover:text-pulsar-pink transition-colors">hello@pulsarpatch.com</a>
             </p>
 
           </div>

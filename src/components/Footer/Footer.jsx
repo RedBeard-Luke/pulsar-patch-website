@@ -1,6 +1,8 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import logoWhite from '../../assets/Logo_White.svg'
 import footerSquigle from '../../assets/footer_Squigle.svg'
+import { submitLead, isEmail } from '../../lib/forms'
 
 const linkColumns = {
   Explore: [
@@ -27,13 +29,44 @@ const linkColumns = {
 }
 
 export default function Footer() {
+  const { pathname } = useLocation()
+  // The footer's top wave should match the colour of the section that sits
+  // directly above it, so the curve reads as one continuous zone into the
+  // footer's blue with no stray band. Pages end on white by default; these
+  // pages close on the lightest blue.
+  const lightBlueClosers = ['/about', '/wholesale', '/affiliate']
+  const waveColor = lightBlueClosers.includes(pathname) ? '#E8F7FB' : 'white'
+
+  const [email, setEmail] = useState('')
+  const [status, setStatus] = useState('idle') // idle | error | loading | done
+  const [error, setError] = useState('')
+
+  async function handleSubscribe(e) {
+    e.preventDefault()
+    if (!isEmail(email)) {
+      setError('Enter a valid email address.')
+      setStatus('error')
+      return
+    }
+    setStatus('loading')
+    setError('')
+    try {
+      await submitLead('newsletter', { email })
+      setStatus('done')
+      setEmail('')
+    } catch {
+      setError('Something went wrong. Try again.')
+      setStatus('error')
+    }
+  }
+
   return (
     <footer className="relative w-full bg-[#44C8E8] text-white pt-[120px] pb-8 overflow-hidden" id="footer">
       
       {/* White Wave Mask at the top to reveal blue + squiggle below */}
       <div className="absolute top-0 left-0 w-full h-[120px] z-10 leading-none pointer-events-none">
         <svg className="block w-full h-full" viewBox="0 0 1440 120" preserveAspectRatio="none">
-          <path d="M 0 40 Q 120 80, 240 40 T 480 40 T 720 40 T 960 40 T 1200 40 T 1440 40 L 1440 0 L 0 0 Z" fill="white" />
+          <path d="M 0 40 Q 120 80, 240 40 T 480 40 T 720 40 T 960 40 T 1200 40 T 1440 40 L 1440 0 L 0 0 Z" fill={waveColor} />
         </svg>
       </div>
 
@@ -102,18 +135,29 @@ export default function Footer() {
               Stay in touch with deals and news from your<br />friends at Pulsar Patch!
             </p>
           </div>
-          <div className="flex items-center lg:w-[45%] gap-6 w-full">
-            <label htmlFor="footer-email" className="font-futura font-[900] text-[18px] uppercase tracking-wide text-white shrink-0 pt-1">EMAIL:</label>
-            <div className="flex-1 border-b-[2px] border-white pb-1 flex items-center">
-              <input
-                type="email"
-                id="footer-email"
-                className="bg-transparent text-white font-inter text-[16px] outline-none w-full px-2"
-              />
-            </div>
-            <button type="button" className="bg-white text-[#44C8E8] font-futura font-bold text-[13px] uppercase px-8 py-3 rounded-full hover:opacity-90 transition-opacity whitespace-nowrap shadow-md">
-              SIGN UP
-            </button>
+          <div className="lg:w-[45%] w-full">
+            {status === 'done' ? (
+              <p className="font-inter text-[15px] text-white font-[600] py-2" role="status">You're in. Watch your inbox for the good stuff.</p>
+            ) : (
+              <form onSubmit={handleSubscribe} noValidate className="flex items-center gap-4 sm:gap-6 w-full">
+                <label htmlFor="footer-email" className="font-futura font-[900] text-[18px] uppercase tracking-wide text-white shrink-0 hidden sm:block pt-1">EMAIL:</label>
+                <div className="flex-1 border-b-[2px] border-white pb-1 flex items-center">
+                  <input
+                    type="email"
+                    id="footer-email"
+                    placeholder="you@email.com"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); if (status === 'error') setStatus('idle') }}
+                    aria-invalid={status === 'error'}
+                    className="bg-transparent text-white placeholder-white/50 font-inter text-[16px] outline-none w-full px-1"
+                  />
+                </div>
+                <button type="submit" disabled={status === 'loading'} className="bg-white text-[#44C8E8] font-futura font-bold text-[13px] uppercase px-6 sm:px-8 py-3 rounded-full hover:opacity-90 transition-opacity whitespace-nowrap shadow-md disabled:opacity-60">
+                  {status === 'loading' ? '...' : 'SIGN UP'}
+                </button>
+              </form>
+            )}
+            {status === 'error' && <p className="font-inter text-[13px] text-white/90 mt-2" role="alert">{error}</p>}
           </div>
         </div>
 
