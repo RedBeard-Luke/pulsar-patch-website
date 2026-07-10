@@ -20,6 +20,10 @@ Takes about 10 minutes.
    different fallback address. Review emails already carry their own recipients
    (your admin address + lclark0684@gmail.com), so you can leave this as is.
 5. Click the **Save** icon. Name the project something like `Pulsar Mailer`.
+6. **Authorize & Test sending:** At the top of the editor, select **`testSend`** from the dropdown list of functions and click the **Run** button.
+   - Google will ask you to authorize. Click **Review permissions**, pick your Google account, and allow the script to access Gmail.
+   - You will see a warning: "Google hasn't verified this app." That is normal for personal scripts. Click **Advanced > Go to Pulsar Mailer (unsafe)**, then click **Allow**.
+   - Check your Gmail inbox (or Spam) for a test email with the subject *"Pulsar: new test-connection submission"*. This confirms the script is authorized and working!
 
 ## Step 2 — Deploy it as a web app
 
@@ -29,13 +33,7 @@ Takes about 10 minutes.
    - **Description:** Pulsar mailer
    - **Execute as:** **Me** (your email)
    - **Who has access:** **Anyone**
-4. Click **Deploy**.
-5. Google will ask you to **authorize**. Click **Authorize access**, pick your
-   account, and allow it to **send email as you**.
-   - You'll likely see "Google hasn't verified this app." That's expected — it's
-     your own script. Click **Advanced > Go to Pulsar Mailer (unsafe)** and
-     continue. (It's only "unverified" because you didn't submit it to Google's
-     review process, which personal scripts don't need.)
+4. Click **Deploy**. (Since you already authorized Gmail in Step 1, it should deploy immediately. If it asks for authorization again, follow the same steps as above).
 6. Copy the **Web app URL**. It looks like:
    `https://script.google.com/macros/s/AKfy...../exec`
 

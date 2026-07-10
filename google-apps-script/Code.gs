@@ -14,9 +14,15 @@
  * Nothing secret lives here. The script runs as you, so it sends as you.
  */
 
-// Where generic submissions go when the site doesn't specify recipients.
-// Review notifications already carry their own recipient list.
-var DEFAULT_RECIPIENTS = ['hello@pulsarpatch.com', 'lclark0684@gmail.com'];
+// Who receives the review-screening notifications. Edit this list anytime to
+// change who gets the emails — no website change needed.
+var REVIEW_RECIPIENTS = ['pulsarpatch@gmail.com', 'lclark0684@gmail.com'];
+
+// Fallback for other generic form submissions (contact, newsletter, etc.).
+var DEFAULT_RECIPIENTS = ['pulsarpatch@gmail.com', 'lclark0684@gmail.com'];
+
+// The email always sends FROM the Google account this script runs under. To send
+// from PulsarPatch.review@gmail.com, create/host this script in that account.
 
 function doPost(e) {
   try {
@@ -24,7 +30,10 @@ function doPost(e) {
     var type = payload.type || 'lead';
     var data = payload.data || {};
 
-    var recipients = normalizeRecipients(data.to) || DEFAULT_RECIPIENTS;
+    var isReview = (type === 'review-screening' || type === 'review-hold');
+    var recipients = isReview
+      ? REVIEW_RECIPIENTS
+      : (normalizeRecipients(data.to) || DEFAULT_RECIPIENTS);
     var subject = data.subject || subjectFor(type);
     var htmlBody = data.html || buildFallbackHtml(type, data, payload.submittedAt);
 
@@ -42,6 +51,30 @@ function doPost(e) {
 // A quick health check so you can open the URL in a browser and confirm it's up.
 function doGet() {
   return json({ ok: true, message: 'Pulsar mailer is live.' });
+}
+
+/**
+ * Run this function in the Apps Script editor to send a test email.
+ * This is the easiest way to authorize the script's Gmail access and verify it works.
+ */
+function testSend() {
+  var testPayload = {
+    type: 'test-connection',
+    data: {
+      message: 'If you are reading this, your Google Apps Script is successfully authorized and able to send emails!',
+      testTime: new Date().toString()
+    },
+    submittedAt: new Date().toLocaleString()
+  };
+  
+  var e = {
+    postData: {
+      contents: JSON.stringify(testPayload)
+    }
+  };
+  
+  var response = doPost(e);
+  Logger.log('Response content: ' + response.getContentText());
 }
 
 function normalizeRecipients(to) {

@@ -16,7 +16,7 @@
 // Who gets the screening email. The admin address is overridable via env; your
 // personal inbox is always copied so nothing slips through.
 export const SCREENING_RECIPIENTS = [
-  import.meta.env.VITE_ADMIN_EMAIL || 'hello@pulsarpatch.com',
+  import.meta.env.VITE_ADMIN_EMAIL || 'pulsarpatch@gmail.com',
   'lclark0684@gmail.com',
 ]
 
