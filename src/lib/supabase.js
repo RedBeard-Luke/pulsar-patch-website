@@ -1,3 +1,4 @@
+// Build marker: forces a fresh Vercel build so env keys are re-read (v1).
 import { createClient } from '@supabase/supabase-js'
 
 /**
