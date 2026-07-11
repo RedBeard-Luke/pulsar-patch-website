@@ -30,8 +30,12 @@ function stars(n) {
   return `<span style="color:${PINK};font-size:20px;letter-spacing:2px;">${full}</span><span style="color:#d9d9d9;font-size:20px;letter-spacing:2px;">${empty}</span>`
 }
 
+// Each button is its own full-width table row so they stack cleanly and never
+// overlap or wrap — reliable across desktop and mobile email clients.
 function actionButton(label, color, href) {
-  return `<a href="${href}" style="display:inline-block;background:${color};color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;text-decoration:none;padding:12px 22px;border-radius:999px;margin:0 4px;">${label}</a>`
+  return `<tr><td style="padding:5px 0;">
+    <a href="${href}" style="display:block;background:${color};color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;text-decoration:none;padding:15px 20px;border-radius:999px;text-align:center;">${label}</a>
+  </td></tr>`
 }
 
 /**
@@ -45,14 +49,18 @@ export function buildReviewScreeningEmail(review, adminBase = 'https://pulsarpat
 
   return `<!doctype html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
 <body style="margin:0;padding:0;background:#f4f6f8;font-family:Arial,Helvetica,sans-serif;color:${DARK};">
-  <div style="max-width:600px;margin:0 auto;padding:24px;">
-    <div style="background:${BLUE};border-radius:16px 16px 0 0;padding:24px 28px;">
+  <div style="max-width:600px;margin:0 auto;padding:16px;">
+    <div style="background:${BLUE};border-radius:16px 16px 0 0;padding:22px;">
       <p style="margin:0;color:#ffffff;font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:0.8;">Pulsar Patch · Review Screening</p>
       <h1 style="margin:6px 0 0;color:#ffffff;font-size:22px;text-transform:uppercase;letter-spacing:1px;">A new review needs a look</h1>
     </div>
 
-    <div style="background:#ffffff;padding:28px;border:1px solid #e6e9ec;border-top:0;">
+    <div style="background:#ffffff;padding:22px;border:1px solid #e6e9ec;border-top:0;">
       ${isLow ? `<div style="background:#fff4e5;border:1px solid #ffd8a8;border-radius:10px;padding:12px 16px;margin-bottom:20px;">
         <strong style="color:#b45309;font-size:13px;">Heads up:</strong>
         <span style="color:#7c5a1e;font-size:13px;">This is a ${review.stars}-star review. Good moment to reach out before it goes live.</span>
@@ -63,20 +71,20 @@ export function buildReviewScreeningEmail(review, adminBase = 'https://pulsarpat
       <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#444;">${review.text || ''}</p>
 
       <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:8px;">
-        <tr><td style="padding:8px 0;color:#888;width:140px;">From</td><td style="padding:8px 0;font-weight:bold;">${review.author || '—'}</td></tr>
-        <tr><td style="padding:8px 0;color:#888;border-top:1px solid #eee;">Email</td><td style="padding:8px 0;border-top:1px solid #eee;"><a href="mailto:${review.email || ''}" style="color:${BLUE};">${review.email || '—'}</a></td></tr>
+        <tr><td style="padding:8px 12px 8px 0;color:#888;width:80px;vertical-align:top;">From</td><td style="padding:8px 0;font-weight:bold;">${review.author || '—'}</td></tr>
+        <tr><td style="padding:8px 12px 8px 0;color:#888;border-top:1px solid #eee;vertical-align:top;">Email</td><td style="padding:8px 0;border-top:1px solid #eee;word-break:break-word;"><a href="mailto:${review.email || ''}" style="color:${BLUE};">${review.email || '—'}</a></td></tr>
         <tr><td style="padding:8px 0;color:#888;border-top:1px solid #eee;">Phone</td><td style="padding:8px 0;border-top:1px solid #eee;"><a href="tel:${review.phone || ''}" style="color:${BLUE};">${review.phone || '—'}</a></td></tr>
         <tr><td style="padding:8px 0;color:#888;border-top:1px solid #eee;">Order #</td><td style="padding:8px 0;border-top:1px solid #eee;font-weight:bold;">${review.orderNumber || '—'}</td></tr>
       </table>
     </div>
 
-    <div style="background:#ffffff;border:1px solid #e6e9ec;border-top:0;border-radius:0 0 16px 16px;padding:24px 28px;text-align:center;">
+    <div style="background:#ffffff;border:1px solid #e6e9ec;border-top:0;border-radius:0 0 16px 16px;padding:22px;text-align:center;">
       <p style="margin:0 0 16px;font-size:13px;color:#888;text-transform:uppercase;letter-spacing:1px;">Decide what happens next</p>
-      <div>
+      <table role="presentation" width="260" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;max-width:100%;">
         ${actionButton('Approve', '#22c55e', link('approve'))}
         ${actionButton('Wait', '#f59e0b', link('hold'))}
         ${actionButton('Deny', '#ef4444', link('deny'))}
-      </div>
+      </table>
       <p style="margin:18px 0 0;font-size:12px;color:#aaa;line-height:1.5;">
         Approve puts it live. Wait holds it while you reach out to the customer. Deny keeps it off the site.<br/>
         Sent to ${SCREENING_RECIPIENTS.join(' and ')}.
