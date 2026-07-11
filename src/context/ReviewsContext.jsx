@@ -49,6 +49,8 @@ function fromRow(r) {
     email: r.email,
     phone: r.phone,
     orderNumber: r.order_number,
+    didItWork: r.did_it_work,
+    recommend: r.recommend,
     status: r.status,
     held: r.held,
     submittedAt: r.created_at ? new Date(r.created_at).toLocaleString() : 'Just now',
@@ -65,6 +67,8 @@ function toRow(review) {
     email: review.email || null,
     phone: review.phone || null,
     order_number: review.orderNumber || null,
+    did_it_work: review.didItWork ?? null,
+    recommend: review.recommend ?? null,
     status: 'pending',
   }
 }

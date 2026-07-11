@@ -13,9 +13,15 @@ create table if not exists public.reviews (
   email        text,
   phone        text,
   order_number text,
+  did_it_work  int  check (did_it_work between 1 and 10),
+  recommend    int  check (recommend between 1 and 10),
   status       text not null default 'pending' check (status in ('pending','live','denied')),
   held         boolean not null default false
 );
+
+-- For a table that already exists (adds the two 1-10 score columns safely).
+alter table public.reviews add column if not exists did_it_work int check (did_it_work between 1 and 10);
+alter table public.reviews add column if not exists recommend   int check (recommend   between 1 and 10);
 
 -- Fast lookups for the public list and the admin queue
 create index if not exists reviews_status_created_idx

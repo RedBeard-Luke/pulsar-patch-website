@@ -265,6 +265,12 @@ function ReviewScreening() {
                       <h3 className="font-futura font-bold text-[16px] text-pulsar-dark uppercase tracking-wide mb-2">{r.title || 'Untitled review'}</h3>
                       <p className="font-inter text-[14px] leading-[1.6] text-gray-700 mb-4">{r.text}</p>
 
+                      {/* 1-10 scores from the review form */}
+                      <div className="flex gap-3 mb-4 max-w-[360px]">
+                        <ScoreTile label="Did the patch work?" value={r.didItWork} />
+                        <ScoreTile label="Would recommend?" value={r.recommend} />
+                      </div>
+
                       {/* Contact + order details */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 max-w-[560px]">
                         <Detail k="From" v={r.author} />
@@ -308,6 +314,25 @@ function ReviewScreening() {
         )}
       </div>
     </section>
+  )
+}
+
+function ScoreTile({ label, value }) {
+  const has = value !== undefined && value !== null && value !== ''
+  const n = Number(value)
+  const low = has && n <= 5
+  const tone = !has
+    ? 'bg-gray-100 text-gray-400'
+    : low
+      ? 'bg-red-50 text-red-600'
+      : 'bg-green-50 text-green-600'
+  return (
+    <div className={`flex-1 rounded-[14px] px-3 py-3 text-center ${tone}`}>
+      <div className="font-futura font-bold text-[24px] leading-none">
+        {has ? n : '—'}{has && <span className="text-[13px] font-normal text-gray-400">/10</span>}
+      </div>
+      <div className="font-inter text-[10px] uppercase tracking-widest text-gray-500 mt-1.5">{label}</div>
+    </div>
   )
 }
 

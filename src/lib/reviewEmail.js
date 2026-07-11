@@ -30,6 +30,22 @@ function stars(n) {
   return `<span style="color:${PINK};font-size:20px;letter-spacing:2px;">${full}</span><span style="color:#d9d9d9;font-size:20px;letter-spacing:2px;">${empty}</span>`
 }
 
+// A single /10 score tile. Colored red-ish when the number is low so a rough
+// score jumps out at a glance while screening.
+function scoreTile(label, value) {
+  const has = value !== undefined && value !== null && value !== ''
+  const n = Number(value)
+  const low = has && n <= 5
+  const bg = !has ? '#f4f6f8' : low ? '#fdecec' : '#eafaf0'
+  const fg = !has ? '#aaa' : low ? '#c0392b' : '#1f9d55'
+  return `<td width="50%" style="padding:0 5px;">
+    <div style="background:${bg};border-radius:12px;padding:14px 10px;text-align:center;">
+      <div style="font-size:26px;font-weight:bold;color:${fg};line-height:1;">${has ? n + '<span style="font-size:14px;color:#999;font-weight:normal;">/10</span>' : '—'}</div>
+      <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:6px;">${label}</div>
+    </div>
+  </td>`
+}
+
 // Each button is its own full-width table row so they stack cleanly and never
 // overlap or wrap — reliable across desktop and mobile email clients.
 function actionButton(label, color, href) {
@@ -68,7 +84,14 @@ export function buildReviewScreeningEmail(review, adminBase = 'https://pulsarpat
 
       <div style="margin-bottom:8px;">${stars(Number(review.stars) || 0)}</div>
       <h2 style="margin:0 0 8px;font-size:18px;text-transform:uppercase;letter-spacing:0.5px;">${review.title || 'Untitled review'}</h2>
-      <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#444;">${review.text || ''}</p>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#444;">${review.text || ''}</p>
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px;">
+        <tr>
+          ${scoreTile('Did the patch work?', review.didItWork)}
+          ${scoreTile('Would recommend?', review.recommend)}
+        </tr>
+      </table>
 
       <table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:8px;">
         <tr><td style="padding:8px 12px 8px 0;color:#888;width:80px;vertical-align:top;">From</td><td style="padding:8px 0;font-weight:bold;">${review.author || '—'}</td></tr>
