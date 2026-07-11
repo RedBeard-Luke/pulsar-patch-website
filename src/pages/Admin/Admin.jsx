@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useAdminAuth } from '../../context/AdminAuthContext'
 import { useReviews } from '../../context/ReviewsContext'
 import { buildReviewScreeningEmail, SCREENING_RECIPIENTS } from '../../lib/reviewEmail'
 
@@ -51,10 +52,22 @@ const sitePages = [
 ]
 
 export default function Admin() {
+  const admin = useAdminAuth()
   const { isLoggedIn } = useAuth()
 
-  /* ── Gate: this demo dashboard is only shown to signed-in users ── */
-  if (!isLoggedIn) {
+  /* ── Gate ──
+     With Supabase configured, require a signed-in admin (enforced by the DB too).
+     Otherwise fall back to the demo sign-in gate. */
+  if (admin.configured) {
+    if (!admin.ready) {
+      return (
+        <div className="min-h-[60vh] bg-white flex items-center justify-center" role="status" aria-label="Loading">
+          <span className="w-9 h-9 rounded-full border-[3px] border-pulsar-light-blue border-t-pulsar-blue animate-spin" />
+        </div>
+      )
+    }
+    if (!admin.isAdmin) return <AdminLogin signIn={admin.signIn} />
+  } else if (!isLoggedIn) {
     return (
       <div className="min-h-[60vh] bg-white flex items-center justify-center px-5 py-24 text-center">
         <div className="max-w-[420px]">
@@ -75,6 +88,12 @@ export default function Admin() {
           <div className="flex items-center gap-3 mb-4">
             <span className="w-[10px] h-[10px] rounded-full bg-green-400 animate-pulse" />
             <span className="font-inter text-[12px] text-green-400 uppercase tracking-widest">Admin access</span>
+            {admin.configured && admin.isAdmin && (
+              <span className="ml-auto flex items-center gap-4">
+                <span className="font-inter text-[12px] text-white/50 hidden sm:inline">{admin.email}</span>
+                <button onClick={admin.signOut} className="font-inter text-[12px] text-white/60 hover:text-white underline transition-colors">Sign out</button>
+              </span>
+            )}
           </div>
           <h1 className="font-futura font-bold text-[clamp(2rem,6vw,3rem)] text-white uppercase tracking-wide mb-2">Site Dashboard</h1>
           <p className="font-inter text-[16px] text-white/60">Screen incoming reviews and jump to any page on the site.</p>
@@ -297,6 +316,47 @@ function Detail({ k, v }) {
     <div className="flex justify-between gap-4 py-1 border-b border-gray-200/60">
       <span className="font-inter text-[13px] text-gray-500 shrink-0">{k}</span>
       <span className="font-inter font-[600] text-[13px] text-gray-800 text-right break-all">{v}</span>
+    </div>
+  )
+}
+
+/* Real admin sign-in (Supabase). Only allow-listed emails get in. */
+function AdminLogin({ signIn }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handle(e) {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    const { error } = await signIn(email, password)
+    setLoading(false)
+    if (error) setError(error.message || 'Sign in failed.')
+  }
+
+  return (
+    <div className="w-full bg-white flex flex-col min-h-screen items-center justify-center py-16 px-5">
+      <div className="max-w-[400px] w-full">
+        <h1 className="font-futura font-bold text-[clamp(28px,7vw,36px)] text-pulsar-blue uppercase tracking-wide mb-2 text-center">Admin</h1>
+        <p className="font-inter text-[14px] text-gray-500 text-center mb-8">Sign in to screen reviews and manage the site.</p>
+        <form onSubmit={handle} className="flex flex-col gap-4" noValidate>
+          <div>
+            <label className="font-inter font-[600] text-[13px] text-gray-500 block mb-2">Email</label>
+            <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setError('') }} autoComplete="username" className="w-full bg-gray-100 rounded-[8px] px-4 py-3 font-inter text-[14px] text-gray-800 outline-none focus:ring-2 focus:ring-pulsar-blue/30" />
+          </div>
+          <div>
+            <label className="font-inter font-[600] text-[13px] text-gray-500 block mb-2">Password</label>
+            <input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setError('') }} autoComplete="current-password" className="w-full bg-gray-100 rounded-[8px] px-4 py-3 font-inter text-[14px] text-gray-800 outline-none focus:ring-2 focus:ring-pulsar-blue/30" />
+          </div>
+          {error && <p className="font-inter text-[13px] text-red-400" role="alert">{error}</p>}
+          <button type="submit" disabled={loading} className="w-full bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60">
+            {loading ? 'Signing in…' : 'Sign In'}
+          </button>
+        </form>
+        <p className="font-inter text-[12px] text-gray-400 text-center mt-6">Only authorized Pulsar admins can access this area.</p>
+      </div>
     </div>
   )
 }

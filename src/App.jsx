@@ -4,6 +4,7 @@ import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 import { UIProvider } from './context/UIContext'
 import { ReviewsProvider } from './context/ReviewsContext'
+import { AdminAuthProvider } from './context/AdminAuthContext'
 import Header from './components/Header/Header'
 import Footer from './components/Footer/Footer'
 import CartToast from './components/Toast/CartToast'
@@ -49,6 +50,7 @@ function RouteFallback() {
 function App() {
   return (
     <AuthProvider>
+    <AdminAuthProvider>
     <CartProvider>
     <UIProvider>
     <ReviewsProvider>
@@ -96,6 +98,7 @@ function App() {
     </ReviewsProvider>
     </UIProvider>
     </CartProvider>
+    </AdminAuthProvider>
     </AuthProvider>
   )
 }
