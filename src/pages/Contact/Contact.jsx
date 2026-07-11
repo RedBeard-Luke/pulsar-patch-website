@@ -36,7 +36,7 @@ export default function Contact() {
     if (Object.keys(next).length) return
     setStatus('loading')
     try {
-      await submitLead('contact', { ...form, attachment: file?.name || null })
+      await submitLead('contact', { ...form, attachment: file?.name || null, to: ['hello@pulsarpatch.com', 'lclark0684@gmail.com'] })
       setStatus('done')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch {
