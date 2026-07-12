@@ -65,7 +65,7 @@ export default function About() {
         <div className="w-full min-h-[300px] lg:w-auto lg:flex-[0_0_50%] bg-pulsar-light-blue-bg"></div>
 
         {/* Right: Content */}
-        <div className="w-full lg:flex-[0_0_50%] bg-pulsar-blue px-5 sm:px-8 lg:px-16 xl:px-[140px] py-[80px] lg:py-[140px] lg:pb-[220px]">
+        <div className="w-full lg:flex-[0_0_50%] bg-pulsar-blue px-5 sm:px-8 lg:px-16 xl:px-[140px] pt-[80px] pb-[120px] sm:pb-[150px] lg:py-[140px] lg:pb-[220px]">
           <h2 className="font-futura font-[900] text-[clamp(1.75rem,5vw,3rem)] text-white uppercase tracking-wide mb-8">Our Goal</h2>
           <p className="font-inter text-[16px] text-white leading-[1.6] max-w-[600px]">
             Pulsar exists to protect your tomorrow: your clarity, your energy, your hustle. Because three drinks with friends shouldn't hinder your morning, your momentum, or your mood. Good nights should lead to great days.
@@ -74,7 +74,7 @@ export default function About() {
 
         {/* Bottom Wave Mask overlay */}
         <div className="absolute bottom-0 left-0 w-full z-10 pointer-events-none">
-          <WaveDivider topColor="transparent" bottomColor="white" />
+          <WaveDivider topColor="transparent" bottomColor="white" height="h-[40px] sm:h-[70px] lg:h-[120px]" />
         </div>
       </section>
 

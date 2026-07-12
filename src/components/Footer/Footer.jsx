@@ -61,12 +61,12 @@ export default function Footer() {
   }
 
   return (
-    <footer className="relative w-full bg-[#44C8E8] text-white pt-[120px] pb-8 overflow-hidden" id="footer">
-      
+    <footer className="relative w-full bg-[#44C8E8] text-white pt-[40px] sm:pt-[70px] lg:pt-[120px] pb-8 overflow-hidden" id="footer">
+
       {/* White Wave Mask at the top to reveal blue + squiggle below */}
-      <div className="absolute top-0 left-0 w-full h-[120px] z-10 leading-none pointer-events-none">
+      <div className="absolute top-0 left-0 w-full h-[40px] sm:h-[70px] lg:h-[120px] z-10 leading-none pointer-events-none">
         <svg className="block w-full h-full" viewBox="0 0 1440 120" preserveAspectRatio="none">
-          <path d="M 0 40 Q 120 80, 240 40 T 480 40 T 720 40 T 960 40 T 1200 40 T 1440 40 L 1440 0 L 0 0 Z" fill={waveColor} />
+          <path d="M 0 40 Q 120 120, 240 40 T 480 40 T 720 40 T 960 40 T 1200 40 T 1440 40 L 1440 0 L 0 0 Z" fill={waveColor} />
         </svg>
       </div>
 
