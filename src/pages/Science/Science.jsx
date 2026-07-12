@@ -209,7 +209,11 @@ export default function Science() {
               </tbody>
             </table>
           </div>
-          <p className="font-inter text-[12px] text-gray-400 mt-4">Full circle = yes. Dash = sometimes or partly. Empty = no.</p>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 mt-5">
+            <span className="inline-flex items-center gap-2 font-inter text-[12px] text-gray-500"><Mark v="y" /> Yes</span>
+            <span className="inline-flex items-center gap-2 font-inter text-[12px] text-gray-500"><Mark v="p" /> Sometimes or partly</span>
+            <span className="inline-flex items-center gap-2 font-inter text-[12px] text-gray-500"><Mark v="n" /> No</span>
+          </div>
         </div>
       </section>
 
