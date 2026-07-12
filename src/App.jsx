@@ -31,6 +31,7 @@ const Account = lazy(() => import('./pages/Account/Account'))
 const StoreLocator = lazy(() => import('./pages/StoreLocator/StoreLocator'))
 const Checkout = lazy(() => import('./pages/Checkout/Checkout'))
 const Affiliate = lazy(() => import('./pages/Affiliate/Affiliate'))
+const AffiliateSignup = lazy(() => import('./pages/AffiliateSignup/AffiliateSignup'))
 const NotFound = lazy(() => import('./pages/NotFound/NotFound'))
 
 function ScrollToTop() {
@@ -85,6 +86,7 @@ function App() {
               <Route path="/store-locator" element={<StoreLocator />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/affiliate" element={<Affiliate />} />
+              <Route path="/affiliate-signup" element={<AffiliateSignup />} />
               {/* Recipes live in the blog — keep the old link alive */}
               <Route path="/recipes" element={<Navigate to="/blog" replace />} />
               <Route path="*" element={<NotFound />} />

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 
 const steps = [
-  { n: '1', title: 'Grab your code', body: 'Make an account and you get a unique referral code on the spot.' },
+  { n: '1', title: 'Apply for your code', body: 'Fill out a quick application. Once you are approved we send your unique referral code.' },
   { n: '2', title: 'Share it', body: 'Drop it in your group chat, your story, wherever your people are.' },
   { n: '3', title: 'Get paid', body: 'They save 15%, you earn cash on every order they place. Simple.' },
 ]
@@ -16,9 +16,12 @@ export default function Affiliate() {
           <p className="font-inter text-[16px] sm:text-[18px] text-white/90 max-w-[560px] mx-auto leading-relaxed mb-8">
             You already tell your friends about Pulsar. Might as well get paid for it. No follower minimum, no catch.
           </p>
-          <Link to="/account" className="inline-block bg-white text-pulsar-pink font-futura font-[800] text-[14px] uppercase tracking-wide px-8 py-4 rounded-full hover:-translate-y-0.5 transition-transform shadow-md">
-            Get my code
+          <Link to="/affiliate-signup" className="inline-block bg-white text-pulsar-pink font-futura font-[800] text-[14px] uppercase tracking-wide px-8 py-4 rounded-full hover:-translate-y-0.5 transition-transform shadow-md">
+            Apply to be an affiliate
           </Link>
+          <p className="font-inter text-[13px] text-white/80 mt-5">
+            Already an affiliate? <Link to="/account" className="font-[700] text-white underline underline-offset-4 hover:text-white/80 transition-colors">Log in</Link>
+          </p>
         </div>
       </section>
 
