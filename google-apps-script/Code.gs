@@ -18,8 +18,21 @@
 // change who gets the emails — no website change needed.
 var REVIEW_RECIPIENTS = ['pulsarpatch@gmail.com', 'lclark0684@gmail.com'];
 
-// Fallback for other generic form submissions (contact, newsletter, etc.).
+// Where contact-form messages go.
+var CONTACT_RECIPIENTS = ['hello@pulsarpatch.com', 'lclark0684@gmail.com'];
+
+// Fallback for other generic form submissions (newsletter, etc.).
 var DEFAULT_RECIPIENTS = ['pulsarpatch@gmail.com', 'lclark0684@gmail.com'];
+
+// SECURITY: recipients are ALWAYS chosen here on the server by message type.
+// We never send to a client-supplied address (data.to), otherwise anyone who
+// finds this URL could use it as an open relay to spam any inbox from our
+// Gmail. Reply-To can still be the customer (that's just a header, not a send).
+function recipientsFor(type) {
+  if (type === 'review-screening' || type === 'review-hold') return REVIEW_RECIPIENTS;
+  if (type === 'contact') return CONTACT_RECIPIENTS;
+  return DEFAULT_RECIPIENTS;
+}
 
 // The email always sends FROM the Google account this script runs under. To send
 // from PulsarPatch.review@gmail.com, create/host this script in that account.
@@ -30,10 +43,7 @@ function doPost(e) {
     var type = payload.type || 'lead';
     var data = payload.data || {};
 
-    var isReview = (type === 'review-screening' || type === 'review-hold');
-    var recipients = isReview
-      ? REVIEW_RECIPIENTS
-      : (normalizeRecipients(data.to) || DEFAULT_RECIPIENTS);
+    var recipients = recipientsFor(type);
     var subject = data.subject || subjectFor(type);
     var htmlBody = data.html || buildFallbackHtml(type, data, payload.submittedAt);
 
