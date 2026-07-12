@@ -12,6 +12,8 @@ import igGlutathione from '../../assets/icons/glutathione-pink.svg'
 import igNac from '../../assets/icons/nac-pink.svg'
 import igGinger from '../../assets/icons/ginger-pink.svg'
 import squigleBg from '../../assets/Squigle_What is Pulsar.svg'
+import ParticleField from '../../components/ParticleField/ParticleField'
+import HowItWorksFlow from './HowItWorksFlow'
 
 /* What a big night actually does to your body — the problem, four ways. */
 const problems = [
@@ -35,14 +37,6 @@ const problems = [
     name: 'DRAINED NUTRIENTS',
     text: 'Alcohol burns through the B vitamins and nutrients your body runs on, leaving you foggy, wiped out, and low on energy.',
   },
-]
-
-/* How transdermal delivery works, made simple. */
-const stages = [
-  { n: '01', title: 'PEEL & STICK', text: 'Put a patch on a clean patch of skin before you go out, or right before bed.' },
-  { n: '02', title: 'ABSORBS THROUGH SKIN', text: 'The ingredients pass through your skin instead of your gut, so nothing gets lost to digestion.' },
-  { n: '03', title: 'STRAIGHT TO YOUR BLOOD', text: 'They enter your bloodstream directly, which means more of what you put on actually gets used.' },
-  { n: '04', title: 'STEADY FOR 8+ HOURS', text: 'Instead of one big dose, it releases slowly while you sleep, right when your body does its recovery work.' },
 ]
 
 const ingredients = [
@@ -98,6 +92,7 @@ export default function Science() {
 
       {/* ═══ 1. HERO ═══ */}
       <section className="relative w-full min-h-[70vh] bg-pulsar-blue flex items-center overflow-hidden" id="science-hero">
+        <ParticleField />
         <div className="relative z-10 max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] w-full pt-20 pb-32">
           <span className="font-futura font-bold text-[13px] uppercase tracking-[3px] text-white/70">The Science</span>
           <h1 className="font-futura font-bold text-[clamp(2.25rem,7vw,3.75rem)] leading-[1.05] uppercase tracking-wide text-white mt-3 mb-5">
@@ -147,37 +142,8 @@ export default function Science() {
         </div>
       </section>
 
-      {/* ═══ 3. HOW IT WORKS — transdermal stages ═══ */}
-      <section className="relative bg-pulsar-blue pt-[90px] lg:pt-[110px] pb-[150px]" id="how-it-works">
-        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
-          <div className="max-w-[760px] mb-16">
-            <span className="font-futura font-bold text-[13px] uppercase tracking-[3px] text-white/60">How It Works</span>
-            <h2 className="font-futura font-bold text-[clamp(1.75rem,5vw,3rem)] leading-[1.05] text-white uppercase tracking-wide mt-3 mb-5">
-              Why a patch, not a pill
-            </h2>
-            <p className="font-inter text-[16px] leading-[1.6] text-white/85">
-              Pills and powders have to survive your stomach first, and a rough night is the worst time to keep something down. A transdermal patch skips all of that and delivers steadily, straight through your skin.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-            {stages.map((s) => (
-              <div key={s.n} className="flex flex-col">
-                <span className="font-futura font-bold text-[44px] text-white/30 leading-none mb-4">{s.n}</span>
-                <div className="w-full h-[2px] bg-white/20 mb-5" />
-                <h3 className="font-futura font-bold text-[16px] text-white uppercase tracking-wide mb-2">{s.title}</h3>
-                <p className="font-inter text-[14px] leading-[1.6] text-white/80">{s.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="absolute -bottom-px left-0 w-full leading-none z-10">
-          <svg className="block w-full h-[40px] sm:h-[70px] lg:h-[120px]" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 80 Q 120 0, 240 80 T 480 80 T 720 80 T 960 80 T 1200 80 T 1440 80 L 1440 120 L 0 120 Z" fill="white" />
-          </svg>
-        </div>
-      </section>
+      {/* ═══ 3. HOW IT WORKS — night timeline + bloodstream simulation ═══ */}
+      <HowItWorksFlow />
 
       {/* ═══ 4. WHAT'S INSIDE ═══ */}
       <section className="bg-white py-[90px] lg:py-[110px]" id="whats-inside">

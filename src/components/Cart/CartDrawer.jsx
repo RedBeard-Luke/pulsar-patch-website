@@ -30,8 +30,8 @@ export default function CartDrawer() {
         {/* Header */}
         <div className="flex justify-between items-center px-6 sm:px-8 py-5 border-b border-gray-100 shrink-0">
           <span className="font-futura font-[800] text-[15px] text-pulsar-blue uppercase tracking-wide">Your Cart ({totalItems})</span>
-          <button onClick={closeCart} aria-label="Close cart" className="p-2 -mr-2 hover:opacity-60 transition-opacity">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <button onClick={closeCart} aria-label="Close cart" className="p-2 -mr-2 text-pulsar-pink hover:text-pulsar-pink-dark transition-colors">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
         </div>
 

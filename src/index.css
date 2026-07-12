@@ -354,6 +354,86 @@ input, textarea {
   border: 0;
 }
 
+
+/* ---------- Interactive 3D & Particle Animations ---------- */
+@keyframes floatSway {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+.animate-float-sway {
+  animation: floatSway 6s ease-in-out infinite;
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translate(0, 0) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(var(--tx, 0px), var(--ty, -60px)) scale(1.1);
+    opacity: 0;
+  }
+}
+.animate-float-particle {
+  animation: floatParticle 4s ease-in-out infinite;
+}
+
+/* Custom Timeline Slider styling overrides */
+input[type="range"].timeline-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+}
+input[type="range"].timeline-slider:focus {
+  outline: none;
+}
+input[type="range"].timeline-slider::-webkit-slider-runnable-track {
+  background: transparent;
+  height: 40px;
+}
+input[type="range"].timeline-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -4px; /* Align center */
+  background-color: var(--color-blue);
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(68, 200, 232, 0.6);
+  transition: transform 0.15s ease-out;
+}
+input[type="range"].timeline-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+input[type="range"].timeline-slider::-moz-range-track {
+  background: transparent;
+  height: 40px;
+}
+input[type="range"].timeline-slider::-moz-range-thumb {
+  background-color: var(--color-blue);
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+  box-shadow: 0 0 15px rgba(68, 200, 232, 0.6);
+  border: none;
+  transition: transform 0.15s ease-out;
+}
+input[type="range"].timeline-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
+
 /* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -368,3 +448,4 @@ input, textarea {
     scroll-behavior: auto;
   }
 }
+

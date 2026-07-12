@@ -1,10 +1,9 @@
-import { useState, useRef, useCallback } from 'react'
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import CurvedFeature from '../../components/CurvedFeature/CurvedFeature'
+import PatchPlayground from '../../components/PatchPlayground/PatchPlayground'
 import heroBg from '../../assets/hero-bg.jpg'
-import patchFront from '../../assets/patch-front.svg'
-import patchBack from '../../assets/patch-back.svg'
 import icon3Ingredient from '../../assets/icon-3-ingredient.svg'
 import iconArrow from '../../assets/icon-arrow.svg'
 import iconPill from '../../assets/icon-pill.svg'
@@ -25,75 +24,6 @@ const reviews = [
   { id: 3, stars: 5, text: "I was skeptical at first but this actually works. No more wasted mornings after a night out. Highly recommend to anyone.", author: 'Mike', date: '6 months ago', verified: true },
 ]
 
-/* ── Scattered Patches Config (desktop decoration) ── */
-const scatteredPatches = [
-  { w: '26%', t: '5%',  l: '12%', r: -15, px: -40, py: -30, z: 10, blur: '',            face: 'back' },
-  { w: '20%', t: '10%', l: '55%', r: 12,  px: 60,  py: 40,  z: 5,  blur: 'blur-[2px]',  face: 'front' },
-  { w: '38%', t: '30%', l: '28%', r: 4,   px: 120, py: 90,  z: 20, blur: '',             face: 'front' },
-  { w: '24%', t: '65%', l: '8%',  r: -25, px: -80, py: 50,  z: 15, blur: '',             face: 'back' },
-  { w: '28%', t: '55%', l: '62%', r: 20,  px: 50,  py: -60, z: 12, blur: 'blur-[1px]',   face: 'front' },
-  { w: '16%', t: '35%', l: '82%', r: -8,  px: -30, py: -90, z: 2,  blur: 'blur-[3px]',   face: 'back' },
-  { w: '22%', t: '80%', l: '45%', r: -6,  px: 30,  py: 110, z: 8,  blur: 'blur-[2px]',   face: 'front' },
-]
-
-function FloatingPatch({ config }) {
-  const [hoverOffset, setHoverOffset] = useState({ x: 0, y: 0 })
-  const [dragRotation, setDragRotation] = useState({ x: 0, y: 0 })
-  const [isDragging, setIsDragging] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
-  const dragStart = useRef(null)
-  const rotationStart = useRef({ x: 0, y: 0 })
-
-  const handlePatchMouseMove = useCallback((e) => {
-    if (isDragging) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2
-    setHoverOffset({ x: x * config.px * 0.15, y: y * config.py * 0.15 })
-  }, [isDragging, config.px, config.py])
-
-  const handlePatchMouseLeave = useCallback(() => {
-    if (!isDragging) { setHoverOffset({ x: 0, y: 0 }); setIsHovered(false) }
-  }, [isDragging])
-
-  const handleMouseDown = useCallback((e) => {
-    e.preventDefault()
-    setIsDragging(true)
-    dragStart.current = { x: e.clientX, y: e.clientY }
-    rotationStart.current = { ...dragRotation }
-    const move = (ev) => {
-      const dx = ev.clientX - dragStart.current.x
-      const dy = ev.clientY - dragStart.current.y
-      setDragRotation({ y: rotationStart.current.y + dx * 0.8, x: rotationStart.current.x - dy * 0.8 })
-    }
-    const up = () => { setIsDragging(false); window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up) }
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseup', up)
-  }, [dragRotation])
-
-  const frontSrc = config.face === 'front' ? patchFront : patchBack
-  const backSrc = config.face === 'front' ? patchBack : patchFront
-
-  return (
-    <div
-      className="absolute cursor-grab active:cursor-grabbing select-none"
-      style={{ width: config.w, top: config.t, left: config.l, zIndex: isHovered || isDragging ? 50 : config.z, perspective: '800px' }}
-      onMouseMove={handlePatchMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handlePatchMouseLeave}
-      onMouseDown={handleMouseDown}
-    >
-      <div
-        className={`relative w-full ${isDragging ? '' : 'transition-transform duration-300'} ease-out`}
-        style={{ transformStyle: 'preserve-3d', transform: `translate(${hoverOffset.x}px, ${hoverOffset.y}px) rotate(${config.r}deg) rotateX(${dragRotation.x}deg) rotateY(${dragRotation.y}deg) ${isHovered && !isDragging ? 'scale(1.08)' : 'scale(1)'}` }}
-      >
-        <img src={frontSrc} alt="" className={`w-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.2)] ${!isHovered && !isDragging ? config.blur : ''}`} style={{ backfaceVisibility: 'hidden' }} draggable={false} />
-        <img src={backSrc} alt="" className={`absolute top-0 left-0 w-full drop-shadow-[0_15px_30px_rgba(0,0,0,0.2)] ${!isHovered && !isDragging ? config.blur : ''}`} style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }} draggable={false} />
-      </div>
-    </div>
-  )
-}
-
 function Stars({ n = 5, size = 16, color = '#44C8E8' }) {
   return (
     <div className="flex gap-0.5" aria-label={`${n} out of 5 stars`}>
@@ -106,6 +36,8 @@ function Stars({ n = 5, size = 16, color = '#44C8E8' }) {
 
 export default function Home() {
   const { addToCart } = useCart()
+  // The patch playground treats this text block as a solid obstacle
+  const patchTextRef = useRef(null)
 
   return (
     <div className="w-full bg-white" id="home-page">
@@ -140,9 +72,17 @@ export default function Home() {
       </section>
 
       {/* ═══ DESIGNED WITH TOMORROW IN MIND ═══ */}
-      <section className="bg-white py-16 lg:py-[100px] overflow-hidden">
-        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] flex flex-col lg:flex-row items-center gap-10 lg:gap-[80px]">
-          <div className="lg:flex-[0_0_45%] relative z-20 text-center lg:text-left">
+      {/* Top padding tuned so just the headline crosses the fold; tight bottom
+          so Our Shop follows closely */}
+      <section className="relative bg-white pt-6 pb-10 lg:pt-[88px] lg:pb-10 overflow-hidden">
+        {/* Physics layer spans the whole section, screen edge to screen edge.
+            The text block is passed in as a solid obstacle, so patches bounce
+            off the copy instead of ever crossing it. */}
+        <div className="absolute inset-0">
+          <PatchPlayground obstacleRef={patchTextRef} />
+        </div>
+        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-[80px]">
+          <div ref={patchTextRef} className="lg:flex-[0_0_45%] relative z-20 text-center lg:text-left">
             <h2 className="font-futura font-[900] text-[clamp(2rem,6vw,3rem)] leading-[1.1] text-pulsar-pink uppercase mb-5">Designed with tomorrow in mind.</h2>
             <p className="font-futura font-[700] text-[clamp(1rem,2.5vw,1.15rem)] leading-[1.5] text-pulsar-blue mb-7 max-w-[440px] mx-auto lg:mx-0">
               Taking care of tomorrow shouldn't mean changing tonight. Even when life doesn't behave.
@@ -151,9 +91,8 @@ export default function Home() {
               Read our story <span className="transition-transform duration-150 group-hover:translate-x-1">→</span>
             </Link>
           </div>
-          <div className="w-full lg:flex-1 relative z-10 h-[320px] sm:h-[440px] lg:h-[600px]">
-            {scatteredPatches.map((patch, i) => <FloatingPatch key={i} config={patch} />)}
-          </div>
+          {/* Spacer keeps the section tall enough for the patches to roam */}
+          <div className="w-full lg:flex-1 h-[320px] sm:h-[400px] lg:h-[440px]" aria-hidden="true" />
         </div>
       </section>
 
