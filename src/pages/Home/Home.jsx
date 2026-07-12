@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
 import CurvedFeature from '../../components/CurvedFeature/CurvedFeature'
 import PatchPlayground from '../../components/PatchPlayground/PatchPlayground'
+import DiscountPopup from '../../components/DiscountPopup/DiscountPopup'
 import heroBg from '../../assets/hero-bg.jpg'
 import icon3Ingredient from '../../assets/icon-3-ingredient.svg'
 import iconArrow from '../../assets/icon-arrow.svg'
@@ -41,6 +42,9 @@ export default function Home() {
 
   return (
     <div className="w-full bg-white" id="home-page">
+
+      {/* First-visit 15%-off email capture */}
+      <DiscountPopup />
 
       {/* ═══ HERO ═══ */}
       <section
