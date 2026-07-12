@@ -93,6 +93,12 @@ async function storefront(query, variables) {
   return json.data
 }
 
+// Shared runner so other modules (e.g. customer auth) can hit the same
+// Storefront endpoint without duplicating fetch/error handling.
+export function storefrontQuery(query, variables) {
+  return storefront(query, variables)
+}
+
 // One query handles both cases: a node can be a ProductVariant (use it as-is)
 // or a Product (use its first variant). nodes() accepts a mix of GID types.
 const CATALOG_QUERY = `

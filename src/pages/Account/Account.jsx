@@ -51,17 +51,26 @@ const businessDemo = {
 }
 
 export default function Account() {
-  const { user, updateUser, logout, isLoggedIn, login } = useAuth()
+  const { user, logout, isLoggedIn, authLoading } = useAuth()
+
+  /* ═══ Verifying a saved Shopify session ═══ */
+  if (authLoading) {
+    return (
+      <div className="min-h-[70vh] bg-white flex items-center justify-center" aria-label="Loading" role="status">
+        <span className="w-9 h-9 rounded-full border-[3px] border-pulsar-light-blue border-t-pulsar-blue animate-spin" />
+      </div>
+    )
+  }
 
   /* ═══ Logged-out: auth flow ═══ */
   if (!isLoggedIn) {
-    return <AuthGate login={login} />
+    return <AuthGate />
   }
 
   /* ═══ Logged-in ═══ */
   return user.accountType === 'business'
     ? <BusinessDashboard user={user} logout={logout} />
-    : <PersonalDashboard user={user} updateUser={updateUser} logout={logout} />
+    : <PersonalDashboard user={user} logout={logout} />
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -70,7 +79,8 @@ export default function Account() {
 
 const DEMO_PASSWORD = 'admin'
 
-function AuthGate({ login }) {
+function AuthGate() {
+  const { signIn, signUp, recover, login, shopifyEnabled } = useAuth()
   const [view, setView] = useState('signin') // signin | signup | forgot | sent
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -78,35 +88,63 @@ function AuthGate({ login }) {
   const [company, setCompany] = useState('')
   const [signupType, setSignupType] = useState('personal') // personal | business
   const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
 
   function reset() { setError(''); setPassword('') }
   function go(next) { reset(); setView(next) }
 
-  function handleSignIn(e) {
-    e.preventDefault()
-    if (!isEmail(email)) { setError('Enter a valid email address.'); return }
-    if (password !== DEMO_PASSWORD) { setError('Wrong password. This demo uses "admin".'); return }
-    // A real sign-in would look the account type up server-side. For the demo,
-    // any email + the demo password lands in the personal dashboard.
-    login({ ...personalDemo, email })
+  function splitName(full) {
+    const parts = full.trim().split(/\s+/)
+    return { firstName: parts.shift() || '', lastName: parts.join(' ') }
   }
 
-  function handleSignUp(e) {
+  async function handleSignIn(e) {
+    e.preventDefault()
+    if (!isEmail(email)) { setError('Enter a valid email address.'); return }
+    if (!password) { setError('Enter your password.'); return }
+    if (!shopifyEnabled) {
+      // Demo mode (no Shopify): any email + the demo password lands in personal.
+      if (password !== DEMO_PASSWORD) { setError('Wrong password. This demo uses "admin".'); return }
+      login({ ...personalDemo, email }); return
+    }
+    setBusy(true)
+    const res = await signIn(email, password)
+    setBusy(false)
+    if (!res.ok) setError(res.error)
+  }
+
+  async function handleSignUp(e) {
     e.preventDefault()
     if (!name.trim()) { setError('Tell us your name.'); return }
     if (signupType === 'business' && !company.trim()) { setError('Add your business name.'); return }
     if (!isEmail(email)) { setError('Enter a valid email address.'); return }
     if (password.length < 6) { setError('Passwords need at least 6 characters.'); return }
-    if (signupType === 'business') {
-      login({ accountType: 'business', name, company, email, rep: businessDemo.rep, wholesaleOrders: [], invoices: [], locations: [] })
-    } else {
-      login({ accountType: 'personal', name, email })
+    if (!shopifyEnabled) {
+      if (signupType === 'business') {
+        login({ accountType: 'business', name, company, email, rep: businessDemo.rep, wholesaleOrders: [], invoices: [], locations: [] })
+      } else {
+        login({ accountType: 'personal', name, email })
+      }
+      return
     }
+    // Real Shopify signup. Tags (personal/business) are managed store-side; a
+    // new account is a standard customer until you tag it wholesale in Shopify.
+    setBusy(true)
+    const { firstName, lastName } = splitName(name)
+    const res = await signUp({ email, password, firstName, lastName })
+    setBusy(false)
+    if (!res.ok) setError(res.error)
   }
 
-  function handleForgot(e) {
+  async function handleForgot(e) {
     e.preventDefault()
     if (!isEmail(email)) { setError('Enter a valid email address.'); return }
+    if (shopifyEnabled) {
+      setBusy(true)
+      const res = await recover(email)
+      setBusy(false)
+      if (!res.ok) { setError(res.error); return }
+    }
     setError('')
     setView('sent')
   }
@@ -129,8 +167,8 @@ function AuthGate({ login }) {
                 Forgot your password?
               </button>
               {error && <p className="font-inter text-[12px] text-red-400" role="alert">{error}</p>}
-              <button type="submit" className="w-full bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark">
-                Sign In
+              <button type="submit" disabled={busy} className="w-full bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60 disabled:hover:translate-y-0">
+                {busy ? 'Signing in…' : 'Sign In'}
               </button>
             </form>
             <p className="font-inter text-[13px] text-gray-500 text-center mt-6">
@@ -166,8 +204,8 @@ function AuthGate({ login }) {
               <Field label="Email" type="email" value={email} onChange={(v) => { setEmail(v); setError('') }} placeholder="you@email.com" autoComplete="email" />
               <Field label="Password" type="password" value={password} onChange={(v) => { setPassword(v); setError('') }} placeholder="At least 6 characters" autoComplete="new-password" />
               {error && <p className="font-inter text-[12px] text-red-400" role="alert">{error}</p>}
-              <button type="submit" className="w-full bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark">
-                Create Account
+              <button type="submit" disabled={busy} className="w-full bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60 disabled:hover:translate-y-0">
+                {busy ? 'Creating…' : 'Create Account'}
               </button>
             </form>
             {signupType === 'business' && (
@@ -190,8 +228,8 @@ function AuthGate({ login }) {
             <form onSubmit={handleForgot} className="flex flex-col gap-4" noValidate>
               <Field label="Email" type="email" value={email} onChange={(v) => { setEmail(v); setError('') }} placeholder="you@email.com" autoComplete="email" />
               {error && <p className="font-inter text-[12px] text-red-400" role="alert">{error}</p>}
-              <button type="submit" className="w-full bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark">
-                Send Reset Link
+              <button type="submit" disabled={busy} className="w-full bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60 disabled:hover:translate-y-0">
+                {busy ? 'Sending…' : 'Send Reset Link'}
               </button>
             </form>
             <p className="font-inter text-[13px] text-gray-500 text-center mt-6">
@@ -214,19 +252,21 @@ function AuthGate({ login }) {
           </>
         )}
 
-        {/* ── Demo previews: jump straight into either dashboard ── */}
-        <div className="mt-10 pt-6 border-t border-dashed border-gray-200">
-          <p className="font-futura font-bold text-[11px] uppercase tracking-widest text-gray-400 text-center mb-4">Preview (demo)</p>
-          <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => login(personalDemo)} className="font-futura font-bold text-[12px] uppercase tracking-wide text-pulsar-blue border-2 border-pulsar-blue/30 rounded-full py-3 transition-all hover:bg-pulsar-blue hover:text-white">
-              Personal
-            </button>
-            <button onClick={() => login(businessDemo)} className="font-futura font-bold text-[12px] uppercase tracking-wide text-pulsar-pink border-2 border-pulsar-pink/30 rounded-full py-3 transition-all hover:bg-pulsar-pink hover:text-white">
-              Business
-            </button>
+        {/* ── Demo previews (only when Shopify is not connected) ── */}
+        {!shopifyEnabled && (
+          <div className="mt-10 pt-6 border-t border-dashed border-gray-200">
+            <p className="font-futura font-bold text-[11px] uppercase tracking-widest text-gray-400 text-center mb-4">Preview (demo)</p>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => login(personalDemo)} className="font-futura font-bold text-[12px] uppercase tracking-wide text-pulsar-blue border-2 border-pulsar-blue/30 rounded-full py-3 transition-all hover:bg-pulsar-blue hover:text-white">
+                Personal
+              </button>
+              <button onClick={() => login(businessDemo)} className="font-futura font-bold text-[12px] uppercase tracking-wide text-pulsar-pink border-2 border-pulsar-pink/30 rounded-full py-3 transition-all hover:bg-pulsar-pink hover:text-white">
+                Business
+              </button>
+            </div>
+            <p className="font-inter text-[11px] text-gray-400 text-center mt-3">Or sign in with any email and password <span className="font-[600]">admin</span>.</p>
           </div>
-          <p className="font-inter text-[11px] text-gray-400 text-center mt-3">Or sign in with any email and password <span className="font-[600]">admin</span>.</p>
-        </div>
+        )}
       </div>
     </div>
   )
@@ -502,33 +542,49 @@ function Row({ k, v }) {
    PERSONAL DASHBOARD
    ════════════════════════════════════════════════════════════════════════ */
 
-function PersonalDashboard({ user, updateUser, logout }) {
+function PersonalDashboard({ user, logout }) {
+  const { updateUser, saveProfile, addAddress, removeAddress } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
 
   const [profileSaved, setProfileSaved] = useState(false)
-  function handleSaveProfile() {
-    setProfileSaved(true)
-    setTimeout(() => setProfileSaved(false), 2000)
+  const [profileError, setProfileError] = useState('')
+  const [profileBusy, setProfileBusy] = useState(false)
+  async function handleSaveProfile() {
+    setProfileBusy(true)
+    setProfileError('')
+    const parts = (user.name || '').trim().split(/\s+/)
+    const firstName = parts.shift() || ''
+    const lastName = parts.join(' ')
+    const res = await saveProfile({ firstName, lastName, phone: user.phone, email: user.email })
+    setProfileBusy(false)
+    if (res.ok) {
+      setProfileSaved(true)
+      setTimeout(() => setProfileSaved(false), 2000)
+    } else {
+      setProfileError(res.error)
+    }
   }
 
   const emptyAddr = { label: '', street: '', city: '', state: '', zip: '' }
   const [showAddrForm, setShowAddrForm] = useState(false)
   const [addrForm, setAddrForm] = useState(emptyAddr)
   const [addrError, setAddrError] = useState('')
-  function handleAddAddress() {
+  const [addrBusy, setAddrBusy] = useState(false)
+  async function handleAddAddress() {
     if (!addrForm.label || !addrForm.street || !addrForm.city || !addrForm.state || !addrForm.zip) {
       setAddrError('Fill in all fields to save this address.')
       return
     }
-    const list = user.addresses || []
-    const newAddr = { ...addrForm, id: Date.now(), isDefault: list.length === 0 }
-    updateUser({ addresses: [...list, newAddr] })
+    setAddrBusy(true)
+    const res = await addAddress(addrForm, (user.addresses || []).length === 0)
+    setAddrBusy(false)
+    if (!res.ok) { setAddrError(res.error); return }
     setAddrForm(emptyAddr)
     setAddrError('')
     setShowAddrForm(false)
   }
   function handleRemoveAddress(id) {
-    updateUser({ addresses: (user.addresses || []).filter((a) => a.id !== id) })
+    removeAddress(id)
   }
 
   const [subMsg, setSubMsg] = useState('')
@@ -599,10 +655,11 @@ function PersonalDashboard({ user, updateUser, logout }) {
               <input type="tel" value={user.phone} onChange={(e) => updateUser({ phone: e.target.value })} className="w-full bg-gray-100 rounded-[8px] px-4 py-3 font-inter text-[14px] text-gray-800 outline-none focus:ring-2 focus:ring-pulsar-blue/30" />
             </div>
             <div className="flex items-center gap-4 mt-4">
-              <button onClick={handleSaveProfile} className="self-start bg-pulsar-pink text-white font-futura font-bold text-[12px] uppercase tracking-widest px-8 py-3 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark">
-                Save Changes
+              <button onClick={handleSaveProfile} disabled={profileBusy} className="self-start bg-pulsar-pink text-white font-futura font-bold text-[12px] uppercase tracking-widest px-8 py-3 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60 disabled:hover:translate-y-0">
+                {profileBusy ? 'Saving…' : 'Save Changes'}
               </button>
               {profileSaved && <span className="font-inter font-[600] text-[14px] text-green-500">Saved!</span>}
+              {profileError && <span className="font-inter font-[600] text-[14px] text-red-400">{profileError}</span>}
             </div>
           </div>
         </div>
@@ -722,8 +779,8 @@ function PersonalDashboard({ user, updateUser, logout }) {
               </div>
               {addrError && <p className="font-inter text-[13px] text-red-400">{addrError}</p>}
               <div className="flex flex-wrap gap-3">
-                <button onClick={handleAddAddress} className="bg-pulsar-pink text-white font-futura font-bold text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark">
-                  Save Address
+                <button onClick={handleAddAddress} disabled={addrBusy} className="bg-pulsar-pink text-white font-futura font-bold text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60 disabled:hover:translate-y-0">
+                  {addrBusy ? 'Saving…' : 'Save Address'}
                 </button>
                 <button onClick={() => { setShowAddrForm(false); setAddrForm(emptyAddr); setAddrError('') }} className="border-2 border-gray-300 text-gray-500 font-futura font-bold text-[11px] uppercase tracking-widest px-6 py-2.5 rounded-full transition-all hover:-translate-y-0.5 hover:border-gray-400">
                   Cancel
@@ -827,15 +884,21 @@ function SettingsPanel({ user, logout }) {
 
 /* Shared password-change panel (personal + business) */
 function PasswordPanel() {
+  const { changePassword } = useAuth()
   const [pw, setPw] = useState({ current: '', next: '', confirm: '' })
   const [pwError, setPwError] = useState('')
   const [pwSuccess, setPwSuccess] = useState(false)
-  function handleUpdatePassword() {
+  const [pwBusy, setPwBusy] = useState(false)
+  async function handleUpdatePassword() {
     setPwSuccess(false)
     if (!pw.current) { setPwError('Enter your current password.'); return }
     if (pw.next.length < 6) { setPwError('Your new password needs at least 6 characters.'); return }
     if (pw.next !== pw.confirm) { setPwError("Those two passwords don't match."); return }
     setPwError('')
+    setPwBusy(true)
+    const res = await changePassword(pw.next)
+    setPwBusy(false)
+    if (!res.ok) { setPwError(res.error); return }
     setPw({ current: '', next: '', confirm: '' })
     setPwSuccess(true)
     setTimeout(() => setPwSuccess(false), 2500)
@@ -858,8 +921,8 @@ function PasswordPanel() {
         </div>
         {pwError && <p className="font-inter text-[13px] text-red-400">{pwError}</p>}
         <div className="flex items-center gap-4 mt-4">
-          <button onClick={handleUpdatePassword} className="self-start bg-pulsar-pink text-white font-futura font-bold text-[12px] uppercase tracking-widest px-8 py-3 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark">
-            Update Password
+          <button onClick={handleUpdatePassword} disabled={pwBusy} className="self-start bg-pulsar-pink text-white font-futura font-bold text-[12px] uppercase tracking-widest px-8 py-3 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60 disabled:hover:translate-y-0">
+            {pwBusy ? 'Updating…' : 'Update Password'}
           </button>
           {pwSuccess && <span className="font-inter font-[600] text-[14px] text-green-500">Password updated</span>}
         </div>
