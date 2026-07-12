@@ -164,8 +164,27 @@ export default function Product() {
                     <p className="font-inter text-[8px] leading-[1.3]">* Percent Daily Values are based on a 2,000 calorie diet.</p>
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-futura font-[800] text-white text-[14px] mb-2 uppercase border-b border-white/50 pb-2">Ingredients</h4>
-                    <p className="font-inter font-[500] text-white text-[13px] leading-[1.7]">Glutathione, N-acetylcysteine (NAC), Vitamin B complex, Ginger extract, water-based adhesive.</p>
+                    <h4 className="font-futura font-[800] text-white text-[14px] mb-3 uppercase border-b border-white/50 pb-2">
+                      Active Ingredients <span className="font-[500] normal-case text-white/75 text-[12px]">per patch</span>
+                    </h4>
+                    <ul className="flex flex-col mb-4">
+                      {[
+                        ['Vitamin B1 (Thiamine)', '1.5 mg'],
+                        ['Vitamin B3 (Niacin)', '2 mg'],
+                        ['Vitamin B9 (Folate)', '0.5 mg'],
+                        ['Glutathione', '0.019 mg'],
+                        ['NAC (N-Acetylcysteine)', '0.009 mg'],
+                        ['Ginger Extract', '3 mg'],
+                      ].map(([name, amt]) => (
+                        <li key={name} className="flex items-baseline justify-between gap-3 border-b border-white/20 py-1.5">
+                          <span className="font-inter text-white text-[13px]">{name}</span>
+                          <span className="font-futura font-bold text-white text-[13px] whitespace-nowrap">{amt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="font-inter text-white/85 text-[12px] leading-[1.6]">
+                      <strong className="font-[700]">Total actives:</strong> 7.03 mg per patch. Other: water-based acrylic adhesive on a clear polyethylene film.
+                    </p>
                   </div>
                 </div>
               )}
