@@ -17,14 +17,14 @@ const ReviewsContext = createContext()
 const STORAGE_KEY = 'pulsar-reviews-v1'
 
 // ── localStorage seeds (fallback mode only) ──────────────────────────────
+// The real reviews carried over from the old Pulsar site. No titles (these are
+// Google-style reviews) and all verified buyers.
 const SEED_LIVE = [
-  { id: 1, stars: 5, title: 'IT REALLY WORKS!', text: "I've tried a bunch of patches and honestly didn't think a patch could do much for a hangover. But at least once a week I'm out having fun, and I feel so much better the next morning. No headache, no nausea. I cannot recommend this enough.", author: 'GABRIELA', date: '4 MONTHS AGO', verified: true, status: 'live' },
-  { id: 2, stars: 5, title: 'INTERESTING, IT WORKS', text: "I bought this for a concert and put it on right before we started drinking. Woke up the next day with no headache! The patch is so unnoticeable you forget it's even on. Highly recommend.", author: 'JORDAN M.', date: '7 MONTHS AGO', verified: true, status: 'live' },
-  { id: 3, stars: 5, title: 'LOVE IT', text: 'Love it! Easy to use and very effective!', author: 'ADAM', date: '1 YEAR AGO', verified: true, status: 'live' },
-  { id: 4, stars: 4, title: 'REALLY GOOD PRODUCT', text: "Really good product. Takes about 30 min to kick in but once it does, you're golden. Will definitely order again.", author: 'JESSICA', date: '5 MONTHS AGO', verified: true, status: 'live' },
-  { id: 5, stars: 5, title: 'BACHELOR PARTY HERO', text: "Bought this for my bachelor party and every single person was amazed the next day. We felt great!", author: 'CHRIS', date: '4 MONTHS AGO', verified: true, status: 'live' },
-  { id: 6, stars: 5, title: 'LIFESAVER', text: "As someone who gets terrible hangovers, this has been a lifesaver. Only three ingredients too, love the simplicity.", author: 'EMMA', date: '3 MONTHS AGO', verified: true, status: 'live' },
-  { id: 7, stars: 3, title: 'DECENT', text: "It helped a bit but I still felt a little rough. Maybe I needed to apply it earlier. Will try again.", author: 'JAKE', date: '2 MONTHS AGO', verified: true, status: 'live' },
+  { id: 1, stars: 5, text: "These have become a staple amongst my fellow parents at hockey tournaments (we're all in the same hotel and don't have to drive anywhere, so...). It works every time for everyone who uses it!", author: 'SEAN', date: '5 MONTHS AGO', verified: true, status: 'live' },
+  { id: 2, stars: 5, text: "I've tried multiple patches and never really understood the whole hangover-cure thing from just a patch. But as soon as I tried Pulsar Patch, I kid you not, I felt completely normal the next day. I was not expecting that feeling, especially with the amount of alcohol I intake.", author: 'GABRIELLA', date: '10 MONTHS AGO', verified: true, status: 'live' },
+  { id: 3, stars: 5, text: "The patch worked great! Slapped it on right before we started drinking and woke up feeling good the next day with no headache or hangover. I usually wake up with a massive headache and this time I didn't. I had tried some anti-hangover drinks before and to start off, they taste nasty, left a nasty taste in my mouth and didn't work. The patch is very unnoticeable and you forget it's even on. I highly recommend you try it.", author: 'CHRIS M.', date: '1 YEAR AGO', verified: true, status: 'live' },
+  { id: 4, stars: 5, text: 'Love it! Easy to use and very effective!', author: 'ADAM', date: '1 YEAR AGO', verified: true, status: 'live' },
+  { id: 5, stars: 5, text: 'Very easily accessible and looks nice as well, can tell there was effort put into this.', author: 'SAMUEL', date: '1 YEAR AGO', verified: true, status: 'live' },
 ]
 const SEED_PENDING = [
   { id: 'seed-bad-1', stars: 1, title: 'PATCH DID NOTHING FOR ME', text: 'Total waste of money. Put one on before a wedding and still woke up feeling awful. Nothing changed. Would not buy again.', author: 'MARCUS T.', email: 'marcus.t@example.com', phone: '(480) 555-0173', orderNumber: '#PUL-3092', date: 'JUST NOW', submittedAt: 'Just now', verified: true, status: 'pending', held: false },
@@ -36,6 +36,20 @@ function loadLocal() {
     if (raw) return JSON.parse(raw)
   } catch { /* ignore */ }
   return [...SEED_PENDING, ...SEED_LIVE]
+}
+
+// Coarse "5 MONTHS AGO" label from a timestamp, for the public review cards.
+function relativeDate(input) {
+  if (!input) return 'JUST NOW'
+  const then = new Date(input).getTime()
+  if (Number.isNaN(then)) return 'JUST NOW'
+  const days = Math.floor((Date.now() - then) / 86400000)
+  if (days < 1) return 'JUST NOW'
+  if (days < 30) return `${days} DAY${days === 1 ? '' : 'S'} AGO`
+  const months = Math.floor(days / 30)
+  if (months < 12) return `${months} MONTH${months === 1 ? '' : 'S'} AGO`
+  const years = Math.floor(months / 12)
+  return `${years} YEAR${years === 1 ? '' : 'S'} AGO`
 }
 
 // ── DB row <-> app shape mapping ─────────────────────────────────────────
@@ -54,8 +68,8 @@ function fromRow(r) {
     status: r.status,
     held: r.held,
     submittedAt: r.created_at ? new Date(r.created_at).toLocaleString() : 'Just now',
-    date: 'JUST NOW',
-    verified: false,
+    date: relativeDate(r.created_at),
+    verified: r.verified ?? true,
   }
 }
 function toRow(review) {

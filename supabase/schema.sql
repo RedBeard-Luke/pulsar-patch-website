@@ -15,13 +15,15 @@ create table if not exists public.reviews (
   order_number text,
   did_it_work  int  check (did_it_work between 1 and 10),
   recommend    int  check (recommend between 1 and 10),
+  verified     boolean not null default true,
   status       text not null default 'pending' check (status in ('pending','live','denied')),
   held         boolean not null default false
 );
 
--- For a table that already exists (adds the two 1-10 score columns safely).
+-- For a table that already exists (adds newer columns safely).
 alter table public.reviews add column if not exists did_it_work int check (did_it_work between 1 and 10);
 alter table public.reviews add column if not exists recommend   int check (recommend   between 1 and 10);
+alter table public.reviews add column if not exists verified    boolean not null default true;
 
 -- Fast lookups for the public list and the admin queue
 create index if not exists reviews_status_created_idx
@@ -63,15 +65,13 @@ create policy "admins update reviews"
   using      ((auth.jwt() ->> 'email') in ('lclark0684@gmail.com','pulsarpatch@gmail.com'))
   with check ((auth.jwt() ->> 'email') in ('lclark0684@gmail.com','pulsarpatch@gmail.com'));
 
--- ── Seed the current live reviews (only if the table is empty) ────────────
-insert into public.reviews (stars, title, text, author, status)
+-- ── Seed the real reviews (only if the table is empty) ────────────────────
+insert into public.reviews (stars, text, author, status, verified, created_at)
 select * from (values
-  (5, 'IT REALLY WORKS!', 'I''ve tried a bunch of patches and honestly didn''t think a patch could do much for a hangover. But at least once a week I''m out having fun, and I feel so much better the next morning. No headache, no nausea. I cannot recommend this enough.', 'GABRIELA', 'live'),
-  (5, 'INTERESTING, IT WORKS', 'I bought this for a concert and put it on right before we started drinking. Woke up the next day with no headache or hangover! The patch is so unnoticeable you forget it''s even on. Highly recommend.', 'JORDAN M.', 'live'),
-  (5, 'LOVE IT', 'Love it! Easy to use and very effective!', 'ADAM', 'live'),
-  (4, 'REALLY GOOD PRODUCT', 'Really good product. Takes about 30 min to kick in but once it does, you''re golden. Will definitely order again.', 'JESSICA', 'live'),
-  (5, 'BACHELOR PARTY HERO', 'Bought this for my bachelor party and every single person was amazed the next day. We felt great!', 'CHRIS', 'live'),
-  (5, 'LIFESAVER', 'As someone who gets terrible hangovers, this has been a lifesaver. Only three ingredients too, love the simplicity.', 'EMMA', 'live'),
-  (3, 'DECENT', 'It helped a bit but I still felt a little rough. Maybe I needed to apply it earlier. Will try again.', 'JAKE', 'live')
-) as seed(stars, title, text, author, status)
+  (5, 'These have become a staple amongst my fellow parents at hockey tournaments (we''re all in the same hotel and don''t have to drive anywhere, so...). It works every time for everyone who uses it!', 'SEAN', 'live', true, timestamptz '2026-02-12'),
+  (5, 'I''ve tried multiple patches and never really understood the whole hangover-cure thing from just a patch. But as soon as I tried Pulsar Patch, I kid you not, I felt completely normal the next day. I was not expecting that feeling, especially with the amount of alcohol I intake.', 'GABRIELLA', 'live', true, timestamptz '2025-09-12'),
+  (5, 'The patch worked great! Slapped it on right before we started drinking and woke up feeling good the next day with no headache or hangover. I usually wake up with a massive headache and this time I didn''t. I had tried some anti-hangover drinks before and to start off, they taste nasty, left a nasty taste in my mouth and didn''t work. The patch is very unnoticeable and you forget it''s even on. I highly recommend you try it.', 'CHRIS M.', 'live', true, timestamptz '2025-07-12'),
+  (5, 'Love it! Easy to use and very effective!', 'ADAM', 'live', true, timestamptz '2025-07-10'),
+  (5, 'Very easily accessible and looks nice as well, can tell there was effort put into this.', 'SAMUEL', 'live', true, timestamptz '2025-07-08')
+) as seed(stars, text, author, status, verified, created_at)
 where not exists (select 1 from public.reviews);
