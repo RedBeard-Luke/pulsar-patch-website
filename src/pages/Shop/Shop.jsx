@@ -24,7 +24,7 @@ const perks = [
 ]
 
 export default function Shop() {
-  const { addToCart } = useCart()
+  const { addToCart, getProduct } = useCart()
 
   return (
     <div className="w-full bg-white flex flex-col" id="shop-page">
@@ -36,7 +36,12 @@ export default function Shop() {
           <p className="font-inter text-[15px] text-gray-500 mb-10 text-center max-w-[460px]">Buy more, save more. Every pack is the same formula, just stocked up for more nights.</p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 lg:gap-8 w-full">
-            {products.map((product) => {
+            {products.map((base) => {
+              // Live Shopify price overrides the placeholder when available.
+              const live = getProduct(base.cartId)
+              const product = live
+                ? { ...base, price: live.price, originalPrice: live.originalPrice }
+                : base
               const save = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0
               return (
                 <div key={product.id} className="flex flex-col text-center group">

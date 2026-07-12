@@ -1,7 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
+import { fetchLivePrices } from '../lib/shopify'
 
-/* ── Product catalog (single source of truth for all prices) ── */
+/* Format a number as a display price, e.g. 6 → "$6.00". */
+export function formatPrice(amount) {
+  return `$${Number(amount || 0).toFixed(2)}`
+}
+
+/* ── Product catalog: these prices are PLACEHOLDER fallbacks. When Shopify is
+   configured, live prices are fetched on load and override these, so the site
+   always shows what checkout actually charges. ── */
 export const PRODUCTS = [
   { id: 'single',    name: 'Single Patch',        price: 6.00,  originalPrice: null,  subscription: false, patches: 1 },
   { id: '3pack',     name: '3 Patch Bundle',      price: 15.80, originalPrice: 18.00, subscription: false, patches: 3 },
@@ -38,6 +46,8 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState(loadCart)
   // last product added — lets UI show a "just added" confirmation
   const [lastAdded, setLastAdded] = useState(null)
+  // live prices pulled from Shopify (keyed by catalog id); empty until loaded
+  const [livePrices, setLivePrices] = useState({})
 
   // Persist cart to localStorage whenever it changes
   useEffect(() => {
@@ -48,7 +58,23 @@ export function CartProvider({ children }) {
     }
   }, [items])
 
-  const getProduct = useCallback((productId) => PRODUCTS.find(p => p.id === productId), [])
+  // On load, pull live prices from Shopify. Falls back silently to placeholders.
+  useEffect(() => {
+    let cancelled = false
+    fetchLivePrices().then(prices => {
+      if (!cancelled && prices && Object.keys(prices).length) setLivePrices(prices)
+    })
+    return () => { cancelled = true }
+  }, [])
+
+  // Merge live prices over the placeholder catalog. This is what the whole app reads.
+  const catalog = useMemo(() => PRODUCTS.map(p => {
+    const live = livePrices[p.id]
+    if (!live) return p
+    return { ...p, price: live.price, originalPrice: live.originalPrice, currency: live.currency }
+  }), [livePrices])
+
+  const getProduct = useCallback((productId) => catalog.find(p => p.id === productId), [catalog])
 
   const addToCart = useCallback((productId, qty = 1) => {
     if (!PRODUCTS.some(p => p.id === productId)) return
@@ -126,7 +152,8 @@ export function CartProvider({ children }) {
       totalPrice: subtotal, // backwards-compatible alias
       totalSavings,
       lastAdded,
-      PRODUCTS,
+      PRODUCTS: catalog,
+      pricesLive: Object.keys(livePrices).length > 0,
     }}>
       {children}
     </CartContext.Provider>

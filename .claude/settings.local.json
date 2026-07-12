@@ -18,7 +18,8 @@
       "Read(//opt/homebrew/bin/**)",
       "Read(//usr/local/bin/**)",
       "Bash(/usr/local/bin/gh auth:*)",
-      "Bash(/usr/local/bin/gh repo:*)"
+      "Bash(/usr/local/bin/gh repo:*)",
+      "Bash(npx eslint *)"
     ]
   }
 }

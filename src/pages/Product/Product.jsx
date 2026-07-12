@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useCart, PRODUCTS as CATALOG } from '../../context/CartContext'
+import { useCart } from '../../context/CartContext'
 import WaveDivider from '../../components/WaveDivider/WaveDivider'
 import iconLeaf from '../../assets/Leaf_icon.svg'
 import iconShield from '../../assets/Sheild_Icon.svg'
@@ -35,7 +35,7 @@ const faqsFor = (count) => ([
 
 export default function Product() {
   const { id } = useParams()
-  const { addToCart } = useCart()
+  const { addToCart, getProduct } = useCart()
   const [activeTab, setActiveTab] = useState('overview')
   const [activeFaq, setActiveFaq] = useState(null)
   const [qty, setQty] = useState(1)
@@ -46,7 +46,7 @@ export default function Product() {
   const [reviewDone, setReviewDone] = useState(false)
 
   const cartId = PRODUCT_MAP[id]
-  const product = cartId ? CATALOG.find(p => p.id === cartId) : null
+  const product = cartId ? getProduct(cartId) : null
 
   /* ── Product not found ── */
   if (!product) {

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { useCart } from '../../context/CartContext'
+import { useCart, formatPrice } from '../../context/CartContext'
 import CurvedFeature from '../../components/CurvedFeature/CurvedFeature'
 import PatchPlayground from '../../components/PatchPlayground/PatchPlayground'
 import DiscountPopup from '../../components/DiscountPopup/DiscountPopup'
@@ -36,7 +36,7 @@ function Stars({ n = 5, size = 16, color = '#44C8E8' }) {
 }
 
 export default function Home() {
-  const { addToCart } = useCart()
+  const { addToCart, getProduct } = useCart()
   // The patch playground treats this text block as a solid obstacle
   const patchTextRef = useRef(null)
 
@@ -105,7 +105,14 @@ export default function Home() {
         <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <h2 className="font-futura font-[900] text-[clamp(1.6rem,5vw,2.25rem)] text-pulsar-pink uppercase mb-8">Our Shop</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 lg:gap-10 mb-10">
-            {products.map((product) => (
+            {products.map((product) => {
+              // Live Shopify price overrides the placeholder strings when available.
+              const live = getProduct(product.cartId)
+              const priceText = live ? formatPrice(live.price) : product.price
+              const originalText = live
+                ? (live.originalPrice ? formatPrice(live.originalPrice) : null)
+                : product.originalPrice
+              return (
               <div key={product.id} className="flex flex-col rounded-[20px] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.15)]">
                 <Link to={`/product/${product.id}`} className="h-[220px] lg:h-[260px] bg-pulsar-light-blue-bg w-full flex items-center justify-center" aria-label={`View ${product.tagline}`}>
                   <span className="font-futura font-[900] text-pulsar-blue/30 text-[18px]">PULSAR</span>
@@ -113,15 +120,16 @@ export default function Home() {
                 <div className="bg-pulsar-blue p-6 text-white flex-1 flex flex-col items-start">
                   <p className="font-futura font-[800] text-[18px] leading-[1.2] uppercase mb-1">{product.tagline}</p>
                   <p className="font-futura font-[700] text-[16px] mb-4 flex items-center gap-2">
-                    {product.price}
-                    {product.originalPrice && <span className="line-through opacity-70 text-[14px]">{product.originalPrice}</span>}
+                    {priceText}
+                    {originalText && <span className="line-through opacity-70 text-[14px]">{originalText}</span>}
                   </p>
                   <button onClick={() => addToCart(product.cartId)} className="inline-block px-6 py-2.5 mt-auto bg-white text-pulsar-pink font-futura font-bold text-[12px] uppercase rounded-full transition-colors duration-300 hover:bg-pulsar-pink hover:text-white">
                     Add to cart
                   </button>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
           <div className="flex justify-center">
             <Link to="/shop" className="inline-flex items-center gap-3 bg-pulsar-blue text-white font-futura font-bold text-[15px] uppercase px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-pulsar-blue-dark hover:-translate-y-0.5 group">

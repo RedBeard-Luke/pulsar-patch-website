@@ -1,4 +1,4 @@
-import { useCart } from '../../context/CartContext'
+import { useCart, formatPrice } from '../../context/CartContext'
 import CurvedFeature from '../../components/CurvedFeature/CurvedFeature'
 import subHeroBg from '../../assets/subscription-hero.jpg'
 import cheersIcon from '../../assets/Cheers_icon.svg'
@@ -52,7 +52,7 @@ const benefits = [
 ]
 
 export default function Subscription() {
-  const { addToCart } = useCart()
+  const { addToCart, getProduct } = useCart()
   return (
     <div className="w-full bg-white flex flex-col" id="subscription-page">
 
@@ -121,7 +121,7 @@ export default function Subscription() {
                   {tier.patches} PATCHES
                 </p>
                 <p className="font-inter font-[600] text-[14px] text-gray-800 mb-6">
-                  {tier.price}
+                  {getProduct(tier.id) ? formatPrice(getProduct(tier.id).price) : tier.price}
                 </p>
 
                 <button
