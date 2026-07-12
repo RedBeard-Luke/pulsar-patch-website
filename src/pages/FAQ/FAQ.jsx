@@ -75,7 +75,7 @@ export default function FAQ() {
             FAQS
           </h1>
         </div>
-        <div className="absolute bottom-0 left-0 w-full leading-none z-10">
+        <div className="absolute -bottom-px left-0 w-full leading-none z-10">
           <svg className="block w-full h-[40px] sm:h-[70px] lg:h-[120px]" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 80 Q 120 0, 240 80 T 480 80 T 720 80 T 960 80 T 1200 80 T 1440 80 L 1440 120 L 0 120 Z" fill="white" />
           </svg>

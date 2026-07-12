@@ -163,10 +163,10 @@ function CategoryCarousel({ category, items, onSeeAll }) {
         <div
           ref={scrollerRef}
           onScroll={handleScroll}
-          className="flex gap-5 sm:gap-8 overflow-x-auto snap-x snap-mandatory pb-2 px-[10%] sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex gap-5 sm:gap-8 overflow-x-auto snap-x snap-mandatory pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {shown.map((post) => (
-            <PostCard key={post.id} post={post} className="snap-center shrink-0 w-[80%] sm:w-[45%] lg:w-[31%]" />
+            <PostCard key={post.id} post={post} className="snap-start shrink-0 w-[80%] sm:w-[45%] lg:w-[31%]" />
           ))}
         </div>
       </div>
@@ -262,7 +262,7 @@ export default function Blog() {
         </div>
 
         {/* White wave at bottom */}
-        <div className="absolute bottom-0 left-0 w-full leading-none z-10">
+        <div className="absolute -bottom-px left-0 w-full leading-none z-10">
           <svg className="block w-full h-[40px] sm:h-[70px] lg:h-[120px]" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 80 Q 120 0, 240 80 T 480 80 T 720 80 T 960 80 T 1200 80 T 1440 80 L 1440 120 L 0 120 Z" fill="white" />
           </svg>

@@ -134,7 +134,7 @@ export default function Home() {
             Own a bar or shop? Stock Pulsar
           </Link>
         </div>
-        <div className="absolute bottom-0 left-0 w-full leading-none z-0 pointer-events-none">
+        <div className="absolute -bottom-px left-0 w-full leading-none z-0 pointer-events-none">
           <svg className="block w-full h-auto min-h-[80px]" viewBox="0 0 1440 80" preserveAspectRatio="none"><path d="M0 40 Q 120 80, 240 40 T 480 40 T 720 40 T 960 40 T 1200 40 T 1440 40 L 1440 120 L 0 120 Z" fill="white" /></svg>
         </div>
       </section>

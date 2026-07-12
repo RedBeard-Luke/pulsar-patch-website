@@ -114,7 +114,7 @@ export default function BusinessSignup() {
           <Link to="/wholesale" className="font-inter text-[13px] text-white/70 hover:text-white transition-colors">← Back to wholesale</Link>
           <h1 className="font-futura font-[900] text-[clamp(2rem,7vw,3.25rem)] text-white uppercase tracking-wide leading-[1.05] mt-3">Become a Pulsar<br />retailer</h1>
         </div>
-        <div className="absolute bottom-0 left-0 w-full leading-none z-10 pointer-events-none">
+        <div className="absolute -bottom-px left-0 w-full leading-none z-10 pointer-events-none">
           <svg className="block w-full h-[40px] sm:h-[70px] lg:h-[120px]" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0 80 Q 120 0, 240 80 T 480 80 T 720 80 T 960 80 T 1200 80 T 1440 80 L 1440 120 L 0 120 Z" fill="white" /></svg>
         </div>
       </section>

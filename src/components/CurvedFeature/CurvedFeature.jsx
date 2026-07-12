@@ -54,7 +54,7 @@ export default function CurvedFeature({
         {/* room for the wave below the title */}
         <div className="h-[56px] lg:h-[104px]" />
         {/* Curved wave — single fill; the top-zone colour shows in the troughs */}
-        <div className="absolute bottom-0 left-0 w-full leading-none pointer-events-none">
+        <div className="absolute -bottom-px left-0 w-full leading-none pointer-events-none">
           <svg className="block w-full h-[60px] lg:h-[112px]" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 40 Q 120 80, 240 40 T 480 40 T 720 40 T 960 40 T 1200 40 T 1440 40 L 1440 120 L 0 120 Z" fill={waveFill} />
           </svg>

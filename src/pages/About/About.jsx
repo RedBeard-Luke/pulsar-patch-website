@@ -73,7 +73,7 @@ export default function About() {
         </div>
 
         {/* Bottom Wave Mask overlay */}
-        <div className="absolute bottom-0 left-0 w-full z-10 pointer-events-none">
+        <div className="absolute -bottom-px left-0 w-full z-10 pointer-events-none">
           <WaveDivider topColor="transparent" bottomColor="white" height="h-[40px] sm:h-[70px] lg:h-[120px]" />
         </div>
       </section>
