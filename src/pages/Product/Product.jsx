@@ -151,19 +151,9 @@ export default function Product() {
                 <p className="font-inter text-[14px] leading-[1.7] text-gray-800 animate-fadeIn">{overviews[cartId]}</p>
               )}
               {activeTab === 'nutrition' && (
-                <div className="w-full bg-[#44C8E8] rounded-2xl p-5 flex flex-col sm:flex-row gap-5 animate-fadeIn">
-                  <div className="bg-white rounded-[10px] p-4 sm:flex-[0_0_220px]">
-                    <h4 className="font-futura font-[900] text-black text-[16px] mb-1 leading-none text-center border-b-[6px] border-black pb-1">NUTRITION FACTS</h4>
-                    <p className="font-inter text-[10px] pt-1">1 serving per container</p>
-                    <p className="font-inter text-[12px] font-bold flex justify-between border-b-[4px] border-black pb-1 mb-1"><span>Serving size</span> <span>1 Patch</span></p>
-                    <p className="font-inter font-[900] text-[20px] flex justify-between leading-none border-b-[3px] border-black pb-1 mb-1"><span>Calories</span> <span>0</span></p>
-                    <p className="font-inter text-[8px] text-right font-bold border-b border-black pb-0.5 mb-1">% Daily Value*</p>
-                    <p className="font-inter text-[10px] flex justify-between border-b border-black pb-0.5 mb-1"><span><strong>Total Fat</strong> 0g</span> <span><strong>0%</strong></span></p>
-                    <p className="font-inter text-[10px] flex justify-between border-b border-black pb-0.5 mb-1"><span><strong>Sodium</strong> 0mg</span> <span><strong>0%</strong></span></p>
-                    <p className="font-inter text-[10px] flex justify-between border-b-[4px] border-black pb-0.5 mb-1"><span><strong>Protein</strong> 0g</span> <span><strong>0%</strong></span></p>
-                    <p className="font-inter text-[8px] leading-[1.3]">* Percent Daily Values are based on a 2,000 calorie diet.</p>
-                  </div>
-                  <div className="flex-1">
+                <div className="w-full bg-[#44C8E8] rounded-2xl p-6 sm:p-7 animate-fadeIn">
+                  <div className="max-w-[520px]">
+                    <p className="font-inter text-white/80 text-[12px] mb-1">Serving size: 1 Patch · 0 Calories</p>
                     <h4 className="font-futura font-[800] text-white text-[14px] mb-3 uppercase border-b border-white/50 pb-2">
                       Active Ingredients <span className="font-[500] normal-case text-white/75 text-[12px]">per patch</span>
                     </h4>
