@@ -130,8 +130,8 @@ export default function About() {
       {/* ═══════════════════════════════════════════════════════════
          5. THE PROBLEM
          ═══════════════════════════════════════════════════════════ */}
-      <section className="w-full flex flex-col lg:flex-row lg:min-h-[600px]">
-        {/* Left: Image Placeholder */}
+      <section className="w-full flex flex-col-reverse lg:flex-row lg:min-h-[600px]">
+        {/* Left on desktop / below the text on mobile: Image Placeholder */}
         <div className="w-full min-h-[300px] lg:w-auto lg:flex-[0_0_50%] bg-pulsar-light-blue-bg"></div>
 
         {/* Right: Content */}
