@@ -29,7 +29,7 @@ const faqs = [
   },
   {
     q: "What's inside the patch?",
-    a: "No mystery blends here. Six ingredients, all listed: Vitamin B (717.5mcg), Vitamin B3 (1,956.5mcg), Vitamin B9 (239mcg), Glutathione (9.5mg), NAC/N-Acetylcysteine (4.75mg), and Ginger Extract (1,435mcg). That's it. We're not hiding anything because we don't need to."
+    a: "No mystery blends here. Six ingredients, all listed: Vitamin B1 (1.5mg), Vitamin B3 (2mg), Vitamin B9 (0.5mg), Glutathione (0.019mg), NAC/N-Acetylcysteine (0.009mg), and Ginger Extract (3mg). That's it. We're not hiding anything because we don't need to."
   },
   {
     q: "Where should I stick it?",

@@ -40,12 +40,12 @@ const problems = [
 ]
 
 const ingredients = [
-  { name: 'VITAMIN B', amount: '717.5mcg', icon: igVitB, description: 'A vital nutrient that supports energy production, brain function, and helps your body recover after a night out.' },
-  { name: 'VITAMIN B3', amount: '1,956.5mcg', icon: igVitB3, description: 'Also known as Niacin, B3 supports cellular repair, helps your body process alcohol, and promotes healthy circulation.' },
-  { name: 'VITAMIN B9', amount: '239mcg', icon: igVitB9, description: 'Folate plays a key role in cell regeneration and helps replenish what alcohol depletes from your system.' },
-  { name: 'GLUTATHIONE', amount: '9.5mg', icon: igGlutathione, description: "Your body's master antioxidant. It defends your cells from oxidative stress so you can bounce back faster the next morning." },
-  { name: 'NAC (N-ACETYLCYSTEINE)', amount: '4.75mg', icon: igNac, description: 'NAC is like a helper for your liver. It gives your body the tools it needs to clean up the mess after a night of fun.' },
-  { name: 'GINGER EXTRACT', amount: '1,435mcg', icon: igGinger, description: 'A natural stomach soother that eases nausea and supports digestion when your body needs it most.' },
+  { name: 'VITAMIN B1', amount: '1.5mg', icon: igVitB, description: 'A vital nutrient that supports energy production, brain function, and helps your body recover after a night out.' },
+  { name: 'VITAMIN B3', amount: '2mg', icon: igVitB3, description: 'B3 supports cellular repair, helps your body process alcohol, and promotes healthy circulation.' },
+  { name: 'VITAMIN B9', amount: '0.5mg', icon: igVitB9, description: 'B9 plays a key role in cell regeneration and helps replenish what alcohol depletes from your system.' },
+  { name: 'GLUTATHIONE', amount: '0.019mg', icon: igGlutathione, description: "Your body's master antioxidant. It defends your cells from oxidative stress so you can bounce back faster the next morning." },
+  { name: 'NAC (N-ACETYLCYSTEINE)', amount: '0.009mg', icon: igNac, description: 'NAC is like a helper for your liver. It gives your body the tools it needs to clean up the mess after a night of fun.' },
+  { name: 'GINGER EXTRACT', amount: '3mg', icon: igGinger, description: 'A natural stomach soother that eases nausea and supports digestion when your body needs it most.' },
 ]
 
 /* Comparison rows: how the patch stacks up. y = yes, n = no, p = partial */
