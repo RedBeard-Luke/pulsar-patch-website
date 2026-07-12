@@ -37,10 +37,15 @@ function doPost(e) {
     var subject = data.subject || subjectFor(type);
     var htmlBody = data.html || buildFallbackHtml(type, data, payload.submittedAt);
 
-    GmailApp.sendEmail(recipients.join(','), subject, plainText(data), {
-      htmlBody: htmlBody,
-      name: 'Pulsar Patch',
-    });
+    // Hitting "Reply" should go straight to the customer. Their address is the
+    // form's email (contact) or the reviewer's email (review screening).
+    var customerEmail = data.email || (data.review && data.review.email) || '';
+    var options = { htmlBody: htmlBody, name: 'Pulsar Patch' };
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(customerEmail).trim())) {
+      options.replyTo = String(customerEmail).trim();
+    }
+
+    GmailApp.sendEmail(recipients.join(','), subject, plainText(data), options);
 
     return json({ ok: true });
   } catch (err) {
