@@ -169,11 +169,11 @@ export default function Product() {
                     </h4>
                     <ul className="flex flex-col mb-4">
                       {[
-                        ['Vitamin B1 (Thiamine)', '1.5 mg'],
-                        ['Vitamin B3 (Niacin)', '2 mg'],
-                        ['Vitamin B9 (Folate)', '0.5 mg'],
+                        ['Vitamin B1', '1.5 mg'],
+                        ['Vitamin B3', '2 mg'],
+                        ['Vitamin B9', '0.5 mg'],
                         ['Glutathione', '0.019 mg'],
-                        ['NAC (N-Acetylcysteine)', '0.009 mg'],
+                        ['NAC (N-acetylcysteine)', '0.009 mg'],
                         ['Ginger Extract', '3 mg'],
                       ].map(([name, amt]) => (
                         <li key={name} className="flex items-baseline justify-between gap-3 border-b border-white/20 py-1.5">
