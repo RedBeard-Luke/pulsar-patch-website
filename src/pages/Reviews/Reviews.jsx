@@ -228,7 +228,7 @@ export default function Reviews() {
       {/* ═══════════════════════════════════════════════════════════
          3. WRITE A REVIEW FORM (collapsible)
          ═══════════════════════════════════════════════════════════ */}
-      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showForm ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showForm ? 'max-h-[1700px] lg:max-h-[900px] opacity-100' : 'max-h-0 opacity-0'}`}>
         <section className="bg-pulsar-blue">
           <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px] py-[50px]">
             <form onSubmit={handleSubmitReview} className="flex flex-col gap-5">

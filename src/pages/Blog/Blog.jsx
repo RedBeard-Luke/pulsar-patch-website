@@ -93,61 +93,119 @@ const categories = [
   { key: 'RECIPES', label: 'RECIPES', activeBg: 'bg-[#FFA700]' },
 ]
 
-function CategoryRow({ category, items }) {
-  const scrollerRef = useRef(null)
+const MAX_CAROUSEL = 5
 
-  const scrollByCard = (dir) => {
+// Shared card. The wrapper width is set by the parent (carousel slide vs grid cell).
+function PostCard({ post, className = '' }) {
+  return (
+    <Link to={`/blog/${post.id}`} className={`flex flex-col group ${className}`}>
+      <div className="w-full aspect-[4/3] bg-pulsar-light-blue-bg rounded-[16px] mb-4 overflow-hidden relative shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
+        <div className={`absolute bottom-3 left-3 ${post.tagColor} text-white font-futura font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full`}>
+          {post.tag}
+        </div>
+      </div>
+      <h4 className="font-futura font-bold text-[16px] text-pulsar-dark uppercase tracking-wide leading-[1.2] mb-2 group-hover:text-pulsar-pink transition-colors">
+        {post.title}
+      </h4>
+      <span className="font-inter text-[12px] text-gray-400 uppercase tracking-wide">{post.date}</span>
+    </Link>
+  )
+}
+
+// ALL view: a swipeable carousel. Mobile shows dot indicators + a "see all"
+// link; desktop keeps the side arrows. Capped at MAX_CAROUSEL cards.
+function CategoryCarousel({ category, items, onSeeAll }) {
+  const scrollerRef = useRef(null)
+  const [active, setActive] = useState(0)
+
+  const shown = items.slice(0, MAX_CAROUSEL)
+
+  const slideWidth = () => {
+    const el = scrollerRef.current
+    return el && shown.length ? el.scrollWidth / shown.length : 1
+  }
+  const goTo = (idx) => scrollerRef.current?.scrollTo({ left: idx * slideWidth(), behavior: 'smooth' })
+  const handleScroll = () => {
     const el = scrollerRef.current
     if (!el) return
-    el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: 'smooth' })
+    setActive(Math.min(shown.length - 1, Math.max(0, Math.round(el.scrollLeft / slideWidth()))))
+  }
+  const scrollByCard = (dir) => scrollerRef.current?.scrollBy({ left: dir * scrollerRef.current.clientWidth * 0.85, behavior: 'smooth' })
+
+  if (items.length === 0) {
+    return (
+      <div className="mb-14">
+        <h3 className="font-futura font-bold text-[24px] text-pulsar-dark uppercase tracking-wide mb-8">{category}</h3>
+        <p className="font-inter text-[15px] text-gray-400">No posts here yet.</p>
+      </div>
+    )
   }
 
   return (
-    <div className="mb-16">
-      <h3 className="font-futura font-bold text-[24px] text-pulsar-dark uppercase tracking-wide mb-8">{category}</h3>
+    <div className="mb-14">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-futura font-bold text-[24px] text-pulsar-dark uppercase tracking-wide">{category}</h3>
+        <button type="button" onClick={() => onSeeAll(category)} className="hidden lg:inline-flex items-center gap-1 font-futura font-bold text-[12px] uppercase tracking-widest text-pulsar-blue hover:text-pulsar-pink transition-colors">
+          See all →
+        </button>
+      </div>
 
+      <div className="relative">
+        {/* Side arrows (desktop only) */}
+        <button type="button" aria-label="Scroll left" onClick={() => scrollByCard(-1)} className="hidden lg:flex absolute left-[-50px] top-1/2 -translate-y-1/2 z-20 w-[40px] h-[40px] bg-white rounded-full shadow-md items-center justify-center hover:shadow-lg transition-shadow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <button type="button" aria-label="Scroll right" onClick={() => scrollByCard(1)} className="hidden lg:flex absolute right-[-50px] top-1/2 -translate-y-1/2 z-20 w-[40px] h-[40px] bg-white rounded-full shadow-md items-center justify-center hover:shadow-lg transition-shadow">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+
+        {/* Swipe track. Centered cards on mobile (px-[10%]); no scrollbar. */}
+        <div
+          ref={scrollerRef}
+          onScroll={handleScroll}
+          className="flex gap-5 sm:gap-8 overflow-x-auto snap-x snap-mandatory pb-2 px-[10%] sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {shown.map((post) => (
+            <PostCard key={post.id} post={post} className="snap-center shrink-0 w-[80%] sm:w-[45%] lg:w-[31%]" />
+          ))}
+        </div>
+      </div>
+
+      {/* Dots + see-all (mobile only) */}
+      <div className="lg:hidden">
+        <div className="flex justify-center items-center gap-2 mt-5">
+          {shown.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Go to post ${i + 1}`}
+              onClick={() => goTo(i)}
+              className={`rounded-full transition-all duration-300 ${active === i ? 'w-[22px] h-[8px] bg-pulsar-pink' : 'w-[8px] h-[8px] bg-pulsar-dark/25'}`}
+            />
+          ))}
+        </div>
+        <div className="text-center mt-5">
+          <button type="button" onClick={() => onSeeAll(category)} className="inline-flex items-center gap-2 font-futura font-bold text-[12px] uppercase tracking-widest text-pulsar-blue hover:text-pulsar-pink transition-colors">
+            See all {category} →
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Drill-down view: every post in one category, stacked and scrolling downward.
+function CategoryGrid({ category, items }) {
+  return (
+    <div>
+      <h3 className="font-futura font-bold text-[24px] text-pulsar-dark uppercase tracking-wide mb-8">{category}</h3>
       {items.length === 0 ? (
         <p className="font-inter text-[15px] text-gray-400">No posts here yet.</p>
       ) : (
-        <div className="relative">
-          {/* Left arrow (desktop only) */}
-          <button
-            type="button"
-            aria-label="Scroll left"
-            onClick={() => scrollByCard(-1)}
-            className="hidden lg:flex absolute left-[-50px] top-1/2 -translate-y-1/2 z-20 w-[40px] h-[40px] bg-white rounded-full shadow-md items-center justify-center hover:shadow-lg transition-shadow"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-          </button>
-
-          {/* Right arrow (desktop only) */}
-          <button
-            type="button"
-            aria-label="Scroll right"
-            onClick={() => scrollByCard(1)}
-            className="hidden lg:flex absolute right-[-50px] top-1/2 -translate-y-1/2 z-20 w-[40px] h-[40px] bg-white rounded-full shadow-md items-center justify-center hover:shadow-lg transition-shadow"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-          </button>
-
-          <div
-            ref={scrollerRef}
-            className="flex gap-6 sm:gap-8 overflow-x-auto snap-x snap-mandatory pb-4 -mx-5 px-5 sm:mx-0 sm:px-0"
-          >
-            {items.map((post) => (
-              <Link key={post.id} to={`/blog/${post.id}`} className="snap-start shrink-0 w-[80%] sm:w-[45%] lg:w-[31%] flex flex-col group">
-                <div className="w-full aspect-[4/3] bg-pulsar-light-blue-bg rounded-[16px] mb-4 overflow-hidden relative shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
-                  <div className={`absolute bottom-3 left-3 ${post.tagColor} text-white font-futura font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full`}>
-                    {post.tag}
-                  </div>
-                </div>
-                <h4 className="font-futura font-bold text-[16px] text-pulsar-dark uppercase tracking-wide leading-[1.2] mb-2 group-hover:text-pulsar-pink transition-colors">
-                  {post.title}
-                </h4>
-                <span className="font-inter text-[12px] text-gray-400 uppercase tracking-wide">{post.date}</span>
-              </Link>
-            ))}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {items.map((post) => (
+            <PostCard key={post.id} post={post} className="w-full" />
+          ))}
         </div>
       )}
     </div>
@@ -161,10 +219,6 @@ export default function Blog() {
     category: c.key,
     items: posts.filter((p) => p.category === c.key),
   }))
-
-  const visibleRows = activeCategory
-    ? rows.filter((r) => r.category === activeCategory)
-    : rows
 
   const toggleCategory = (key) =>
     setActiveCategory((prev) => (prev === key ? null : key))
@@ -261,9 +315,21 @@ export default function Blog() {
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white pb-[100px]">
         <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
-          {visibleRows.map((r) => (
-            <CategoryRow key={r.category} category={r.category} items={r.items} />
-          ))}
+          {activeCategory ? (
+            <CategoryGrid
+              category={activeCategory}
+              items={posts.filter((p) => p.category === activeCategory)}
+            />
+          ) : (
+            rows.map((r) => (
+              <CategoryCarousel
+                key={r.category}
+                category={r.category}
+                items={r.items}
+                onSeeAll={setActiveCategory}
+              />
+            ))
+          )}
         </div>
       </section>
 
