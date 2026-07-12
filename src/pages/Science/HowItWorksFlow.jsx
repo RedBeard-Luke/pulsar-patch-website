@@ -683,7 +683,6 @@ export default function HowItWorksFlow() {
                       <span className="w-[9px] h-[9px] rounded-full shrink-0" style={{ backgroundColor: `rgb(${RGB[ing.color]})` }} />
                       <img src={ing.icon} alt="" className="w-[16px] h-[16px] object-contain" />
                       <span className="font-futura font-bold text-[11px] uppercase tracking-wide text-pulsar-dark/80">{ing.name}</span>
-                      <span className="font-inter text-[10px] font-semibold text-pulsar-pink">{ing.dose}</span>
                     </span>
                   ))}
                 </div>
