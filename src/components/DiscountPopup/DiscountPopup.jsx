@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { submitLead, isEmail } from '../../lib/forms'
-import squiggle from '../../assets/Squigle_What is Pulsar.svg'
-import patchFront from '../../assets/patch-front.svg'
 
 /*
  * DiscountPopup — first-visit "15% off" email capture for the home page.
@@ -12,8 +10,11 @@ import patchFront from '../../assets/patch-front.svg'
  * their one-time code and (2) add them to the newsletter list, then reveals the
  * code on screen so they have it immediately either way.
  *
+ * The only way to close the capture step is the "No thanks" link (there's no X
+ * and clicking the backdrop does nothing), so the choice is always deliberate.
+ *
  * The code itself is a shared code you create in Shopify and set to "one use
- * per customer" (see README / setup notes). Swap WELCOME_CODE to match it.
+ * per customer" (see setup notes). Swap WELCOME_CODE to match it.
  */
 
 const STORAGE_KEY = 'pulsar-welcome-15' // set once claimed or dismissed
@@ -36,18 +37,15 @@ export default function DiscountPopup() {
     return () => clearTimeout(t)
   }, [])
 
-  // Lock scroll + focus the field + Escape to close, while open
+  // Lock scroll + focus the field while open
   useEffect(() => {
     if (!open) return
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const focusT = setTimeout(() => inputRef.current?.focus(), 350)
-    const onKey = (e) => { if (e.key === 'Escape') close('dismissed') }
-    window.addEventListener('keydown', onKey)
     return () => {
       document.body.style.overflow = prevOverflow
       clearTimeout(focusT)
-      window.removeEventListener('keydown', onKey)
     }
   }, [open])
 
@@ -79,29 +77,12 @@ export default function DiscountPopup() {
   return (
     <div
       className="fixed inset-0 z-[3000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-      onClick={() => close('dismissed')}
       role="dialog"
       aria-modal="true"
       aria-label="15% off your first order"
     >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-[430px] rounded-[28px] overflow-hidden shadow-2xl bg-pulsar-blue text-white animate-[popIn_0.4s_cubic-bezier(0.34,1.56,0.64,1)]"
-      >
-        {/* Texture + faded patch */}
-        <img src={squiggle} alt="" className="absolute inset-0 w-full h-full object-cover opacity-[0.08] pointer-events-none" />
-        <img src={patchFront} alt="" className="absolute -right-8 -bottom-8 w-[150px] opacity-20 rotate-[18deg] pointer-events-none select-none" draggable={false} />
-
-        {/* Close */}
-        <button
-          onClick={() => close('dismissed')}
-          aria-label="Close"
-          className="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25 transition-colors"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" /></svg>
-        </button>
-
-        <div className="relative z-10 px-7 sm:px-9 py-10 text-center">
+      <div className="relative w-full max-w-[430px] rounded-[28px] overflow-hidden shadow-2xl bg-pulsar-blue text-white animate-[popIn_0.4s_cubic-bezier(0.34,1.56,0.64,1)]">
+        <div className="px-7 sm:px-9 py-10 text-center">
           {status === 'done' ? (
             /* ── Success ── */
             <div className="flex flex-col items-center">
@@ -128,7 +109,7 @@ export default function DiscountPopup() {
             <>
               <span className="inline-block font-futura font-bold text-[12px] uppercase tracking-[3px] text-white/70 mb-4">First time here?</span>
               <h2 className="font-futura font-[900] text-[34px] sm:text-[38px] uppercase leading-[0.95] tracking-wide">You've got</h2>
-              <div className="inline-block bg-pulsar-pink px-5 py-1.5 my-3 -rotate-1 shadow-md">
+              <div className="inline-block bg-pulsar-pink px-5 py-1.5 my-3 shadow-md">
                 <span className="font-futura font-[900] text-[38px] sm:text-[44px] uppercase leading-none tracking-wide">15% off</span>
               </div>
               <p className="font-inter text-[14px] text-white/85 leading-[1.6] mb-6 max-w-[320px] mx-auto">
@@ -159,7 +140,7 @@ export default function DiscountPopup() {
 
               <button
                 onClick={() => close('dismissed')}
-                className="mt-4 font-inter text-[13px] text-white/60 hover:text-white underline underline-offset-4 transition-colors"
+                className="mt-6 inline-block font-inter text-[15px] font-semibold text-white hover:text-white/80 underline underline-offset-4 decoration-2 transition-colors"
               >
                 No thanks, I'll pay full price
               </button>
