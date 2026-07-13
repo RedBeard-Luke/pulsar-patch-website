@@ -1,0 +1,29 @@
+<!--
+  Pulsar email brand style block.
+
+  HOW TO USE: In EVERY Shopify notification template (Settings -> Notifications),
+  open its code, find the small <style> block in the <head> that looks like:
+
+      <style>
+        .button__cell { background: {{ shop.email_accent_color }}; }
+        .actions-buttons .button__cell--primary { background-color: {{ shop.email_accent_color }}; }
+        a, a:hover, a:active, a:visited { color: {{ shop.email_accent_color }}; }
+      </style>
+
+  ...and REPLACE it with the block below. Leave everything else in the template
+  alone. This brands all emails the same (white bg, blue header block, pink pill
+  button, blue links, centered logo) without touching each email's body content.
+
+  The two account emails (activation + reset) also need their button LINK changed
+  to the headless /activate and /reset pages -- use their full files instead.
+-->
+<style>
+  .body { background-color: #ffffff; }
+  .shop-name__cell { text-align: center; }
+  .shop-name__text a { color: #23c1e0; font-weight: 800; letter-spacing: 1px; text-decoration: none; }
+  h2 { display: inline-block; background: #44C8E8; color: #ffffff; text-transform: uppercase; font-weight: 800; padding: 8px 16px; margin: 0 0 18px; line-height: 1.15; }
+  .button__cell { background: #DE64A5; border-radius: 999px; }
+  .actions-buttons .button__cell--primary { background-color: #DE64A5; }
+  .button__text { color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+  a, a:hover, a:active, a:visited { color: #44C8E8; }
+</style>

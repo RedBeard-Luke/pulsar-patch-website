@@ -6,6 +6,15 @@ contents into the matching template at Shopify → Settings → Notifications.
 ## Files
 - `customer-account-activation.html` → "Customer account activation" / invite
 - `customer-password-reset.html` → "Customer account password reset"
+- `brand-style-block.html` → reusable `<style>` block to brand ALL other emails
+
+## Branding every email fast
+Rather than rewriting each of the ~40 notification templates, paste the
+`brand-style-block.html` `<style>` over the small stock `<style>` block in each
+template's `<head>` (the one referencing `shop.email_accent_color`). Same swap
+everywhere; brands logo + header + button + links without touching email bodies.
+The activation + reset templates use their full files instead (their buttons
+must point at the headless pages).
 
 Both action buttons point at our headless pages (`/activate`, `/reset`) so the
 links never go to the old Shopify-hosted store. After the domain move, swap
