@@ -135,7 +135,10 @@ function AuthGate() {
     const { firstName, lastName } = splitName(name)
     const res = await signUp({ email, password, firstName, lastName })
     setBusy(false)
-    if (!res.ok) setError(res.error)
+    if (!res.ok) { setError(res.error); return }
+    // Store requires email verification before first login: show a friendly
+    // confirmation screen instead of dropping them into the dashboard.
+    if (res.needsVerification) { setError(''); setView('verify') }
   }
 
   async function handleForgot(e) {
@@ -155,7 +158,7 @@ function AuthGate() {
     <div className="w-full bg-white flex flex-col min-h-screen items-center justify-center py-16 px-5">
       <div className="max-w-[420px] w-full">
         <h1 className="font-futura font-bold text-[clamp(28px,7vw,36px)] text-pulsar-blue uppercase tracking-wide mb-2 text-center">
-          {view === 'signup' ? 'Create Account' : view === 'forgot' || view === 'sent' ? 'Reset Password' : 'My Account'}
+          {view === 'signup' ? 'Create Account' : view === 'verify' ? 'Almost There' : view === 'forgot' || view === 'sent' ? 'Reset Password' : 'My Account'}
         </h1>
 
         {/* ── SIGN IN ── */}
@@ -252,6 +255,21 @@ function AuthGate() {
             <button onClick={() => go('signin')} className="w-full bg-pulsar-blue text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-blue-dark">
               Back to Sign In
             </button>
+          </>
+        )}
+
+        {/* ── VERIFY EMAIL (account created, awaiting email confirmation) ── */}
+        {view === 'verify' && (
+          <>
+            <div className="w-[64px] h-[64px] rounded-full bg-pulsar-light-blue-bg flex items-center justify-center mx-auto mb-6">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#44C8E8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></svg>
+            </div>
+            <p className="font-inter text-[15px] text-gray-700 text-center mb-2">Your account is created. One last step.</p>
+            <p className="font-inter text-[14px] text-gray-500 text-center mb-8">We sent a verification link to <span className="font-[600] text-gray-700 break-all">{email}</span>. Click it to confirm your email, then come back and sign in.</p>
+            <button onClick={() => go('signin')} className="w-full bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark">
+              Back to Sign In
+            </button>
+            <p className="font-inter text-[12px] text-gray-400 text-center mt-4">Didn't get it? Check spam, or give it a minute.</p>
           </>
         )}
 

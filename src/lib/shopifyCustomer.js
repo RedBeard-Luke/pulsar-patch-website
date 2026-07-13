@@ -252,7 +252,11 @@ export async function signIn(email, password) {
   return { token: t.accessToken, expiresAt: t.expiresAt }
 }
 
-// Create an account, then sign in so the customer lands logged in.
+// Create an account, then try to sign in so the customer lands logged in.
+// Returns { session } when login succeeds, or { session: null,
+// needsVerification: true } when the store requires the customer to click an
+// email verification link before their first login. Throws only on a real
+// creation failure (e.g. email already taken, weak password).
 export async function signUp({ email, password, firstName, lastName, phone }) {
   const input = { email, password }
   if (firstName) input.firstName = firstName
@@ -261,7 +265,13 @@ export async function signUp({ email, password, firstName, lastName, phone }) {
   const data = await storefrontQuery(CREATE, { input })
   const err = firstError(data?.customerCreate?.customerUserErrors)
   if (err) throw new Error(err)
-  return signIn(email, password)
+  // Account created. Log in immediately unless the store gates on verification.
+  try {
+    const session = await signIn(email, password)
+    return { session }
+  } catch {
+    return { session: null, needsVerification: true }
+  }
 }
 
 // Send a password-reset email.

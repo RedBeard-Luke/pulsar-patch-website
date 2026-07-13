@@ -108,7 +108,8 @@ export function AuthProvider({ children }) {
 
   const signUp = useCallback(async (fields) => {
     try {
-      const session = await shopifyCustomer.signUp(fields)
+      const { session, needsVerification } = await shopifyCustomer.signUp(fields)
+      if (needsVerification || !session) return { ok: true, needsVerification: true }
       const mapped = await shopifyCustomer.fetchCustomer(session.token)
       setSession(session, mapped)
       return { ok: true }
