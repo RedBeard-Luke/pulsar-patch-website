@@ -23,7 +23,6 @@ const CUSTOMER_FIELDS = `
   lastName
   email
   phone
-  tags
   defaultAddress { id }
   addresses(first: 20) {
     nodes {
