@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
-import { isEmail } from '../../lib/forms'
+import { isEmail, isPhone } from '../../lib/forms'
 import PasswordField from '../../components/PasswordField/PasswordField'
 
 /* ── Demo profiles ───────────────────────────────────────────────────────
@@ -87,6 +87,7 @@ function AuthGate() {
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
   const [company, setCompany] = useState('')
   const [signupType, setSignupType] = useState('personal') // personal | business
   const [error, setError] = useState('')
@@ -98,6 +99,17 @@ function AuthGate() {
   function splitName(full) {
     const parts = full.trim().split(/\s+/)
     return { firstName: parts.shift() || '', lastName: parts.join(' ') }
+  }
+
+  // Shopify wants phone numbers in E.164 (e.g. +15551234567). Normalize US-style
+  // input; leave already-internationalized (+...) numbers as-is.
+  function toE164(raw) {
+    const s = String(raw).trim()
+    const digits = s.replace(/\D/g, '')
+    if (s.startsWith('+')) return '+' + digits
+    if (digits.length === 11 && digits.startsWith('1')) return '+' + digits
+    if (digits.length === 10) return '+1' + digits
+    return '+' + digits
   }
 
   async function handleSignIn(e) {
@@ -120,13 +132,14 @@ function AuthGate() {
     if (!name.trim()) { setError('Tell us your name.'); return }
     if (signupType === 'business' && !company.trim()) { setError('Add your business name.'); return }
     if (!isEmail(email)) { setError('Enter a valid email address.'); return }
+    if (!isPhone(phone)) { setError('Enter a valid phone number.'); return }
     if (password.length < 6) { setError('Passwords need at least 6 characters.'); return }
     if (password !== confirm) { setError("Those two passwords don't match."); return }
     if (!shopifyEnabled) {
       if (signupType === 'business') {
-        login({ accountType: 'business', name, company, email, rep: businessDemo.rep, wholesaleOrders: [], invoices: [], locations: [] })
+        login({ accountType: 'business', name, company, email, phone, rep: businessDemo.rep, wholesaleOrders: [], invoices: [], locations: [] })
       } else {
-        login({ accountType: 'personal', name, email })
+        login({ accountType: 'personal', name, email, phone })
       }
       return
     }
@@ -134,7 +147,7 @@ function AuthGate() {
     // new account is a standard customer until you tag it wholesale in Shopify.
     setBusy(true)
     const { firstName, lastName } = splitName(name)
-    const res = await signUp({ email, password, firstName, lastName })
+    const res = await signUp({ email, password, firstName, lastName, phone: toE164(phone) })
     setBusy(false)
     if (!res.ok) { setError(res.error); return }
     // Store requires email verification before first login: show a friendly
@@ -208,6 +221,7 @@ function AuthGate() {
                 <Field label="Business Name" type="text" value={company} onChange={(v) => { setCompany(v); setError('') }} placeholder="Your bar or shop" autoComplete="organization" />
               )}
               <Field label="Email" type="email" value={email} onChange={(v) => { setEmail(v); setError('') }} placeholder="you@email.com" autoComplete="email" />
+              <Field label="Phone" type="tel" value={phone} onChange={(v) => { setPhone(v); setError('') }} placeholder="(555) 123-4567" autoComplete="tel" />
               <PasswordField label="Password" value={password} onChange={(v) => { setPassword(v); setError('') }} placeholder="At least 6 characters" autoComplete="new-password" />
               <PasswordField label="Confirm Password" value={confirm} onChange={(v) => { setConfirm(v); setError('') }} placeholder="Re-enter your password" autoComplete="new-password" />
               {error && <p className="font-inter text-[12px] text-red-400" role="alert">{error}</p>}
