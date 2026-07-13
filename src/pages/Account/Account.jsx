@@ -943,18 +943,9 @@ function PasswordPanel() {
     <div className="max-w-[600px]">
       <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-8">Change Password</h2>
       <div className="flex flex-col gap-5">
-        <div>
-          <label className="font-inter font-[600] text-[13px] text-gray-500 block mb-2">Current Password</label>
-          <input type="password" value={pw.current} onChange={(e) => { setPw({ ...pw, current: e.target.value }); setPwError('') }} className="w-full bg-gray-100 rounded-[8px] px-4 py-3 font-inter text-[14px] text-gray-800 outline-none focus:ring-2 focus:ring-pulsar-blue/30" />
-        </div>
-        <div>
-          <label className="font-inter font-[600] text-[13px] text-gray-500 block mb-2">New Password</label>
-          <input type="password" value={pw.next} onChange={(e) => { setPw({ ...pw, next: e.target.value }); setPwError('') }} className="w-full bg-gray-100 rounded-[8px] px-4 py-3 font-inter text-[14px] text-gray-800 outline-none focus:ring-2 focus:ring-pulsar-blue/30" />
-        </div>
-        <div>
-          <label className="font-inter font-[600] text-[13px] text-gray-500 block mb-2">Confirm New Password</label>
-          <input type="password" value={pw.confirm} onChange={(e) => { setPw({ ...pw, confirm: e.target.value }); setPwError('') }} className="w-full bg-gray-100 rounded-[8px] px-4 py-3 font-inter text-[14px] text-gray-800 outline-none focus:ring-2 focus:ring-pulsar-blue/30" />
-        </div>
+        <PasswordField label="Current Password" value={pw.current} onChange={(v) => { setPw({ ...pw, current: v }); setPwError('') }} autoComplete="current-password" />
+        <PasswordField label="New Password" value={pw.next} onChange={(v) => { setPw({ ...pw, next: v }); setPwError('') }} placeholder="At least 6 characters" autoComplete="new-password" />
+        <PasswordField label="Confirm New Password" value={pw.confirm} onChange={(v) => { setPw({ ...pw, confirm: v }); setPwError('') }} placeholder="Re-enter your new password" autoComplete="new-password" />
         {pwError && <p className="font-inter text-[13px] text-red-400">{pwError}</p>}
         <div className="flex items-center gap-4 mt-4">
           <button onClick={handleUpdatePassword} disabled={pwBusy} className="self-start bg-pulsar-pink text-white font-futura font-bold text-[12px] uppercase tracking-widest px-8 py-3 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60 disabled:hover:translate-y-0">
