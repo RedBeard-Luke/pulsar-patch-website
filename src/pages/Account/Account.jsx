@@ -84,13 +84,14 @@ function AuthGate() {
   const [view, setView] = useState('signin') // signin | signup | forgot | sent
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
   const [name, setName] = useState('')
   const [company, setCompany] = useState('')
   const [signupType, setSignupType] = useState('personal') // personal | business
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
-  function reset() { setError(''); setPassword('') }
+  function reset() { setError(''); setPassword(''); setConfirm('') }
   function go(next) { reset(); setView(next) }
 
   function splitName(full) {
@@ -119,6 +120,7 @@ function AuthGate() {
     if (signupType === 'business' && !company.trim()) { setError('Add your business name.'); return }
     if (!isEmail(email)) { setError('Enter a valid email address.'); return }
     if (password.length < 6) { setError('Passwords need at least 6 characters.'); return }
+    if (password !== confirm) { setError("Those two passwords don't match."); return }
     if (!shopifyEnabled) {
       if (signupType === 'business') {
         login({ accountType: 'business', name, company, email, rep: businessDemo.rep, wholesaleOrders: [], invoices: [], locations: [] })
@@ -162,7 +164,7 @@ function AuthGate() {
             <p className="font-inter text-[14px] text-gray-500 text-center mb-8">Sign in to manage your orders, subscription, and more.</p>
             <form onSubmit={handleSignIn} className="flex flex-col gap-4" noValidate>
               <Field label="Email" type="email" value={email} onChange={(v) => { setEmail(v); setError('') }} placeholder="you@email.com" autoComplete="email" />
-              <Field label="Password" type="password" value={password} onChange={(v) => { setPassword(v); setError('') }} placeholder="••••••••" autoComplete="current-password" />
+              <PasswordField label="Password" value={password} onChange={(v) => { setPassword(v); setError('') }} placeholder="••••••••" autoComplete="current-password" />
               <button type="button" onClick={() => go('forgot')} className="self-end -mt-1 font-inter text-[12px] text-gray-400 hover:text-pulsar-pink transition-colors">
                 Forgot your password?
               </button>
@@ -202,7 +204,8 @@ function AuthGate() {
                 <Field label="Business Name" type="text" value={company} onChange={(v) => { setCompany(v); setError('') }} placeholder="Your bar or shop" autoComplete="organization" />
               )}
               <Field label="Email" type="email" value={email} onChange={(v) => { setEmail(v); setError('') }} placeholder="you@email.com" autoComplete="email" />
-              <Field label="Password" type="password" value={password} onChange={(v) => { setPassword(v); setError('') }} placeholder="At least 6 characters" autoComplete="new-password" />
+              <PasswordField label="Password" value={password} onChange={(v) => { setPassword(v); setError('') }} placeholder="At least 6 characters" autoComplete="new-password" />
+              <PasswordField label="Confirm Password" value={confirm} onChange={(v) => { setConfirm(v); setError('') }} placeholder="Re-enter your password" autoComplete="new-password" />
               {error && <p className="font-inter text-[12px] text-red-400" role="alert">{error}</p>}
               <button type="submit" disabled={busy} className="w-full bg-pulsar-pink text-white font-futura font-bold text-[14px] uppercase tracking-widest py-4 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark disabled:opacity-60 disabled:hover:translate-y-0">
                 {busy ? 'Creating…' : 'Create Account'}
@@ -285,6 +288,39 @@ function Field({ label, type, value, onChange, placeholder, autoComplete }) {
         autoComplete={autoComplete}
         className="w-full bg-gray-100 rounded-[8px] px-4 py-3 font-inter text-[14px] text-gray-800 outline-none focus:ring-2 focus:ring-pulsar-blue/30"
       />
+    </div>
+  )
+}
+
+/* Password input with a show/hide eye toggle */
+function PasswordField({ label, value, onChange, placeholder, autoComplete }) {
+  const [show, setShow] = useState(false)
+  return (
+    <div>
+      <label className="font-inter font-[600] text-[13px] text-gray-500 block mb-2">{label}</label>
+      <div className="relative">
+        <input
+          type={show ? 'text' : 'password'}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          className="w-full bg-gray-100 rounded-[8px] px-4 py-3 pr-12 font-inter text-[14px] text-gray-800 outline-none focus:ring-2 focus:ring-pulsar-blue/30"
+        />
+        <button
+          type="button"
+          onClick={() => setShow((s) => !s)}
+          aria-label={show ? 'Hide password' : 'Show password'}
+          aria-pressed={show}
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-pulsar-blue transition-colors"
+        >
+          {show ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          )}
+        </button>
+      </div>
     </div>
   )
 }
