@@ -28,6 +28,7 @@ const Wholesale = lazy(() => import('./pages/Wholesale/Wholesale'))
 const Admin = lazy(() => import('./pages/Admin/Admin'))
 const BusinessSignup = lazy(() => import('./pages/BusinessSignup/BusinessSignup'))
 const Account = lazy(() => import('./pages/Account/Account'))
+const AccountAction = lazy(() => import('./pages/Account/AccountAction'))
 const StoreLocator = lazy(() => import('./pages/StoreLocator/StoreLocator'))
 const Checkout = lazy(() => import('./pages/Checkout/Checkout'))
 const Affiliate = lazy(() => import('./pages/Affiliate/Affiliate'))
@@ -83,6 +84,8 @@ function App() {
               <Route path="/admin" element={<Admin />} />
               <Route path="/business-signup" element={<BusinessSignup />} />
               <Route path="/account" element={<Account />} />
+              <Route path="/activate" element={<AccountAction mode="activate" />} />
+              <Route path="/reset" element={<AccountAction mode="reset" />} />
               <Route path="/store-locator" element={<StoreLocator />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/affiliate" element={<Affiliate />} />

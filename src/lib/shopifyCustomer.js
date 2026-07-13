@@ -97,6 +97,28 @@ const LOGOUT = `
   }
 `
 
+// Complete account activation from the link in Shopify's activation email.
+const ACTIVATE_BY_URL = `
+  mutation activate($url: URL!, $password: String!) {
+    customerActivateByUrl(activationUrl: $url, password: $password) {
+      customer { id }
+      customerAccessToken { accessToken expiresAt }
+      customerUserErrors { code field message }
+    }
+  }
+`
+
+// Complete a password reset from the link in Shopify's reset email.
+const RESET_BY_URL = `
+  mutation reset($url: URL!, $password: String!) {
+    customerResetByUrl(resetUrl: $url, password: $password) {
+      customer { id }
+      customerAccessToken { accessToken expiresAt }
+      customerUserErrors { code field message }
+    }
+  }
+`
+
 const GET_CUSTOMER = `
   query getCustomer($token: String!) {
     customer(customerAccessToken: $token) { ${CUSTOMER_FIELDS} }
@@ -272,6 +294,28 @@ export async function signUp({ email, password, firstName, lastName, phone }) {
   } catch {
     return { session: null, needsVerification: true }
   }
+}
+
+// Activate a new account via the URL from Shopify's activation email, setting
+// the password. Returns { token, expiresAt } (logs them straight in) or throws.
+export async function activateByUrl(activationUrl, password) {
+  const data = await storefrontQuery(ACTIVATE_BY_URL, { url: activationUrl, password })
+  const err = firstError(data?.customerActivateByUrl?.customerUserErrors)
+  if (err) throw new Error(err)
+  const t = data?.customerActivateByUrl?.customerAccessToken
+  if (!t?.accessToken) throw new Error('That activation link is invalid or has already been used.')
+  return { token: t.accessToken, expiresAt: t.expiresAt }
+}
+
+// Reset a password via the URL from Shopify's reset email. Returns
+// { token, expiresAt } (logs them in) or throws.
+export async function resetByUrl(resetUrl, password) {
+  const data = await storefrontQuery(RESET_BY_URL, { url: resetUrl, password })
+  const err = firstError(data?.customerResetByUrl?.customerUserErrors)
+  if (err) throw new Error(err)
+  const t = data?.customerResetByUrl?.customerAccessToken
+  if (!t?.accessToken) throw new Error('That reset link is invalid or has expired.')
+  return { token: t.accessToken, expiresAt: t.expiresAt }
 }
 
 // Send a password-reset email.

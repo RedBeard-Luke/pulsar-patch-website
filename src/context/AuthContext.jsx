@@ -118,6 +118,28 @@ export function AuthProvider({ children }) {
     }
   }, [setSession])
 
+  const activate = useCallback(async (url, password) => {
+    try {
+      const session = await shopifyCustomer.activateByUrl(url, password)
+      const mapped = await shopifyCustomer.fetchCustomer(session.token)
+      setSession(session, mapped)
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err.message || 'Could not activate your account.' }
+    }
+  }, [setSession])
+
+  const resetPassword = useCallback(async (url, password) => {
+    try {
+      const session = await shopifyCustomer.resetByUrl(url, password)
+      const mapped = await shopifyCustomer.fetchCustomer(session.token)
+      setSession(session, mapped)
+      return { ok: true }
+    } catch (err) {
+      return { ok: false, error: err.message || 'Could not reset your password.' }
+    }
+  }, [setSession])
+
   const recover = useCallback(async (email) => {
     try {
       await shopifyCustomer.recover(email)
@@ -209,6 +231,8 @@ export function AuthProvider({ children }) {
       signIn,         // real
       signUp,         // real
       recover,        // real
+      activate,       // real (from activation email)
+      resetPassword,  // real (from reset email)
       logout,
       updateUser,
       saveProfile,
