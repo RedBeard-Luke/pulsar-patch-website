@@ -6,29 +6,30 @@ import calendarIcon from '../../assets/Calender_icon.svg'
 import dollarIcon from '../../assets/$.svg'
 import squigleBg from '../../assets/footer_Squigle.svg'
 
+// One product now: the 30-patch Party Pack. The only choice is how often it
+// ships. More frequent delivery = bigger discount off the regular $90 price.
+const PARTY_BASE = 90
+
 const tiers = [
   {
-    id: 'sub-weekend',
-    name: 'THE WEEKEND WARRIOR',
-    subtitle: 'FOR ONE SOLID NIGHT EACH WEEK!',
-    patches: 4,
-    price: '$21.00',
-    recommended: false,
-  },
-  {
-    id: 'sub-social',
-    name: 'THE SOCIAL CALENDAR',
-    subtitle: 'ONE FOR EACH WEEKEND DAY',
-    patches: 8,
-    price: '$36.00',
+    id: 'sub-30',
+    cadence: 'EVERY 30 DAYS',
+    subtitle: 'FOR THE REGULARS WHO GO OUT MOST WEEKENDS.',
+    discount: 0.15,
     recommended: true,
   },
   {
-    id: 'sub-jugular',
-    name: 'THE JUGULAR',
-    subtitle: 'FOR THOSE WHO GRAB LIFE BY IT.',
-    patches: 20,
-    price: '$70.00',
+    id: 'sub-60',
+    cadence: 'EVERY 60 DAYS',
+    subtitle: 'A STEADY STASH FOR THE EVERY-OTHER-WEEKEND CROWD.',
+    discount: 0.10,
+    recommended: false,
+  },
+  {
+    id: 'sub-90',
+    cadence: 'EVERY 90 DAYS',
+    subtitle: 'STOCK UP AND COAST. FOR THE OCCASIONAL BIG NIGHT.',
+    discount: 0.05,
     recommended: false,
   },
 ]
@@ -52,7 +53,8 @@ const benefits = [
 ]
 
 export default function Subscription() {
-  const { addToCart, getProduct } = useCart()
+  const { getProduct } = useCart()
+  const partyBase = getProduct('party')?.price ?? PARTY_BASE
   return (
     <div className="w-full bg-white flex flex-col" id="subscription-page">
 
@@ -87,12 +89,27 @@ export default function Subscription() {
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white py-[100px]">
         <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
-          <h2 className="font-futura font-[900] text-[36px] text-pulsar-blue uppercase tracking-wide mb-16">
-            SUBSCRIPTION TIERS
+          <h2 className="font-futura font-[900] text-[36px] text-pulsar-blue uppercase tracking-wide mb-4">
+            ONE PACK, YOUR SCHEDULE
           </h2>
 
+          {/* How it works */}
+          <div className="max-w-[720px] mb-14">
+            <p className="font-inter text-[15px] leading-[1.7] text-pulsar-dark mb-3">
+              It's one pack, our 30-patch Party Pack, and the only thing you pick is how often it shows up. The more often it ships, the more you save off the regular {formatPrice(partyBase)} price.
+            </p>
+            <p className="font-inter text-[15px] leading-[1.7] text-gray-600">
+              Every 30 days saves you 15%, every 60 days saves 10%, and every 90 days saves 5%. Same 30 patches each delivery, no lock-in. Skip, change your schedule, or cancel whenever you want.
+            </p>
+            <p className="font-futura font-[800] text-[13px] text-pulsar-blue uppercase tracking-wide mt-4">
+              Subscriptions are launching soon. Pick your plan then.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
-            {tiers.map((tier) => (
+            {tiers.map((tier) => {
+              const price = partyBase * (1 - tier.discount)
+              return (
               <div
                 key={tier.id}
                 className={`flex flex-col items-center text-center p-8 rounded-[24px] border-2 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg ${
@@ -103,35 +120,44 @@ export default function Subscription() {
               >
                 {tier.recommended && (
                   <span className="font-futura font-[900] text-[14px] text-pulsar-blue uppercase tracking-widest mb-4">
-                    RECOMMENDED TIER
+                    BEST VALUE
                   </span>
                 )}
 
                 {/* Image placeholder */}
                 <div className="w-full aspect-[4/3] bg-pulsar-light-blue-bg rounded-[16px] mb-6 shadow-md"></div>
 
-                <h3 className="font-futura font-[900] text-[18px] text-pulsar-dark uppercase tracking-wide mb-1">
-                  {tier.name}
+                {/* Discount badge */}
+                <span className="inline-block bg-pulsar-pink text-white font-futura font-[900] text-[13px] uppercase tracking-wide px-4 py-1 rounded-full mb-4">
+                  SAVE {tier.discount * 100}%
+                </span>
+
+                <h3 className="font-futura font-[900] text-[20px] text-pulsar-dark uppercase tracking-wide mb-1">
+                  {tier.cadence}
                 </h3>
                 <p className="font-inter text-[12px] text-gray-500 uppercase tracking-wide mb-4">
                   {tier.subtitle}
                 </p>
 
-                <p className="font-futura font-[800] text-[16px] text-pulsar-blue uppercase tracking-wide mb-1">
-                  {tier.patches} PATCHES
-                </p>
-                <p className="font-inter font-[600] text-[14px] text-gray-800 mb-6">
-                  {getProduct(tier.id) ? formatPrice(getProduct(tier.id).price) : tier.price}
+                <p className="font-futura font-[800] text-[16px] text-pulsar-blue uppercase tracking-wide mb-2">
+                  30 PATCHES / DELIVERY
                 </p>
 
+                <div className="flex items-baseline justify-center gap-2 mb-1">
+                  <span className="font-inter text-[14px] text-gray-400 line-through">{formatPrice(partyBase)}</span>
+                  <span className="font-futura font-[900] text-[26px] text-pulsar-dark">{formatPrice(price)}</span>
+                </div>
+                <p className="font-inter text-[12px] text-gray-500 mb-6">per delivery</p>
+
                 <button
-                  onClick={() => addToCart(tier.id)}
-                  className="bg-pulsar-pink text-white font-futura font-[800] text-[12px] uppercase tracking-wide px-10 py-2.5 rounded-full shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-pulsar-pink-dark"
+                  disabled
+                  className="bg-gray-200 text-gray-500 font-futura font-[800] text-[12px] uppercase tracking-wide px-10 py-2.5 rounded-full shadow-inner cursor-not-allowed"
                 >
-                  SELECT PLAN
+                  COMING SOON
                 </button>
               </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </section>
