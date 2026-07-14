@@ -333,6 +333,26 @@ export async function fetchCustomer(token) {
   return mapCustomer(data?.customer)
 }
 
+// Wholesale approval check. A customer is "approved" when the admin has added a
+// wholesale tag to them in Shopify. Kept as its OWN query (not in GET_CUSTOMER)
+// and fully guarded: reading `tags` needs the unauthenticated_read_customer_tags
+// scope, and if that scope isn't granted the request errors -- we swallow it and
+// return false so this can NEVER break login. Default is "not approved" = safe.
+const WHOLESALE_TAGS = ['wholesale', 'wholesale-approved', 'wholesale approved', 'approved-wholesale']
+const CUSTOMER_TAGS = `query customerTags($token: String!) {
+  customer(customerAccessToken: $token) { tags }
+}`
+export async function fetchWholesaleApproved(token) {
+  if (!token) return false
+  try {
+    const data = await storefrontQuery(CUSTOMER_TAGS, { token })
+    const tags = (data?.customer?.tags || []).map(t => String(t).trim().toLowerCase())
+    return tags.some(t => WHOLESALE_TAGS.includes(t))
+  } catch {
+    return false // scope not granted or any error -> treat as not approved
+  }
+}
+
 // Renew a token nearing expiry. Returns { token, expiresAt } or null.
 export async function renew(token) {
   try {

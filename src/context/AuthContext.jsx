@@ -8,6 +8,15 @@ const TOKEN_KEY = 'pulsar-customer-v1'    // real Shopify customer token
 
 const shopifyEnabled = shopifyCustomer.isConfigured()
 
+// Fetch the customer and merge in wholesale-approval (its own guarded query, so
+// it can't break the login if the tags scope isn't enabled).
+async function loadCustomer(token) {
+  const mapped = await shopifyCustomer.fetchCustomer(token)
+  if (!mapped) return null
+  const wholesaleApproved = await shopifyCustomer.fetchWholesaleApproved(token)
+  return { ...mapped, wholesaleApproved }
+}
+
 /* ── persistence helpers ── */
 function loadDemoUser() {
   try {
@@ -50,7 +59,7 @@ export function AuthProvider({ children }) {
     let cancelled = false
     const t = tokenRef.current
     if (!t) { setAuthLoading(false); return }
-    shopifyCustomer.fetchCustomer(t.token)
+    loadCustomer(t.token)
       .then(mapped => {
         if (cancelled) return
         if (mapped) setUser(mapped)
@@ -98,7 +107,7 @@ export function AuthProvider({ children }) {
   const signIn = useCallback(async (email, password) => {
     try {
       const session = await shopifyCustomer.signIn(email, password)
-      const mapped = await shopifyCustomer.fetchCustomer(session.token)
+      const mapped = await loadCustomer(session.token)
       setSession(session, mapped)
       return { ok: true }
     } catch (err) {
@@ -110,7 +119,7 @@ export function AuthProvider({ children }) {
     try {
       const { session, needsVerification } = await shopifyCustomer.signUp(fields)
       if (needsVerification || !session) return { ok: true, needsVerification: true }
-      const mapped = await shopifyCustomer.fetchCustomer(session.token)
+      const mapped = await loadCustomer(session.token)
       setSession(session, mapped)
       return { ok: true }
     } catch (err) {
@@ -121,7 +130,7 @@ export function AuthProvider({ children }) {
   const activate = useCallback(async (url, password) => {
     try {
       const session = await shopifyCustomer.activateByUrl(url, password)
-      const mapped = await shopifyCustomer.fetchCustomer(session.token)
+      const mapped = await loadCustomer(session.token)
       setSession(session, mapped)
       return { ok: true }
     } catch (err) {
@@ -132,7 +141,7 @@ export function AuthProvider({ children }) {
   const resetPassword = useCallback(async (url, password) => {
     try {
       const session = await shopifyCustomer.resetByUrl(url, password)
-      const mapped = await shopifyCustomer.fetchCustomer(session.token)
+      const mapped = await loadCustomer(session.token)
       setSession(session, mapped)
       return { ok: true }
     } catch (err) {
@@ -170,7 +179,7 @@ export function AuthProvider({ children }) {
     }
     try {
       const mapped = await shopifyCustomer.updateProfile(tokenRef.current.token, fields)
-      if (mapped) setUser(mapped)
+      if (mapped) setUser(prev => ({ ...mapped, wholesaleApproved: prev?.wholesaleApproved ?? false }))
       return { ok: true }
     } catch (err) {
       return { ok: false, error: err.message || 'Could not save your profile.' }
@@ -189,7 +198,7 @@ export function AuthProvider({ children }) {
     }
     try {
       const mapped = await shopifyCustomer.addAddress(tokenRef.current.token, addr, makeDefault)
-      if (mapped) setUser(mapped)
+      if (mapped) setUser(prev => ({ ...mapped, wholesaleApproved: prev?.wholesaleApproved ?? false }))
       return { ok: true }
     } catch (err) {
       return { ok: false, error: err.message || 'Could not add the address.' }
@@ -214,7 +223,7 @@ export function AuthProvider({ children }) {
     }
     try {
       const mapped = await shopifyCustomer.removeAddress(tokenRef.current.token, id)
-      if (mapped) setUser(mapped)
+      if (mapped) setUser(prev => ({ ...mapped, wholesaleApproved: prev?.wholesaleApproved ?? false }))
       return { ok: true }
     } catch (err) {
       return { ok: false, error: err.message || 'Could not remove the address.' }
