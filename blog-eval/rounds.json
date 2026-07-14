@@ -1,0 +1,38 @@
+{
+  "metric": "score out of 130 (10 posts x 13 criteria)",
+  "criteria": {
+    "c1": "grammar", "c2": "voice", "c3": "subheads>=3", "c4": "length>=500",
+    "c5": "one valid category", "c6": "brand mention", "c7": "inline attribution",
+    "c8": "sources section complete", "c9": "no orphan sources", "c10": "link integrity",
+    "c11": "body coherence", "c12": "section coherence", "c13": "health-claim safety"
+  },
+  "learningRun": {
+    "note": "First run: prove the prompt can self-improve to a perfect score.",
+    "rounds": [
+      { "round": 1, "total": 126, "max": 130, "posts": 10,
+        "failsByCriterion": { "c1":0,"c2":0,"c3":0,"c4":0,"c5":0,"c6":0,"c7":3,"c8":0,"c9":0,"c10":0,"c11":0,"c12":0,"c13":1 } },
+      { "round": 2, "total": 130, "max": 130, "posts": 10,
+        "failsByCriterion": { "c1":0,"c2":0,"c3":0,"c4":0,"c5":0,"c6":0,"c7":0,"c8":0,"c9":0,"c10":0,"c11":0,"c12":0,"c13":0 } }
+    ],
+    "improvedCriteria": ["c7 attribution", "c13 health-claim safety"],
+    "sourcePoolCaveat": "Eval trusted the pool; only 3/6 seed sources were genuinely on-claim. Fixed in the locked-pool run."
+  },
+  "lockedPoolRun": {
+    "note": "Second run: corrected pool + live verify+gate + real link-fetch on the winner.",
+    "sourceGate": { "verified": 5, "total": 6, "gatedOut": ["nature-nac-hangover"], "reason": "Nature redirect/cookie wall could not be confirmed this run; excluded before generation." },
+    "rounds": [
+      { "round": 1, "total": 130, "max": 130, "posts": 10,
+        "failsByCriterion": { "c1":0,"c2":0,"c3":0,"c4":0,"c5":0,"c6":0,"c7":0,"c8":0,"c9":0,"c10":0,"c11":0,"c12":0,"c13":0 } }
+    ],
+    "winner": {
+      "path": "blog-eval/v2/round1/post-9.md",
+      "title": "The Zero-Proof Spritz For Your Night Off",
+      "category": "recipes",
+      "wordCount": 707,
+      "distinctSources": 5,
+      "score": 13
+    },
+    "winnerLinkCheck": { "allPass": true, "linksVerified": 5, "linksTotal": 5, "method": "real WebFetch/WebSearch per cited URL" }
+  },
+  "run": { "workers": "sonnet", "learningRunTokens": 1044545, "lockedPoolRunTokens": 556420 }
+}

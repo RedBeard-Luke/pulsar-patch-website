@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
+import Seo, { JsonLd } from '../../components/Seo/Seo'
+import { SITE_URL, SITE_NAME } from '../../lib/seo'
 import WaveDivider from '../../components/WaveDivider/WaveDivider'
 import iconLeaf from '../../assets/Leaf_icon.svg'
 import iconShield from '../../assets/Sheild_Icon.svg'
@@ -64,6 +66,26 @@ export default function Product() {
   const patchCount = product.patches || 1
   const faqs = faqsFor(patchCount)
 
+  // Canonicalize to the named slug so /product/1 and /product/single don't split.
+  const canonicalSlug = cartId
+  const productUrl = `${SITE_URL}/product/${canonicalSlug}`
+  const productDesc = `${product.name}: a ${patchCount}-patch ${patchCount === 1 ? 'pack' : 'supply'} of Pulsar Patch, the transdermal hangover recovery patch powered by NAC and Glutathione. Peel, stick, and wake up ready.`
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: `Pulsar Patch — ${product.name}`,
+    description: productDesc,
+    brand: { '@type': 'Brand', name: SITE_NAME },
+    url: productUrl,
+    offers: {
+      '@type': 'Offer',
+      price: (product.price ?? 0).toFixed(2),
+      priceCurrency: product.currency || 'USD',
+      availability: 'https://schema.org/InStock',
+      url: productUrl,
+    },
+  }
+
   function submitReview(e) {
     e.preventDefault()
     if (!reviewForm.stars) { setReviewError('Please pick a star rating.'); return }
@@ -83,6 +105,14 @@ export default function Product() {
 
   return (
     <div className="w-full bg-white flex flex-col pb-24 lg:pb-0" id="product-page">
+
+      <Seo
+        title={`Pulsar Patch — ${product.name}`}
+        description={productDesc}
+        path={`/product/${canonicalSlug}`}
+        type="product"
+      />
+      <JsonLd data={productJsonLd} />
 
       {/* ═══ 1. PRODUCT DETAILS ═══ */}
       <section className="w-full pt-8 lg:pt-[60px] pb-10 bg-white px-5 sm:px-8 lg:px-16 xl:px-[140px]">

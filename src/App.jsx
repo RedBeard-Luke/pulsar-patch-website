@@ -8,6 +8,7 @@ import { AdminAuthProvider } from './context/AdminAuthContext'
 import Header from './components/Header/Header'
 import Footer from './components/Footer/Footer'
 import CartToast from './components/Toast/CartToast'
+import RouteSeo from './components/Seo/RouteSeo'
 import Home from './pages/Home/Home'
 
 /* Route-level code splitting: Home ships eagerly (first paint), the rest lazy-load. */
@@ -58,6 +59,7 @@ function App() {
     <ReviewsProvider>
     <Router>
       <ScrollToTop />
+      <RouteSeo />
       <div className="flex flex-col min-h-screen bg-pulsar-dark">
         <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[3000] focus:bg-pulsar-pink focus:text-white focus:px-5 focus:py-3 focus:rounded-full focus:font-futura focus:font-bold focus:text-[13px] focus:uppercase focus:tracking-wide">
           Skip to content

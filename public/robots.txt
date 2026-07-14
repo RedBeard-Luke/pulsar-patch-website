@@ -1,0 +1,14 @@
+# Pulsar Patch
+User-agent: *
+Allow: /
+
+# No-index utility routes
+Disallow: /account
+Disallow: /checkout
+Disallow: /admin
+Disallow: /activate
+Disallow: /reset
+Disallow: /business-signup
+Disallow: /affiliate-signup
+
+Sitemap: https://www.pulsarpatch.com/sitemap.xml

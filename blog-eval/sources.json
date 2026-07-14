@@ -1,0 +1,47 @@
+{
+  "note": "Vetted source pool. Every URL is real and reachable; each `claim` has been corrected to match what the page ACTUALLY says (the loop's verify phase re-confirms live, and any source that fails is gated out before generation). The generator may ONLY cite from this list, and only for the specific claim each source supports.",
+  "sources": [
+    {
+      "id": "pharmacytimes-patch-vs-oral",
+      "name": "Pharmacy Times",
+      "url": "https://www.pharmacytimes.com/view/delivery-methods-the-patch-versus-the-oral-route",
+      "claim": "Transdermal patches deliver actives through the skin and avoid the first-pass metabolism that oral pills go through, which can improve how much of the active reaches the bloodstream.",
+      "topics": ["transdermal", "patch", "absorption", "bioavailability", "first-pass"]
+    },
+    {
+      "id": "adf-thiamine",
+      "name": "Alcohol and Drug Foundation",
+      "url": "https://adf.org.au/insights/alcohol-related-thiamine-deficiency/",
+      "claim": "Heavy alcohol use can inflame the digestive tract and block the absorption of vitamins, and is associated with thiamine (vitamin B1) deficiency.",
+      "topics": ["thiamine", "vitamin b", "b1", "alcohol", "absorption", "deficiency"]
+    },
+    {
+      "id": "nature-nac-hangover",
+      "name": "Nature (Scientific Reports)",
+      "url": "https://www.nature.com/articles/s41598-021-92676-0",
+      "claim": "Hangover severity varies between individuals, with some people more prone to hangovers than others even at smaller amounts of alcohol, and is associated with the amount consumed.",
+      "topics": ["hangover", "severity", "alcohol", "individual", "study"]
+    },
+    {
+      "id": "cedars-hangover-inflammation",
+      "name": "Cedars-Sinai",
+      "url": "https://www.cedars-sinai.org/stories-and-insights/healthy-living/science-of-hangovers",
+      "claim": "Hangover symptoms are linked to an inflammatory (cytokine) response rather than dehydration, which the article says there is no good evidence for as the primary cause.",
+      "topics": ["hangover", "inflammation", "cytokines", "immune", "science"]
+    },
+    {
+      "id": "pmc-hangover-mechanisms",
+      "name": "National Library of Medicine (PMC)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6761819/",
+      "claim": "Alcohol hangover is driven by multiple mechanisms and mediators, including inflammation, rather than any single cause.",
+      "topics": ["hangover", "mechanisms", "mediators", "inflammation", "review"]
+    },
+    {
+      "id": "mdpi-glutathione-hangover",
+      "name": "Nutrients (MDPI)",
+      "url": "https://www.mdpi.com/2072-6643/16/19/3262",
+      "claim": "Glutathione (GSH) has been studied for its effects on alcohol metabolism and hangover in a randomized double-blind placebo-controlled trial.",
+      "topics": ["glutathione", "gsh", "alcohol metabolism", "hangover", "antioxidant", "trial"]
+    }
+  ]
+}

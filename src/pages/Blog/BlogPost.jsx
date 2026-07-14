@@ -1,5 +1,7 @@
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { blogPosts } from './blogData'
+import Seo, { JsonLd } from '../../components/Seo/Seo'
+import { blogPostJsonLd, blogPostMeta } from './blogSeo'
 import iconArrow from '../../assets/icon-arrow.svg'
 
 export default function BlogPost() {
@@ -8,13 +10,31 @@ export default function BlogPost() {
 
   if (!post) return <Navigate to="/blog" replace />
 
+  const meta = blogPostMeta(post, id)
+
   return (
     <div className="w-full bg-white flex flex-col" id="blog-post-page">
+
+      <Seo
+        title={meta.title}
+        description={meta.description}
+        path={`/blog/${id}`}
+        image={meta.image}
+        type="article"
+      />
+      <JsonLd data={blogPostJsonLd(post, id)} />
 
       {/* ═══════════════════════════════════════════════════════════
          1. HERO IMAGE
          ═══════════════════════════════════════════════════════════ */}
       <section className="relative w-full h-[55vh] bg-pulsar-light-blue-bg overflow-hidden">
+        {post.heroImg && (
+          <img
+            src={post.heroImg}
+            alt={post.heroAlt || ''}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
         <div className="absolute -bottom-px left-0 w-full leading-none z-10">
           <svg className="block w-full h-[40px] sm:h-[70px] lg:h-[120px]" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M0 80 Q 120 0, 240 80 T 480 80 T 720 80 T 960 80 T 1200 80 T 1440 80 L 1440 120 L 0 120 Z" fill="white" />

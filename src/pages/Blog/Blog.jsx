@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import squigleBg from '../../assets/footer_Squigle.svg'
+import { blogPosts } from './blogData'
 
 const featuredPost = {
   id: 'what-is-pulsar-patch',
@@ -85,6 +86,15 @@ const posts = [
     title: 'BEST LOW-REGRET COCKTAILS',
     date: 'MAY 8',
   },
+  // ── STAGED DRAFT: winning post from the self-improving generator ──
+  {
+    id: 'zero-proof-spritz',
+    category: 'RECIPES',
+    tag: 'RECIPES',
+    tagColor: 'bg-[#FFA700]',
+    title: 'THE ZERO-PROOF SPRITZ FOR YOUR NIGHT OFF',
+    date: 'DRAFT',
+  },
 ]
 
 const categories = [
@@ -97,10 +107,20 @@ const MAX_CAROUSEL = 5
 
 // Shared card. The wrapper width is set by the parent (carousel slide vs grid cell).
 function PostCard({ post, className = '' }) {
+  // Thumbnail comes from blogData (single source of truth for images), keyed by id.
+  const img = blogPosts[post.id]?.heroImg
   return (
     <Link to={`/blog/${post.id}`} className={`flex flex-col group ${className}`}>
       <div className="w-full aspect-[4/3] bg-pulsar-light-blue-bg rounded-[16px] mb-4 overflow-hidden relative shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
-        <div className={`absolute bottom-3 left-3 ${post.tagColor} text-white font-futura font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full`}>
+        {img && (
+          <img
+            src={img}
+            alt=""
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          />
+        )}
+        <div className={`absolute bottom-3 left-3 z-10 ${post.tagColor} text-white font-futura font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full`}>
           {post.tag}
         </div>
       </div>
@@ -243,7 +263,15 @@ export default function Blog() {
           <div className="flex flex-col lg:flex-row lg:items-center gap-8 lg:gap-[60px]">
             {/* Left: Image */}
             <div className="w-full lg:flex-[0_0_42%]">
-              <div className="w-full aspect-[4/3] bg-pulsar-light-blue-bg rounded-[20px] shadow-2xl"></div>
+              <div className="w-full aspect-[4/3] bg-pulsar-light-blue-bg rounded-[20px] shadow-2xl overflow-hidden">
+                {blogPosts[featuredPost.id]?.heroImg && (
+                  <img
+                    src={blogPosts[featuredPost.id].heroImg}
+                    alt={blogPosts[featuredPost.id].heroAlt || ''}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+              </div>
             </div>
 
             {/* Right: Title + Excerpt + CTA */}

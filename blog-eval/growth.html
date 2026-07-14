@@ -1,0 +1,173 @@
+<title>Pulsar Blog Generator — Self-Improvement Run</title>
+<style>
+  :root{
+    --ground:#F4F8FA; --surface:#FFFFFF; --ink:#14232A; --muted:#5B7480; --line:#E3EDF1;
+    --accent:#0E7C99; --accent-soft:#0e7c9922; --pink:#C4538B; --pink-soft:#c4538b1a;
+    --pass:#1E8A5B; --pass-soft:#1e8a5b1a; --miss:#B0771A; --miss-soft:#b0771a1a; --fail:#C6453E;
+    --shadow:0 1px 2px rgba(20,35,42,.06),0 8px 24px rgba(20,35,42,.06);
+    --r:16px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0D1618; --surface:#15242A; --ink:#EAF6FA; --muted:#8BA5B0; --line:#243943;
+      --accent:#44C8E8; --accent-soft:#44c8e820; --pink:#E27AAE; --pink-soft:#e27aae1f;
+      --pass:#41BA86; --pass-soft:#41ba861f; --miss:#E0A64A; --miss-soft:#e0a64a20; --fail:#E5766B;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F4F8FA; --surface:#FFFFFF; --ink:#14232A; --muted:#5B7480; --line:#E3EDF1;
+    --accent:#0E7C99; --accent-soft:#0e7c9922; --pink:#C4538B; --pink-soft:#c4538b1a;
+    --pass:#1E8A5B; --pass-soft:#1e8a5b1a; --miss:#B0771A; --miss-soft:#b0771a1a; --fail:#C6453E;
+    --shadow:0 1px 2px rgba(20,35,42,.06),0 8px 24px rgba(20,35,42,.06);
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D1618; --surface:#15242A; --ink:#EAF6FA; --muted:#8BA5B0; --line:#243943;
+    --accent:#44C8E8; --accent-soft:#44c8e820; --pink:#E27AAE; --pink-soft:#e27aae1f;
+    --pass:#41BA86; --pass-soft:#41ba861f; --miss:#E0A64A; --miss-soft:#e0a64a20; --fail:#E5766B;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased;
+    font-variant-numeric:tabular-nums;}
+  .wrap{max-width:860px;margin:0 auto;padding:40px 22px 72px;}
+  .eyebrow{font-size:12px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin:0 0 12px;}
+  h1{font-size:clamp(26px,5vw,40px);line-height:1.06;font-weight:850;letter-spacing:-.4px;margin:0 0 10px;text-wrap:balance;}
+  .lede{color:var(--muted);font-size:16px;max-width:60ch;margin:0 0 34px;}
+  .grid{display:grid;gap:16px;}
+  .cols-3{grid-template-columns:repeat(3,1fr);}
+  .cols-2{grid-template-columns:1fr 1fr;}
+  @media (max-width:620px){.cols-3,.cols-2{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);}
+  .tile .k{font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:0 0 8px;}
+  .tile .v{font-size:34px;font-weight:850;letter-spacing:-.5px;line-height:1;}
+  .tile .v small{font-size:16px;font-weight:700;color:var(--muted);letter-spacing:0;}
+  .tile .sub{font-size:12.5px;color:var(--muted);margin-top:7px;}
+  .up{color:var(--pass);font-weight:800;}
+  .section-h{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:38px 0 14px;}
+  figure{margin:0;}
+  svg{display:block;width:100%;height:auto;}
+  .axis{stroke:var(--line);stroke-width:1.5;}
+  .target{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:5 5;opacity:.7;}
+  .scoreline{stroke:var(--accent);stroke-width:3;fill:none;}
+  .fillzone{fill:var(--accent-soft);}
+  .dot{fill:var(--surface);stroke:var(--accent);stroke-width:3;}
+  .dot-final{fill:var(--accent);stroke:var(--surface);stroke-width:3;}
+  .vlabel{fill:var(--ink);font-weight:850;font-size:19px;}
+  .xlabel{fill:var(--muted);font-weight:700;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;}
+  .ylabel{fill:var(--muted);font-size:11px;font-weight:600;}
+  .tlabel{fill:var(--muted);font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;}
+  .fixrow{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line);}
+  .fixrow:first-child{border-top:0;}
+  .fixrow .name{flex:1;font-weight:700;font-size:15px;}
+  .fixrow .name span{display:block;font-weight:500;font-size:12.5px;color:var(--muted);}
+  .chip{font-size:12px;font-weight:800;letter-spacing:.4px;padding:5px 10px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
+  .chip.miss{color:var(--miss);background:var(--miss-soft);}
+  .chip.pass{color:var(--pass);background:var(--pass-soft);}
+  .arrow{color:var(--muted);font-weight:800;}
+  .warn{border-color:var(--miss);background:var(--miss-soft);}
+  .warn h3{margin:0 0 6px;font-size:16px;font-weight:850;display:flex;align-items:center;gap:8px;}
+  .warn p{margin:0 0 14px;font-size:14px;color:var(--ink);}
+  .ok{border-color:var(--pass);background:var(--pass-soft);}
+  .ok h3{margin:0 0 6px;font-size:16px;font-weight:850;display:flex;align-items:center;gap:8px;}
+  .ok p{margin:0 0 14px;font-size:14px;color:var(--ink);}
+  .srclist{list-style:none;margin:0;padding:0;display:grid;gap:9px;}
+  .srclist li{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;}
+  .badge{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;margin-top:1px;color:#fff;}
+  .badge.no{background:var(--fail);}
+  .badge.yes{background:var(--pass);}
+  .srclist .src-name{font-weight:750;}
+  .srclist .why{color:var(--muted);}
+  .foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px 20px;}
+  .foot b{color:var(--ink);font-weight:750;}
+  a{color:var(--accent);}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Pulsar · self-improving skill run</p>
+  <h1>The blog generator taught itself to a perfect score</h1>
+  <p class="lede">An autoresearch-style loop: generate 10 posts with the current prompt, score them against the 13 constraints (max 130), then rewrite the prompt to attack its weakest criteria and go again. It converged in two rounds — then a second, locked-pool run verified every source live and fetched the winning post's links for real.</p>
+
+  <div class="grid cols-3">
+    <div class="card tile">
+      <p class="k">Final score</p>
+      <p class="v">130<small> / 130</small></p>
+      <p class="sub">Round 2 — every post, every criterion</p>
+    </div>
+    <div class="card tile">
+      <p class="k">Round 1 → 2</p>
+      <p class="v">126 <span class="up">→ 130</span></p>
+      <p class="sub"><span class="up">+4</span> after one prompt rewrite</p>
+    </div>
+    <div class="card tile">
+      <p class="k">Rounds to converge</p>
+      <p class="v">2</p>
+      <p class="sub">Stopped early on a perfect round</p>
+    </div>
+  </div>
+
+  <p class="section-h">Score per round (out of 130)</p>
+  <figure class="card">
+    <svg viewBox="0 0 640 250" role="img" aria-label="Line chart: round 1 scored 126 of 130, round 2 scored 130 of 130.">
+      <!-- y gridlines/labels -->
+      <line class="axis" x1="70" y1="30" x2="70" y2="200"></line>
+      <line class="axis" x1="70" y1="200" x2="600" y2="200"></line>
+      <!-- target line at 130 -->
+      <line class="target" x1="70" y1="42" x2="600" y2="42"></line>
+      <text class="tlabel" x="600" y="36" text-anchor="end">Target 130</text>
+      <!-- y ticks: 120,124,128,130 mapped; domain 118..131 over y 200..30 -->
+      <text class="ylabel" x="60" y="204" text-anchor="end">118</text>
+      <text class="ylabel" x="60" y="139" text-anchor="end">123</text>
+      <text class="ylabel" x="60" y="46" text-anchor="end">130</text>
+      <!-- points: x r1=200 r2=470 ; y(v)=200-(v-118)/13*170 -->
+      <!-- r1 126 -> y=200-(8/13*170)=95.4 ; r2 130 -> y=200-(12/13*170)=43.1 -->
+      <polygon class="fillzone" points="200,95.4 470,43.1 470,200 200,200"></polygon>
+      <polyline class="scoreline" points="200,95.4 470,43.1"></polyline>
+      <circle class="dot" cx="200" cy="95.4" r="7"><title>Round 1: 126 / 130</title></circle>
+      <circle class="dot-final" cx="470" cy="43.1" r="7.5"><title>Round 2: 130 / 130</title></circle>
+      <text class="vlabel" x="200" y="84" text-anchor="middle">126</text>
+      <text class="vlabel" x="470" y="32" text-anchor="middle">130</text>
+      <text class="xlabel" x="200" y="222" text-anchor="middle">Round 1</text>
+      <text class="xlabel" x="470" y="222" text-anchor="middle">Round 2</text>
+    </svg>
+  </figure>
+
+  <p class="section-h">What the prompt rewrite fixed</p>
+  <div class="card">
+    <div class="fixrow">
+      <div class="name">Inline attribution <span>Every non-Pulsar claim needs a source link right at the claim</span></div>
+      <span class="chip miss">3 posts missed</span>
+      <span class="arrow">→</span>
+      <span class="chip pass">0 in R2</span>
+    </div>
+    <div class="fixrow">
+      <div class="name">Health-claim safety <span>No treat / cure / prevent language for a condition</span></div>
+      <span class="chip miss">1 post missed</span>
+      <span class="arrow">→</span>
+      <span class="chip pass">0 in R2</span>
+    </div>
+    <p style="margin:16px 0 0;font-size:13px;color:var(--muted)">Prompt v1 → v2 added a stricter "source sits in the same clause as the claim" rule with a good/bad example, and widened the banned-health-verb list to cover headers and subheads, not just the closing line.</p>
+  </div>
+
+  <p class="section-h">Pool lockdown — verified</p>
+  <div class="card ok">
+    <h3>✓ Pool locked, and the winner's links were fetched and confirmed</h3>
+    <p>The seed pool had 3 bad claim-to-URL mappings. Those were corrected, then a re-run added a live verify+gate step plus a real link-fetch pass on the winning post to prove it out.</p>
+    <ul class="srclist">
+      <li><span class="badge yes">✓</span><span><span class="src-name">5 of 6 sources verified live</span> — <span class="why">Nature couldn't be confirmed this run (redirect/cookie wall) and was automatically gated out — the generator never saw it.</span></span></li>
+      <li><span class="badge yes">✓</span><span><span class="src-name">Locked-pool re-run scored 130/130 on round 1</span> — <span class="why">clean pool, verified-sources-only, no prompt rewrite needed.</span></span></li>
+      <li><span class="badge yes">✓</span><span><span class="src-name">Winner: "The Zero-Proof Spritz For Your Night Off"</span> — <span class="why">707 words, recipes, cites 5 sources.</span></span></li>
+      <li><span class="badge yes">✓</span><span><span class="src-name">All 5 of the winner's links fetched &amp; confirmed on-claim</span> — <span class="why">a real WebFetch/WebSearch pass, not pool-trust. Publish-ready.</span></span></li>
+    </ul>
+  </div>
+
+  <div class="foot">
+    <span>learning run: <b>42</b> agents · <b>~1.04M</b> tok</span>
+    <span>locked-pool run: <b>22</b> agents · <b>~556k</b> tok</span>
+    <span>workers: <b>Sonnet</b></span>
+    <span>winner links verified: <b>5 / 5</b></span>
+    <span>13 criteria × 10 posts = <b>130</b></span>
+  </div>
+</div>
