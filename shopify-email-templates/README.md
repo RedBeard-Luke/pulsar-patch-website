@@ -26,9 +26,8 @@ solid Pulsar-blue (`#44C8E8`) rectangle**, mirroring the blue header blocks on
 the site. Keep this style for any new email templates.
 
 ## Brand bits
-- Font: **Inter** (site body font) via Google Fonts `@import`, with
-  `'Helvetica Neue',Helvetica,Arial,sans-serif` fallback (Gmail/Outlook can't
-  load web fonts and fall back; Apple Mail renders real Inter)
+- Font: clean **sans-serif** stack `'Helvetica Neue', Helvetica, Arial,
+  sans-serif` (no web font, no serif, renders reliably everywhere)
 - Background: white (`#ffffff`)
 - Primary button: pink pill (`#DE64A5`, fully rounded, white uppercase text)
 - Links: Pulsar blue (`#44C8E8`)
