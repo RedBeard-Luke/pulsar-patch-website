@@ -14,15 +14,14 @@ import './Product.css'
 
 // Map URL param IDs to cart product IDs
 const PRODUCT_MAP = {
-  '1': 'single', '2': '3pack', '3': '6pack', '4': 'kickback', '5': 'party',
-  single: 'single', '3pack': '3pack', '6pack': '6pack', kickback: 'kickback', party: 'party',
+  '1': 'single', '2': '3pack', '3': '6pack', '5': 'party',
+  single: 'single', '3pack': '3pack', '6pack': '6pack', party: 'party',
 }
 
 const overviews = {
   single: "The Single Patch gives you one powerful dose of overnight hangover defense. Perfect for a night out, a wedding weekend, or a test run before you commit to more. Powered by NAC and Glutathione, it supports your body while you sleep so you wake up sharper and ready for what's next.",
   '3pack': "The 3 Patch Bundle is built for the weekender. Three patches for three nights out. A long weekend, a mini trip, or just a solid stretch of plans, you'll have one ready every time. Same formula, same easy application, just more of it.",
   '6pack': "The 6 Patch Combo is for the person who plans ahead. Six patches means you're covered for weeks of weekends without reordering. Our most popular bundle for a reason: reliable, simple, and always there when the group chat gets active.",
-  kickback: "The Kick Back Pack comes with 10 patches, enough for over two months of weekend nights. Perfect for the person who likes to stay ready without thinking about it. Stock your nightstand, your travel bag, or split them with a friend.",
   party: "The Party Pack is 30 patches for the person who refuses to slow down. Stock up for the season, share with your crew, or lock in the best value per patch. You'll forget what a rough morning feels like.",
 }
 
@@ -239,6 +238,32 @@ export default function Product() {
                 Add to cart · ${(product.price * qty).toFixed(2)}
               </button>
             </div>
+
+            {/* Party Pack only: buy once vs subscribe & save */}
+            {cartId === 'party' && (
+              <div className="w-full max-w-[500px] mt-8">
+                <p className="font-futura font-[800] text-[12px] text-pulsar-blue uppercase tracking-widest mb-3">Buy once or subscribe</p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {/* Option 1 — One-time */}
+                  <div className="flex-1 rounded-2xl border-2 border-pulsar-pink bg-pulsar-pink/[0.04] p-4">
+                    <span className="font-futura font-[800] text-[10px] text-gray-400 uppercase tracking-widest">Option 1</span>
+                    <p className="font-futura font-[900] text-[13px] text-pulsar-dark uppercase tracking-wide mt-1">One-Time Purchase</p>
+                    <p className="font-inter font-[700] text-[20px] text-pulsar-pink mt-1">${product.price.toFixed(2)}</p>
+                  </div>
+                  {/* Option 2 — Subscribe & save */}
+                  <div className="flex-1 rounded-2xl border-2 border-pulsar-blue bg-pulsar-light-blue-bg/40 p-4 relative">
+                    <span className="absolute top-3 right-3 bg-pulsar-blue text-white font-futura font-[900] text-[9px] uppercase tracking-wide px-2 py-0.5 rounded-full">Save 15%</span>
+                    <span className="font-futura font-[800] text-[10px] text-gray-400 uppercase tracking-widest">Option 2</span>
+                    <p className="font-futura font-[900] text-[13px] text-pulsar-dark uppercase tracking-wide mt-1">Subscribe &amp; Save</p>
+                    <div className="flex items-baseline gap-2 mt-1">
+                      <p className="font-inter font-[700] text-[20px] text-pulsar-blue">${(product.price * 0.85).toFixed(2)}</p>
+                      <span className="font-inter text-[12px] text-gray-400 line-through">${product.price.toFixed(2)}</span>
+                    </div>
+                    <Link to="/subscription" className="inline-block font-futura font-[800] text-[10px] text-pulsar-blue uppercase tracking-widest mt-2 hover:text-pulsar-pink">See plans →</Link>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

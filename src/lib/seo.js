@@ -96,7 +96,7 @@ export const ROUTE_META = {
 }
 
 // Canonical product slugs (named, not the numeric aliases). Used by the sitemap.
-export const PRODUCT_SLUGS = ['single', '3pack', '6pack', 'kickback', 'party']
+export const PRODUCT_SLUGS = ['single', '3pack', '6pack', 'party']
 
 // Routes that should NOT be indexed (account/checkout/admin/auth flows). These
 // get a robots noindex tag and are excluded from the sitemap.

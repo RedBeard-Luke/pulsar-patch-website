@@ -22,7 +22,6 @@ const sitePages = [
     { label: 'Single Patch', path: '/product/1' },
     { label: '3 Patch Bundle', path: '/product/2' },
     { label: '6 Patch Combo', path: '/product/3' },
-    { label: 'Kick Back Pack (10)', path: '/product/4' },
     { label: 'Party Pack (30)', path: '/product/5' },
   ]},
   { section: 'ACCOUNT & COMMERCE', links: [

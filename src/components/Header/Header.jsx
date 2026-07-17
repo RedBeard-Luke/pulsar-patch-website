@@ -22,7 +22,6 @@ const SEARCH_INDEX = [
   { title: 'Single Patch', path: '/product/1', tags: 'single patch one 1 buy $6' },
   { title: '3 Patch Bundle', path: '/product/2', tags: '3 patch bundle three pack buy' },
   { title: '6 Patch Combo', path: '/product/3', tags: '6 patch combo six pack buy' },
-  { title: 'Kick Back Pack', path: '/product/4', tags: 'kick back pack 10 ten patches buy' },
   { title: 'Party Pack', path: '/product/5', tags: 'party pack 30 thirty patches buy' },
 ]
 

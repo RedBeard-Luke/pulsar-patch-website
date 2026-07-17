@@ -12,7 +12,6 @@ const products = [
   { id: 1, cartId: 'single',   name: 'SINGLE PATCH',    patches: 1,  price: 6.00,  originalPrice: null,  badge: null },
   { id: 2, cartId: '3pack',    name: '3 PATCH BUNDLE',  patches: 3,  price: 15.80, originalPrice: 18.00, badge: null },
   { id: 3, cartId: '6pack',    name: '6 PATCH COMBO',   patches: 6,  price: 25.20, originalPrice: 36.00, badge: 'Most popular' },
-  { id: 4, cartId: 'kickback', name: 'KICK BACK PACK',  patches: 10, price: 35.33, originalPrice: 60.00, badge: null },
   { id: 5, cartId: 'party',    name: 'PARTY PACK',      patches: 30, price: 90.00, originalPrice: 180.00, badge: 'Best value' },
 ]
 
@@ -35,7 +34,7 @@ export default function Shop() {
           <h1 className="font-futura font-[900] text-[clamp(2rem,7vw,3rem)] text-pulsar-blue uppercase tracking-wide mb-2 text-center">Shop All</h1>
           <p className="font-inter text-[15px] text-gray-500 mb-10 text-center max-w-[460px]">Buy more, save more. Every pack is the same formula, just stocked up for more nights.</p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 lg:gap-8 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-8 w-full">
             {products.map((base) => {
               // Live Shopify price overrides the placeholder when available.
               const live = getProduct(base.cartId)
@@ -72,9 +71,24 @@ export default function Shop() {
             })}
           </div>
 
-          <Link to="/subscription" className="mt-10 font-futura font-bold text-[13px] uppercase tracking-wide text-pulsar-blue hover:text-pulsar-pink transition-colors">
-            Or subscribe and save →
-          </Link>
+          {/* Subscribe & Save CTA */}
+          <div className="mt-14 w-full max-w-[1100px]">
+            <div className="relative overflow-hidden rounded-[28px] bg-pulsar-blue px-8 py-10 lg:px-14 lg:py-12 flex flex-col lg:flex-row items-center justify-between gap-8 text-center lg:text-left shadow-lg">
+              <div className="max-w-[520px]">
+                <span className="inline-block bg-pulsar-pink text-white font-futura font-[900] text-[11px] uppercase tracking-widest px-3 py-1 rounded-full mb-3">Save 15%</span>
+                <h2 className="font-futura font-[900] text-white text-[clamp(1.5rem,4vw,2rem)] uppercase tracking-wide leading-none mb-3">Subscribe &amp; Save</h2>
+                <p className="font-inter text-white/85 text-[14px] leading-[1.6]">
+                  Get the 30-patch Party Pack on your schedule, 15% off every shipment with free shipping. Skip, pause, or cancel anytime.
+                </p>
+              </div>
+              <Link
+                to="/subscription"
+                className="shrink-0 bg-white text-pulsar-blue font-futura font-[800] text-[13px] uppercase tracking-widest px-8 py-3.5 rounded-full transition-all hover:bg-pulsar-pink hover:text-white hover:-translate-y-0.5"
+              >
+                Subscribe &amp; Save →
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 

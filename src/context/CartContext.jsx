@@ -14,7 +14,6 @@ export const PRODUCTS = [
   { id: 'single',    name: 'Single Patch',        price: 6.00,  originalPrice: null,  subscription: false, patches: 1 },
   { id: '3pack',     name: '3 Patch Bundle',      price: 15.80, originalPrice: 18.00, subscription: false, patches: 3 },
   { id: '6pack',     name: '6 Patch Combo',       price: 25.20, originalPrice: 36.00, subscription: false, patches: 6 },
-  { id: 'kickback',  name: 'Kick Back Pack',      price: 35.33, originalPrice: 60.00, subscription: false, patches: 10 },
   { id: 'party',     name: 'Party Pack',          price: 90.00, originalPrice: 180.00, subscription: false, patches: 30 },
   { id: 'sub-weekend', name: 'The Weekend Warrior', price: 21.00, originalPrice: null, subscription: true, patches: 4 },
   { id: 'sub-social',  name: 'The Social Calendar', price: 36.00, originalPrice: null, subscription: true, patches: 8 },

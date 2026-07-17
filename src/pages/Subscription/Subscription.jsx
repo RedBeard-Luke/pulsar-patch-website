@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useCart, formatPrice } from '../../context/CartContext'
 import CurvedFeature from '../../components/CurvedFeature/CurvedFeature'
 import subHeroBg from '../../assets/subscription-hero.jpg'
@@ -6,33 +7,20 @@ import calendarIcon from '../../assets/Calender_icon.svg'
 import dollarIcon from '../../assets/$.svg'
 import squigleBg from '../../assets/footer_Squigle.svg'
 
-// One product now: the 30-patch Party Pack. The only choice is how often it
-// ships. More frequent delivery = bigger discount off the regular $90 price.
+// One product: the 30-patch Party Pack. Buy it once for the regular price, or
+// subscribe and save a flat 15% on every shipment. The only choice on the
+// subscription is how often it ships. Every 2 months is emphasized as the most
+// popular cadence — repeat 30-pack buyers commonly reorder around that timeframe.
 const PARTY_BASE = 90
+const SUB_DISCOUNT = 0.15
 
-const tiers = [
-  {
-    id: 'sub-30',
-    cadence: 'EVERY 30 DAYS',
-    subtitle: 'FOR THE REGULARS WHO GO OUT MOST WEEKENDS.',
-    discount: 0.15,
-    recommended: true,
-  },
-  {
-    id: 'sub-60',
-    cadence: 'EVERY 60 DAYS',
-    subtitle: 'A STEADY STASH FOR THE EVERY-OTHER-WEEKEND CROWD.',
-    discount: 0.10,
-    recommended: false,
-  },
-  {
-    id: 'sub-90',
-    cadence: 'EVERY 90 DAYS',
-    subtitle: 'STOCK UP AND COAST. FOR THE OCCASIONAL BIG NIGHT.',
-    discount: 0.05,
-    recommended: false,
-  },
+const frequencies = [
+  { id: 'monthly', label: 'Every month', badge: null, recommended: false },
+  { id: 'bimonthly', label: 'Every 2 months', badge: 'Most Popular', recommended: true },
+  { id: 'quarterly', label: 'Every 3 months', badge: null, recommended: false },
 ]
+
+const subPerks = ['15% savings', 'Free shipping', 'Skip, pause, or cancel anytime']
 
 const benefits = [
   {
@@ -53,8 +41,10 @@ const benefits = [
 ]
 
 export default function Subscription() {
-  const { getProduct } = useCart()
+  const { getProduct, addToCart } = useCart()
   const partyBase = getProduct('party')?.price ?? PARTY_BASE
+  const subPrice = partyBase * (1 - SUB_DISCOUNT)
+  const [frequency, setFrequency] = useState('bimonthly')
   return (
     <div className="w-full bg-white flex flex-col" id="subscription-page">
 
@@ -85,10 +75,10 @@ export default function Subscription() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════
-         2. SUBSCRIPTION TIERS
+         2. BUY ONCE OR SUBSCRIBE & SAVE
          ═══════════════════════════════════════════════════════════ */}
       <section className="bg-white py-[100px]">
-        <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
+        <div className="max-w-[1180px] mx-auto px-5 sm:px-8 lg:px-16">
           <h2 className="font-futura font-[900] text-[36px] text-pulsar-blue uppercase tracking-wide mb-4">
             ONE PACK, YOUR SCHEDULE
           </h2>
@@ -96,68 +86,93 @@ export default function Subscription() {
           {/* How it works */}
           <div className="max-w-[720px] mb-14">
             <p className="font-inter text-[15px] leading-[1.7] text-pulsar-dark mb-3">
-              It's one pack, our 30-patch Party Pack, and the only thing you pick is how often it shows up. The more often it ships, the more you save off the regular {formatPrice(partyBase)} price.
-            </p>
-            <p className="font-inter text-[15px] leading-[1.7] text-gray-600">
-              Every 30 days saves you 15%, every 60 days saves 10%, and every 90 days saves 5%. Same 30 patches each delivery, no lock-in. Skip, change your schedule, or cancel whenever you want.
+              It's one pack, our 30-patch Party Pack. Buy it once for {formatPrice(partyBase)}, or subscribe and save 15% on every shipment with free shipping. You pick how often it shows up, and you can skip, pause, or cancel anytime.
             </p>
             <p className="font-futura font-[800] text-[13px] text-pulsar-blue uppercase tracking-wide mt-4">
               Subscriptions are launching soon. Pick your plan then.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
-            {tiers.map((tier) => {
-              const price = partyBase * (1 - tier.discount)
-              return (
-              <div
-                key={tier.id}
-                className={`flex flex-col items-center text-center p-8 rounded-[24px] border-2 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-lg ${
-                  tier.recommended
-                    ? 'border-pulsar-blue shadow-glow-blue scale-105 hover:scale-110'
-                    : 'border-gray-200'
-                }`}
-              >
-                {tier.recommended && (
-                  <span className="font-futura font-[900] text-[14px] text-pulsar-blue uppercase tracking-widest mb-4">
-                    BEST VALUE
-                  </span>
-                )}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
 
-                {/* Image placeholder */}
-                <div className="w-full aspect-[4/3] bg-pulsar-light-blue-bg rounded-[16px] mb-6 shadow-md"></div>
-
-                {/* Discount badge */}
-                <span className="inline-block bg-pulsar-pink text-white font-futura font-[900] text-[13px] uppercase tracking-wide px-4 py-1 rounded-full mb-4">
-                  SAVE {tier.discount * 100}%
-                </span>
-
-                <h3 className="font-futura font-[900] text-[20px] text-pulsar-dark uppercase tracking-wide mb-1">
-                  {tier.cadence}
-                </h3>
-                <p className="font-inter text-[12px] text-gray-500 uppercase tracking-wide mb-4">
-                  {tier.subtitle}
-                </p>
-
-                <p className="font-futura font-[800] text-[16px] text-pulsar-blue uppercase tracking-wide mb-2">
-                  30 PATCHES / DELIVERY
-                </p>
-
-                <div className="flex items-baseline justify-center gap-2 mb-1">
-                  <span className="font-inter text-[14px] text-gray-400 line-through">{formatPrice(partyBase)}</span>
-                  <span className="font-futura font-[900] text-[26px] text-pulsar-dark">{formatPrice(price)}</span>
-                </div>
-                <p className="font-inter text-[12px] text-gray-500 mb-6">per delivery</p>
-
-                <button
-                  disabled
-                  className="bg-gray-200 text-gray-500 font-futura font-[800] text-[12px] uppercase tracking-wide px-10 py-2.5 rounded-full shadow-inner cursor-not-allowed"
-                >
-                  COMING SOON
-                </button>
+            {/* ── OPTION 1: ONE-TIME ── */}
+            <div className="flex flex-col p-8 rounded-[24px] border-2 border-gray-200">
+              <span className="font-futura font-[900] text-[12px] text-gray-400 uppercase tracking-widest mb-2">Option 1</span>
+              <h3 className="font-futura font-[900] text-[22px] text-pulsar-dark uppercase tracking-wide mb-5">One-Time Purchase</h3>
+              <div className="w-full aspect-[16/9] bg-pulsar-light-blue-bg rounded-[16px] mb-6 shadow-sm"></div>
+              <p className="font-futura font-[800] text-[15px] text-pulsar-blue uppercase tracking-wide mb-1">30 Patches</p>
+              <div className="flex items-baseline gap-2 mb-6">
+                <span className="font-futura font-[900] text-[34px] text-pulsar-dark">{formatPrice(partyBase)}</span>
+                <span className="font-inter text-[13px] text-gray-500">one time</span>
               </div>
-              )
-            })}
+              <p className="font-inter text-[13px] leading-[1.6] text-gray-600 mb-6">
+                One 30-patch Party Pack, no commitment. Order whenever you need a refill.
+              </p>
+              <button
+                onClick={() => addToCart('party')}
+                className="mt-auto bg-pulsar-pink text-white font-futura font-[800] text-[13px] uppercase tracking-widest px-10 py-3 rounded-full shadow-md transition-all hover:bg-pulsar-pink-dark hover:-translate-y-0.5"
+              >
+                Add to cart
+              </button>
+            </div>
+
+            {/* ── OPTION 2: SUBSCRIBE & SAVE (emphasized) ── */}
+            <div className="relative flex flex-col p-8 rounded-[24px] border-2 border-pulsar-blue shadow-glow-blue">
+              <span className="absolute -top-3 left-8 bg-pulsar-pink text-white font-futura font-[900] text-[11px] uppercase tracking-widest px-3 py-1 rounded-full">Save 15%</span>
+              <span className="font-futura font-[900] text-[12px] text-pulsar-blue uppercase tracking-widest mb-2">Option 2</span>
+              <h3 className="font-futura font-[900] text-[22px] text-pulsar-dark uppercase tracking-wide mb-5">Subscribe &amp; Save</h3>
+              <div className="w-full aspect-[16/9] bg-pulsar-light-blue-bg rounded-[16px] mb-6 shadow-md"></div>
+              <p className="font-futura font-[800] text-[15px] text-pulsar-blue uppercase tracking-wide mb-1">30 Patches / shipment</p>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="font-inter text-[15px] text-gray-400 line-through">{formatPrice(partyBase)}</span>
+                <span className="font-futura font-[900] text-[34px] text-pulsar-blue">{formatPrice(subPrice)}</span>
+              </div>
+              <p className="font-inter text-[12px] text-gray-500 mb-5">per shipment</p>
+
+              {/* Perks */}
+              <ul className="flex flex-col gap-2 mb-7">
+                {subPerks.map((perk) => (
+                  <li key={perk} className="flex items-center gap-2.5">
+                    <span className="shrink-0 w-4 h-4 rounded-full bg-pulsar-blue text-white flex items-center justify-center text-[10px] font-bold">✓</span>
+                    <span className="font-inter text-[13px] text-pulsar-dark">{perk}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Delivery frequency */}
+              <p className="font-futura font-[800] text-[12px] text-pulsar-dark uppercase tracking-widest mb-3">Delivery frequency</p>
+              <div className="flex flex-col gap-3 mb-7">
+                {frequencies.map((f) => {
+                  const selected = frequency === f.id
+                  return (
+                    <button
+                      key={f.id}
+                      onClick={() => setFrequency(f.id)}
+                      className={`flex items-center justify-between gap-3 w-full text-left rounded-full border-2 px-5 py-3 transition-all ${
+                        selected ? 'border-pulsar-blue bg-pulsar-light-blue-bg/50' : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <span className={`shrink-0 w-4 h-4 rounded-full border-2 flex items-center justify-center ${selected ? 'border-pulsar-blue' : 'border-gray-300'}`}>
+                          {selected && <span className="w-2 h-2 rounded-full bg-pulsar-blue" />}
+                        </span>
+                        <span className="font-futura font-[800] text-[13px] text-pulsar-dark uppercase tracking-wide">{f.label}</span>
+                      </span>
+                      {f.badge && (
+                        <span className="shrink-0 bg-pulsar-pink text-white font-futura font-[900] text-[9px] uppercase tracking-wide px-2.5 py-1 rounded-full">{f.badge}</span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+
+              <button
+                disabled
+                className="mt-auto bg-gray-200 text-gray-500 font-futura font-[800] text-[13px] uppercase tracking-widest px-10 py-3 rounded-full shadow-inner cursor-not-allowed"
+              >
+                COMING SOON
+              </button>
+            </div>
           </div>
         </div>
       </section>
