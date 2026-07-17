@@ -235,12 +235,17 @@ function planMonths(plan) {
  * product isn't mapped as a PRODUCT, or the request fails (button stays "soon").
  */
 export async function getSellingPlans(cartId = 'party') {
-  const empty = { byMonths: {}, plans: [] }
-  if (!isConfigured()) return empty
+  if (!isConfigured()) return { byMonths: {}, plans: [], error: 'Shopify not configured (missing VITE_SHOPIFY_DOMAIN / TOKEN)' }
   // Selling plans hang off the PRODUCT, so we need a product mapping (not just a
   // variant one) to look them up.
   const gid = toGid('Product', PRODUCT_MAP[cartId])
-  if (!gid) return empty
+  if (!gid) {
+    return {
+      byMonths: {},
+      plans: [],
+      error: `No product GID for "${cartId}". It must be mapped in VITE_SHOPIFY_PRODUCTS as a product id (not only in VITE_SHOPIFY_VARIANTS).`,
+    }
+  }
   try {
     const data = await storefront(SELLING_PLANS_QUERY, { id: gid })
     const groups = data?.product?.sellingPlanGroups?.nodes || []
@@ -254,9 +259,9 @@ export async function getSellingPlans(cartId = 'party') {
     for (const p of plans) {
       if (p.months && !byMonths[p.months]) byMonths[p.months] = p
     }
-    return { byMonths, plans }
-  } catch {
-    return empty
+    return { byMonths, plans, error: null, groups: groups.length }
+  } catch (err) {
+    return { byMonths: {}, plans: [], error: String(err?.message || err) }
   }
 }
 
