@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCart, formatPrice } from '../../context/CartContext'
+import { isConfigured, getSellingPlans, createCheckout } from '../../lib/shopify'
 import CurvedFeature from '../../components/CurvedFeature/CurvedFeature'
 import subHeroBg from '../../assets/subscription-hero.jpg'
 import cheersIcon from '../../assets/Cheers_icon.svg'
@@ -15,9 +16,9 @@ const PARTY_BASE = 90
 const SUB_DISCOUNT = 0.15
 
 const frequencies = [
-  { id: 'monthly', label: 'Every month', badge: null, recommended: false },
-  { id: 'bimonthly', label: 'Every 2 months', badge: 'Most Popular', recommended: true },
-  { id: 'quarterly', label: 'Every 3 months', badge: null, recommended: false },
+  { id: 'monthly', label: 'Every month', months: 1, badge: null, recommended: false },
+  { id: 'bimonthly', label: 'Every 2 months', months: 2, badge: 'Most Popular', recommended: true },
+  { id: 'quarterly', label: 'Every 3 months', months: 3, badge: null, recommended: false },
 ]
 
 const subPerks = ['15% savings', 'Free shipping', 'Skip, pause, or cancel anytime']
@@ -45,6 +46,39 @@ export default function Subscription() {
   const partyBase = getProduct('party')?.price ?? PARTY_BASE
   const subPrice = partyBase * (1 - SUB_DISCOUNT)
   const [frequency, setFrequency] = useState('bimonthly')
+
+  // Selling plans fetched from Shopify (keyed by month interval). Until they
+  // load (or if Shopify isn't connected), subscribe stays "coming soon".
+  const [plansByMonths, setPlansByMonths] = useState({})
+  const [subStatus, setSubStatus] = useState('idle') // idle | loading | error
+  const [subError, setSubError] = useState('')
+
+  useEffect(() => {
+    if (!isConfigured()) return
+    let alive = true
+    getSellingPlans('party')
+      .then(({ byMonths }) => { if (alive) setPlansByMonths(byMonths || {}) })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [])
+
+  const subsAvailable = Object.keys(plansByMonths).length > 0
+  const selectedFreq = frequencies.find(f => f.id === frequency)
+  const selectedPlan = selectedFreq ? plansByMonths[selectedFreq.months] : null
+
+  async function handleSubscribe() {
+    if (!selectedPlan) return
+    setSubStatus('loading')
+    setSubError('')
+    try {
+      const url = await createCheckout([{ productId: 'party', qty: 1, sellingPlanId: selectedPlan.id }])
+      window.location.href = url
+    } catch (e) {
+      setSubError(e.message || 'Could not start checkout. Please try again.')
+      setSubStatus('error')
+    }
+  }
+
   return (
     <div className="w-full bg-white flex flex-col" id="subscription-page">
 
@@ -88,9 +122,11 @@ export default function Subscription() {
             <p className="font-inter text-[15px] leading-[1.7] text-pulsar-dark mb-3">
               It's one pack, our 30-patch Party Pack. Buy it once for {formatPrice(partyBase)}, or subscribe and save 15% on every shipment with free shipping. You pick how often it shows up, and you can skip, pause, or cancel anytime.
             </p>
-            <p className="font-futura font-[800] text-[13px] text-pulsar-blue uppercase tracking-wide mt-4">
-              Subscriptions are launching soon. Pick your plan then.
-            </p>
+            {!subsAvailable && (
+              <p className="font-futura font-[800] text-[13px] text-pulsar-blue uppercase tracking-wide mt-4">
+                Subscriptions are launching soon. Pick your plan then.
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
@@ -166,12 +202,25 @@ export default function Subscription() {
                 })}
               </div>
 
-              <button
-                disabled
-                className="mt-auto bg-gray-200 text-gray-500 font-futura font-[800] text-[13px] uppercase tracking-widest px-10 py-3 rounded-full shadow-inner cursor-not-allowed"
-              >
-                COMING SOON
-              </button>
+              {selectedPlan ? (
+                <button
+                  onClick={handleSubscribe}
+                  disabled={subStatus === 'loading'}
+                  className="mt-auto bg-pulsar-blue text-white font-futura font-[800] text-[13px] uppercase tracking-widest px-10 py-3 rounded-full shadow-md transition-all hover:bg-pulsar-blue/90 hover:-translate-y-0.5 disabled:opacity-70 disabled:translate-y-0"
+                >
+                  {subStatus === 'loading' ? 'Starting checkout…' : `Subscribe · ${formatPrice(subPrice)}`}
+                </button>
+              ) : (
+                <button
+                  disabled
+                  className="mt-auto bg-gray-200 text-gray-500 font-futura font-[800] text-[13px] uppercase tracking-widest px-10 py-3 rounded-full shadow-inner cursor-not-allowed"
+                >
+                  COMING SOON
+                </button>
+              )}
+              {subStatus === 'error' && (
+                <p className="font-inter text-[12px] text-pulsar-pink mt-3">{subError}</p>
+              )}
             </div>
           </div>
         </div>

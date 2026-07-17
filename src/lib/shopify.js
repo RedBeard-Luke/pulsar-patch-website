@@ -189,6 +189,77 @@ export async function fetchLivePrices() {
   }
 }
 
+// ── Subscriptions (native Shopify Subscriptions app) ──────────────────────
+// A product's selling plan group exposes one SellingPlan per delivery frequency.
+// We read them via the Storefront API and match each to a month interval so the
+// subscription page can attach the right plan to the cart line.
+const SELLING_PLANS_QUERY = `
+  query sellingPlans($id: ID!) {
+    product(id: $id) {
+      sellingPlanGroups(first: 10) {
+        nodes {
+          name
+          sellingPlans(first: 20) {
+            nodes {
+              id
+              name
+              options { name value }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+// Derive the delivery interval in MONTHS from a plan's name/options text, e.g.
+// "Delivered every 2 months" -> 2, "Every month" -> 1. Returns null if unknown.
+function planMonths(plan) {
+  const hay = [plan.name, ...(plan.options || []).map(o => `${o.name} ${o.value}`)]
+    .join(' ')
+    .toLowerCase()
+  const digit = hay.match(/(\d+)\s*month/)
+  if (digit) return parseInt(digit[1], 10)
+  // Word/label forms. Order matters: check "bimonthly"/"quarterly" before the
+  // generic "month" catch (bimonthly contains "monthly").
+  if (/quarter|three\s*month|3\s*month/.test(hay)) return 3
+  if (/bimonth|every other month|two\s*month/.test(hay)) return 2
+  if (/month/.test(hay)) return 1
+  return null
+}
+
+/**
+ * Fetch the selling plans for a catalog product (default: the Party Pack).
+ * Returns { byMonths: { 1: {id,name}, 2: {...}, 3: {...} }, plans: [...] }.
+ * Never throws — returns empty structures if Shopify isn't configured, the
+ * product isn't mapped as a PRODUCT, or the request fails (button stays "soon").
+ */
+export async function getSellingPlans(cartId = 'party') {
+  const empty = { byMonths: {}, plans: [] }
+  if (!isConfigured()) return empty
+  // Selling plans hang off the PRODUCT, so we need a product mapping (not just a
+  // variant one) to look them up.
+  const gid = toGid('Product', PRODUCT_MAP[cartId])
+  if (!gid) return empty
+  try {
+    const data = await storefront(SELLING_PLANS_QUERY, { id: gid })
+    const groups = data?.product?.sellingPlanGroups?.nodes || []
+    const plans = []
+    for (const g of groups) {
+      for (const p of g.sellingPlans?.nodes || []) {
+        plans.push({ id: p.id, name: p.name, months: planMonths(p) })
+      }
+    }
+    const byMonths = {}
+    for (const p of plans) {
+      if (p.months && !byMonths[p.months]) byMonths[p.months] = p
+    }
+    return { byMonths, plans }
+  } catch {
+    return empty
+  }
+}
+
 const CART_CREATE = `
   mutation cartCreate($lines: [CartLineInput!]!) {
     cartCreate(input: { lines: $lines }) {
@@ -215,7 +286,10 @@ export async function createCheckout(items) {
     // Prefer the resolved variant; fall back to an explicit variant mapping.
     const variantId = catalogCache?.[i.productId]?.variantId || toGid('ProductVariant', VARIANT_MAP[i.productId])
     if (!variantId) throw new Error(`No Shopify variant mapped for "${i.productId}"`)
-    return { merchandiseId: variantId, quantity: i.qty }
+    const line = { merchandiseId: variantId, quantity: i.qty }
+    // Subscription line: attach the selling plan so checkout bills on schedule.
+    if (i.sellingPlanId) line.sellingPlanId = i.sellingPlanId
+    return line
   })
   const data = await storefront(CART_CREATE, { lines })
   const url = data?.cartCreate?.cart?.checkoutUrl
