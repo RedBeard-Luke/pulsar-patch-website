@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useAdminAuth } from '../../context/AdminAuthContext'
 import squigleBg from '../../assets/footer_Squigle.svg'
 
 /* Example wholesale pricing. Suggested retail is $6.00/patch. Confirm live numbers before launch. */
@@ -30,7 +31,11 @@ const businessFaqs = [
 export default function Wholesale() {
   const [activeFaq, setActiveFaq] = useState(null)
   const { user } = useAuth()
-  const approved = !!user?.wholesaleApproved
+  const { isAdmin } = useAdminAuth()
+  // Real approved wholesale partner (Shopify tag). Admins also see the numbers
+  // for reference, but only true wholesale partners get the order CTA.
+  const isWholesale = !!user?.wholesaleApproved
+  const showPricing = isWholesale || isAdmin
 
   return (
     <div className="w-full bg-white flex flex-col" id="wholesale-page">
@@ -95,16 +100,22 @@ export default function Wholesale() {
           <p className="font-inter text-[15px] text-gray-600 mb-4 max-w-[620px]">
             The more you order, the more you make per patch. Suggested retail is $6.00 each.
           </p>
-          {!approved && (
+          {!showPricing && (
             <p className="font-inter text-[14px] text-pulsar-blue mb-10 max-w-[620px] flex items-start gap-2">
               <span aria-hidden="true">🔒</span>
               <span>Wholesale pricing is for approved partners only. Apply below, and once our team approves you, log in here to see live per-patch pricing and order totals.</span>
             </p>
           )}
-          {approved && (
+          {isWholesale && (
             <p className="font-inter text-[14px] text-green-600 mb-10 max-w-[620px] flex items-center gap-2">
               <span aria-hidden="true">✅</span>
               <span>You're approved for wholesale. Here's your pricing.</span>
+            </p>
+          )}
+          {isAdmin && !isWholesale && (
+            <p className="font-inter text-[14px] text-pulsar-dark mb-10 max-w-[620px] flex items-center gap-2">
+              <span aria-hidden="true">🛠️</span>
+              <span>Admin view: wholesale pricing shown for reference (not a wholesale account).</span>
             </p>
           )}
 
@@ -117,7 +128,7 @@ export default function Wholesale() {
                   <h3 className="font-futura font-[900] text-[22px] text-pulsar-dark uppercase tracking-wide mb-1">{tier.name}</h3>
                   <p className="font-inter text-[13px] text-gray-500 mb-6 min-h-[54px]">{tier.description}</p>
                   <div className="w-full border-t border-gray-100 pt-5 mb-6 text-left">
-                    {approved ? (
+                    {showPricing ? (
                       <>
                         <div className="flex justify-between mb-2"><span className="font-inter text-[13px] text-gray-500">Cost per patch</span><span className="font-futura font-bold text-[15px] text-pulsar-blue">${tier.perPatch.toFixed(2)}</span></div>
                         <div className="flex justify-between mb-2"><span className="font-inter text-[13px] text-gray-500">Order total</span><span className="font-futura font-bold text-[16px] text-pulsar-pink">${tier.total.toFixed(2)}</span></div>
@@ -130,7 +141,7 @@ export default function Wholesale() {
                       </>
                     )}
                   </div>
-                  {approved ? (
+                  {isWholesale ? (
                     <a href={`mailto:hello@pulsarpatch.com?subject=Wholesale%20Order%20-%20${tier.patches}%20Patches`} className="mt-auto w-full bg-pulsar-pink text-white font-futura font-bold text-[13px] uppercase tracking-widest py-3.5 rounded-full shadow-md transition-all hover:-translate-y-0.5 hover:bg-pulsar-pink-dark text-center">
                       Place order
                     </a>
