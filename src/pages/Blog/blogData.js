@@ -12,6 +12,7 @@ import imgGinger from '../../assets/blog/ginger.jpg'
 import imgLowCalorieMargarita from '../../assets/blog/low-calorie-margarita.jpg'
 import imgHangoversArentInevitable from '../../assets/blog/hangovers-arent-inevitable.jpg'
 import imgFastedOldFashion from '../../assets/blog/fasted-old-fashion.jpg'
+import imgFastedOldFashionWhiskey from '../../assets/blog/fasted-old-fashion-whiskey.jpg'
 
 /* ── Blog post content with sources ── */
 
@@ -562,8 +563,9 @@ export const blogPosts = {
       },
       {
         type: 'image',
-        img: imgOldFashioned,
-        source: 'Photo by Unsplash'
+        img: imgFastedOldFashionWhiskey,
+        alt: 'A bottle of bourbon whiskey beside a glass of whiskey over ice',
+        source: 'Photo via Pexels'
       },
       {
         type: 'heading',

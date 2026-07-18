@@ -91,7 +91,7 @@ export default function BlogPost() {
                   <div key={i} className="my-10">
                     <div className="w-full aspect-[16/9] bg-pulsar-light-blue-bg rounded-[24px] shadow-lg overflow-hidden">
                       {block.img && (
-                        <img src={block.img} alt="" className="w-full h-full object-cover" />
+                        <img src={block.img} alt={block.alt || ''} className="w-full h-full object-cover" />
                       )}
                     </div>
                     {block.source && (

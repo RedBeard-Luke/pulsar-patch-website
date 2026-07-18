@@ -115,6 +115,28 @@ looks up `heroImg` from blogData by id).
      push**. Remind them the picture is the most visible thing — eyeball it before
      it goes live.
 
+## Second / inline body images
+Posts can have inline image blocks inside `content` (`{ type: 'image', img,
+source, alt }`), sitting under a subhead. Same flow as the hero, with these
+differences:
+- **Subject = the SUBHEAD it sits under (+ nearby text), NOT the post title.**
+  Read the section the block falls in and pick a concrete subject that
+  illustrates THAT section. It should also be a *different angle* from the hero,
+  so the post isn't two near-identical shots. E.g. Old Fashioned post: hero = the
+  finished drink → inline under "THE RECIPE" = a **bottle of whiskey** or the
+  ingredients/pour.
+- **No repeats — automatic.** The dedup ledger already excludes the hero and every
+  other used photo, so a normal `search` can never return them. Use a *different
+  query* than the hero to guarantee a different look, not just a different ID.
+- **Brand labels are OK on inline images** (unlike the hero). A whiskey bottle with
+  a visible brand is fine here. Still avoid people (unless the section calls for
+  it), text overlays/watermarks, and low-res.
+- **Filename:** save with a descriptive slug that won't collide with the hero:
+  `save <id> <slug>-whiskey` → `src/assets/blog/<slug>-whiskey.jpg`.
+- **Wire into the CONTENT BLOCK, not the hero:** set that image block's `img` to
+  the new import, and give it an `alt` describing the photo (for SEO — the renderer
+  uses `block.alt`). Update/keep its `source` caption if you want one.
+
 ## Notes
 - One source only (Pexels) for a clean, uniform license. If Pexels genuinely has
   nothing usable after a few queries, say so and stop — don't silently reach for a
