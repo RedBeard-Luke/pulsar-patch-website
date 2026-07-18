@@ -1,0 +1,41 @@
+{
+  "note": "Fixed set of posts the picker is scored against each round. Keep it fixed so round-over-round scores compare the RULES (query derivation + guardrails), not the posts. Covers both selection modes (title-noun vs Feeling Library) and all three categories. Add rows as the blog grows, but don't churn them. Eval runs use --no-dedup and grade previews WITHOUT saving (don't pollute the real ledger).",
+  "posts": [
+    {
+      "slug": "low-calorie-margarita",
+      "title": "Best Low Calorie Margarita",
+      "category": "RECIPE",
+      "mode": "title-noun",
+      "target": "hero",
+      "expectedSubject": "a margarita cocktail (not a Margherita pizza)",
+      "peopleAllowed": false
+    },
+    {
+      "slug": "fasted-old-fashion",
+      "title": "The Fasted Old Fashioned For After Work",
+      "category": "RECIPE",
+      "mode": "title-noun",
+      "target": "hero",
+      "expectedSubject": "an Old Fashioned cocktail in a rocks glass",
+      "peopleAllowed": false
+    },
+    {
+      "slug": "fasted-old-fashion-whiskey",
+      "title": "The Fasted Old Fashioned For After Work",
+      "category": "RECIPE",
+      "mode": "subhead",
+      "target": "inline",
+      "expectedSubject": "a bottle of whiskey / bourbon (brand OK, different angle from the hero drink)",
+      "peopleAllowed": false
+    },
+    {
+      "slug": "hangovers-arent-inevitable",
+      "title": "Hangovers Aren't Inevitable",
+      "category": "SCIENCE",
+      "mode": "feeling-library",
+      "target": "hero",
+      "expectedSubject": "Feeling Library default: sunny bedroom / morning light",
+      "peopleAllowed": false
+    }
+  ]
+}

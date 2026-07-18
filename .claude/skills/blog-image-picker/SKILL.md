@@ -1,6 +1,6 @@
 ---
 name: blog-image-picker
-description: Pick a free, commercially-licensed hero image for a chosen Pulsar blog post from Pexels, optimize it, and wire it into blogData. Use after a blog post has been selected and needs its hero/thumbnail image. Manual/on-request until re-enabled.
+description: Pick a free, commercially-licensed hero/inline image for a chosen Pulsar blog post from Pexels, score it /9, optimize it, and wire it into blogData. Every pick is graded so picker quality trends upward over rounds. Use after a blog post has been selected and needs its image. Manual/on-request until re-enabled.
 ---
 
 > ⏸ **MANUAL / ON-REQUEST ONLY.** This is designed to slot into the daily flow
@@ -83,16 +83,40 @@ looks up `heroImg` from blogData by id).
    downloads preview thumbnails; `droppedDup` shows how many the ledger skipped.
    **Read the previewPath images and actually LOOK** — don't judge on alt alone.
 
-4. **Pick the best — apply the guardrails. REJECT a candidate if it:**
+4. **Shortlist the top 3 candidates — apply the guardrails. Drop a candidate if it:**
    - **shows people** (any person, face, or hands) on a food/drink post,
    - **doesn't match the title's subject** (wrong drink/food/thing),
    - isn't **horizontal**, or is too vertical to crop to a wide hero,
-   - shows an identifiable **brand/logo** or real **alcohol-brand label**,
+   - shows an identifiable **brand/logo** or real **alcohol-brand label** (hero only),
    - reads **clinical/medical**, or is **text-heavy / watermarked / low-res**.
-   Prefer bright, clean, natural-light shots that fit Pulsar's vibe. If nothing
-   clears the bar, run another query (a close synonym) rather than settling.
+   Don't hand-pick one winner here — pick the **3 strongest** to take to scoring.
+   Prefer bright, clean, natural-light shots, but include some variety (e.g. one
+   moodier, one brighter) so the score has a real choice. If fewer than 3 clear
+   the bar, run another query (a close synonym) rather than settling.
 
-5. **Save + optimize.** With the chosen candidate's `id`:
+4b. **Grade the slate of 3, then let the tool pick the winner (/27).** This is the
+   generate-N-and-keep-the-best pattern: each candidate is graded /9, the blog's
+   slate totals /27, and the highest /9 is the one you actually use. The 3
+   deterministic criteria are already in `search` output (`det`/`detScore`); you
+   supply the 6 vision criteria as `1`/`0` after **looking at each preview**:
+   ```
+   # grade all 3 candidates under the SAME --slug. --category drives the light rule;
+   # --has-people is your vision verdict (0 = no people visible).
+   node .claude/skills/blog-image-picker/image-tool.mjs grade <id1> --slug <slug> --category cocktail --has-people 0 --subject 1 --light 1 --color 1 --nobrand 1 --clean 1 --small 1
+   node .claude/skills/blog-image-picker/image-tool.mjs grade <id2> --slug <slug> --category cocktail --has-people 0 --subject 0 --light 1 --color 1 --nobrand 1 --clean 1 --small 1
+   node .claude/skills/blog-image-picker/image-tool.mjs grade <id3> --slug <slug> --category cocktail --has-people 0 --subject 1 --light 1 --color 1 --nobrand 1 --clean 1 --small 1
+   # then select the winner of the slate
+   node .claude/skills/blog-image-picker/image-tool.mjs select <slug>
+   ```
+   `--category` (`recipe|cocktail|science|lifestyle`) sets the `light` standard
+   (moody OK for cocktail/night-out). `--has-people 0|1` is required (vision-confirmed
+   peopleOK) unless `--people-ok` (lifestyle, people allowed). `--inline` exempts
+   `nobrand` (brands OK on inline). `grade` logs to `eval/image-scores.json`;
+   `select` prints the `poolScore` /27, ranks the 3, and names the `winner` +
+   `nextStep` (the exact `save` line). Tie-break: more vision passes, then more
+   deterministic passes. See **Scoring & the self-improving loop** below.
+
+5. **Save + optimize the WINNER only.** With the `select` winner's `id`:
    ```
    node .claude/skills/blog-image-picker/image-tool.mjs save <photoId> <slug>
    ```
@@ -136,6 +160,68 @@ differences:
 - **Wire into the CONTENT BLOCK, not the hero:** set that image block's `img` to
   the new import, and give it an `alt` describing the photo (for SEO — the renderer
   uses `block.alt`). Update/keep its `source` caption if you want one.
+
+## Scoring & the self-improving loop
+Every picked image is scored **/9** so picker quality is a number we can trend
+upward over time — the same idea as the post generator's score, applied to images.
+The score also means a pick is defensible ("8/9, only missed `light`") instead of
+a gut call.
+
+**Per blog we grade a SLATE of 3 candidates (/27) and use the best.** Like the
+generator makes ~10 posts and keeps the best one, the picker grades 3 images per
+blog and `select` keeps the top-scoring /9. The /27 is the slate total; only the
+winner is saved + wired in. This raises the floor: a single lucky-or-unlucky pick
+becomes best-of-3.
+
+**The 9 criteria (each binary):**
+
+*Deterministic — computed free in the tool from Pexels metadata:*
+1. `horizontal` — width > height (croppable to a wide hero)
+2. `hiRes` — source ≥ 1600px wide (no upscale blur)
+3. `peopleOK` — **vision-confirmed** no people when the category requires it. The
+   alt-text heuristic (shown as `likelyPeople` in `search`) is only a pre-filter;
+   at `grade` time you must LOOK and pass `--has-people 0|1` (or `--people-ok` for
+   lifestyle where people are fine). *Fix #2: a faint background silhouette once
+   slipped past the alt heuristic — pixels are the source of truth now.*
+
+*Vision — you grade these by looking at the actual preview (`1`/`0` flags on `grade`):*
+4. `subject` — clearly shows ONE unambiguous title/subhead subject (a busy or
+   mixed composition, e.g. two different drinks, fails)
+5. `light` — **category-aware.** Bright, natural, clean light is required for
+   `recipe`/`science`/`lifestyle`/morning/recovery posts. For `cocktail`/`night-out`
+   posts, warm/moody light passes (as long as it's not murky/underexposed) because
+   that fits the cocktail community. Pass `--category` so this is applied + audited.
+   *Fix #1: `light` used to punish on-brand moody cocktail shots.*
+6. `color` — cohesive, doesn't clash with Pulsar blue/pink
+7. `nobrand` — no brand/logo *(hero only; `--inline` auto-passes it)*
+8. `clean` — not clinical / text-heavy / watermarked
+9. `small` — subject legible at thumbnail + OG size
+
+**The loop — what actually gets better.** There's no prompt to rewrite here; the
+thing being optimized is **this file's rules** (the query-derivation binary rule,
+the Feeling Library, and the guardrails). The cycle:
+1. Pick + `grade` images (during normal use, and/or run the `eval/eval-set.json`
+   posts with `--eval` so eval grades don't touch the real ledger).
+2. Close a round: `node image-tool.mjs round --label R2 --note "what I changed"`.
+   It assigns every un-rounded score to the round, prints `avgScore`, `avgPct`,
+   per-criterion pass-rates, and the **`weakest`** criterion, and appends to
+   `eval/rounds.json`.
+3. **Make ONE rule change that attacks the weakest criterion**, then grade the
+   next batch and close another round. Keep the version of this file whose round
+   scores are higher. Trend `avgPct` up round over round (chart: `eval/growth.html`).
+
+**Reading the weakest criterion — don't over-correct.** A low pass-rate is a
+signal, not always a defect. Baseline R1's weakest was `light` (50%), but it only
+failed on **dark cocktail shots**, which fit the cocktail community (Luke's call).
+So the right rule change there isn't "force bright cocktail photos" — it's to make
+`light` **category-aware** (bright expected for morning/recovery/lifestyle; moody
+allowed for cocktail/night-out). That kind of edit is exactly the loop working.
+
+**Levers the loop can pull** (rule changes, in rough order of reach): tighten a
+query or add a Feeling Library row; add **query-variant rotation + pagination** so
+repeat topics don't return the same tired shots as the pool thins; make a criterion
+category-aware; adjust a guardrail threshold. One change per round so you can see
+which move helped.
 
 ## Notes
 - One source only (Pexels) for a clean, uniform license. If Pexels genuinely has

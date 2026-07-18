@@ -1,0 +1,173 @@
+[
+  {
+    "ts": "2026-07-18T21:34:29.649Z",
+    "id": "4051401",
+    "slug": "low-calorie-margarita",
+    "target": "hero",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": true,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 9,
+    "max": 9,
+    "round": "R1",
+    "note": "R1 seed: existing pick"
+  },
+  {
+    "ts": "2026-07-18T21:34:29.794Z",
+    "id": "6890413",
+    "slug": "hangovers-arent-inevitable",
+    "target": "hero",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": true,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 9,
+    "max": 9,
+    "round": "R1",
+    "note": "R1 seed: existing pick"
+  },
+  {
+    "ts": "2026-07-18T21:34:29.929Z",
+    "id": "16444385",
+    "slug": "fasted-old-fashion",
+    "target": "hero",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": false,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 8,
+    "max": 9,
+    "round": "R1",
+    "note": "R1 seed: dark cocktail shot"
+  },
+  {
+    "ts": "2026-07-18T21:34:30.061Z",
+    "id": "35020803",
+    "slug": "fasted-old-fashion-whiskey",
+    "target": "inline",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": false,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 8,
+    "max": 9,
+    "round": "R1",
+    "note": "R1 seed: inline, brand exempt"
+  },
+  {
+    "ts": "2026-07-18T21:45:13.798Z",
+    "id": "37662777",
+    "slug": "fasted-old-fashion",
+    "target": "hero",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": false,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 8,
+    "max": 9,
+    "round": null,
+    "note": "slate: dark bar, moody",
+    "winner": false
+  },
+  {
+    "ts": "2026-07-18T21:45:14.047Z",
+    "id": "8375098",
+    "slug": "fasted-old-fashion",
+    "target": "hero",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": false,
+      "light": true,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 8,
+    "max": 9,
+    "round": null,
+    "note": "slate: bright but 2 mixed drinks (green basil)",
+    "winner": false
+  },
+  {
+    "ts": "2026-07-18T21:45:14.295Z",
+    "id": "12431191",
+    "slug": "fasted-old-fashion",
+    "target": "hero",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": true,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 9,
+    "max": 9,
+    "round": null,
+    "note": "slate: single amber rocks glass, soft warm light",
+    "winner": true
+  }
+]

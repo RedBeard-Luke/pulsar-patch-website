@@ -45,6 +45,40 @@ function recordUsed(id) {
   writeFileSync(LEDGER, JSON.stringify([...s], null, 0) + '\n')
 }
 
+// ── Scoring (the self-improving loop) ──────────────────────────────────────
+// Every picked image gets a score /9 so we can trend picker quality upward, the
+// same way Stage 3 scores posts. 3 deterministic criteria (computed here, free)
+// + 6 vision criteria (graded by Claude looking at the actual pixels, recorded
+// via the `grade` command). `round` aggregates the log and names the weakest
+// criterion — that's the rule to improve next.
+const EVAL_DIR = join(__dirname, 'eval')
+const SCORES = join(EVAL_DIR, 'image-scores.json')
+const ROUNDS = join(EVAL_DIR, 'rounds.json')
+const RUBRIC = {
+  det: ['horizontal', 'hiRes', 'peopleOK'], // computed from Pexels metadata
+  vision: ['subject', 'light', 'color', 'nobrand', 'clean', 'small'], // graded by eye
+}
+const MAX_SCORE = RUBRIC.det.length + RUBRIC.vision.length // 9
+function loadJsonArray(path) {
+  try { return JSON.parse(readFileSync(path, 'utf8')) || [] } catch { return [] }
+}
+function writeJsonArray(path, arr) {
+  mkdirSync(EVAL_DIR, { recursive: true })
+  writeFileSync(path, JSON.stringify(arr, null, 2) + '\n')
+}
+// The 3 deterministic criteria, straight off the photo's metadata.
+function detFlags(p, noPeople) {
+  const horizontal = p.width > p.height
+  const hiRes = p.width >= 1600
+  const peopleOK = noPeople ? !hasPeople(p.alt) : true // people allowed -> auto-pass
+  const passed = [horizontal, hiRes, peopleOK].filter(Boolean).length
+  return { horizontal, hiRes, peopleOK, passed }
+}
+function truthy(v) {
+  if (v === true) return true
+  return ['1', 'true', 'y', 'yes', 'pass'].includes(String(v).toLowerCase())
+}
+
 const API_KEY = process.env.PEXELS_API_KEY
 // Only the Pexels-hitting commands need the key; `suggest` doesn't.
 function requireKey() {
@@ -165,6 +199,7 @@ async function cmdSearch(positional, flags) {
     } catch {
       continue
     }
+    const det = detFlags(p, noPeople)
     candidates.push({
       id: p.id,
       photographer: p.photographer,
@@ -175,6 +210,8 @@ async function cmdSearch(positional, flags) {
       width: p.width,
       height: p.height,
       avg_color: p.avg_color,
+      det, // 3 deterministic criteria (free); vision 6 come from `grade`
+      detScore: `${det.passed}/3`,
       previewPath,
     })
   }
@@ -251,12 +288,196 @@ async function cmdSave(positional, flags) {
   )
 }
 
+// Record the full /9 score for a chosen image. The 3 deterministic criteria are
+// recomputed from Pexels metadata; the 6 vision criteria are passed as 1/0 flags
+// by Claude after actually looking at the preview. For inline images --inline
+// exempts `nobrand` (brand labels are allowed there), so it auto-passes.
+//   grade <photoId> --slug <slug> [--hero|--inline] [--people-ok] [--eval] \
+//     --subject 1 --light 1 --color 1 --nobrand 1 --clean 1 --small 1 [--note "..."]
+async function cmdGrade(positional, flags) {
+  requireKey()
+  const photoId = positional[0]
+  const slug = flags.slug || positional[1]
+  if (!photoId || !slug) {
+    console.error('usage: grade <photoId> --slug <slug> --category <recipe|cocktail|science|lifestyle> --has-people 0|1 [--inline] [--people-ok] [--eval] --subject 1 --light 1 --color 1 --nobrand 1 --clean 1 --small 1')
+    process.exit(1)
+  }
+  const target = flags.inline === true ? 'inline' : 'hero'
+  const peopleAllowed = flags['people-ok'] === true // lifestyle: people are fine
+  // Fix #1: `light` is graded CATEGORY-AWARE. Bright is required for morning/
+  // recovery/lifestyle/science; warm/moody is acceptable for cocktail/night-out
+  // (as long as it's not murky/underexposed). Category is recorded so we can audit
+  // the light pass-rate per category. See SKILL.md "Scoring & the self-improving loop".
+  const category = String(flags.category || '').toLowerCase()
+  const MOODY_OK = category === 'cocktail' || category === 'night-out'
+  if (!category) {
+    console.error('ERROR: pass --category <recipe|cocktail|science|lifestyle>. `light` is graded category-aware (moody is OK for cocktail/night-out).')
+    process.exit(1)
+  }
+
+  const p = await pexels(`photos/${photoId}`)
+  const horizontal = p.width > p.height
+  const hiRes = p.width >= 1600
+  // Fix #2: peopleOK is VISION-confirmed, not guessed from alt text. The alt
+  // heuristic false-passed a faint background silhouette (37662777), so the grader
+  // must LOOK and pass --has-people 0|1. Only --people-ok (people allowed) skips it.
+  let peopleOK, peopleSource
+  if (peopleAllowed) {
+    peopleOK = true; peopleSource = 'allowed'
+  } else if (flags['has-people'] !== undefined) {
+    peopleOK = !truthy(flags['has-people']); peopleSource = 'vision'
+  } else {
+    console.error('ERROR: peopleOK is vision-confirmed now — LOOK at the image and pass --has-people 0|1 (or --people-ok for lifestyle posts where people are fine).')
+    process.exit(1)
+  }
+  const det = { horizontal, hiRes, peopleOK }
+  const detPassed = [horizontal, hiRes, peopleOK].filter(Boolean).length
+
+  const vision = {}
+  for (const k of RUBRIC.vision) {
+    if (k === 'nobrand' && target === 'inline') { vision[k] = true; continue } // brands OK inline
+    if (flags[k] === undefined) {
+      console.error(`ERROR: missing --${k} (pass 1 or 0). All 6 vision criteria must be graded: ${RUBRIC.vision.join(', ')}`)
+      process.exit(1)
+    }
+    vision[k] = truthy(flags[k])
+  }
+  const visionPassed = RUBRIC.vision.filter((k) => vision[k]).length
+  const score = detPassed + visionPassed
+
+  const record = {
+    ts: new Date().toISOString(),
+    id: String(photoId),
+    slug,
+    target,
+    category,
+    lightRule: MOODY_OK ? 'moody-ok' : 'bright-required',
+    peopleSource,
+    isEval: flags.eval === true,
+    det,
+    vision,
+    score,
+    max: MAX_SCORE,
+    round: null,
+    note: flags.note || '',
+  }
+  const scores = loadJsonArray(SCORES)
+  scores.push(record)
+  writeJsonArray(SCORES, scores)
+
+  const failed = [
+    ...RUBRIC.det.filter((k) => !det[k]),
+    ...RUBRIC.vision.filter((k) => !vision[k] && !(k === 'nobrand' && target === 'inline')),
+  ]
+  console.log(JSON.stringify({ ...record, scoreLabel: `${score}/${MAX_SCORE}`, failed, loggedTo: 'eval/image-scores.json' }, null, 2))
+}
+
+// Pick the winner of a candidate slate. Grade 3 (or more) candidates for the same
+// --slug, then `select <slug>` reports the pool score /(9*N), ranks them, and marks
+// the highest /9 as the one to actually use. Ties break on vision passes, then
+// deterministic passes. Only the winner should be saved + wired in.
+//   select <slug> [--use]
+function candRank(a, b) {
+  if (b.score !== a.score) return b.score - a.score
+  const vp = (r) => Object.values(r.vision).filter(Boolean).length
+  if (vp(b) !== vp(a)) return vp(b) - vp(a)
+  const dp = (r) => Object.values(r.det).filter(Boolean).length
+  return dp(b) - dp(a)
+}
+function cmdSelect(positional, flags) {
+  const slug = positional[0] || flags.slug
+  if (!slug) { console.error('usage: select <slug> [--use]'); process.exit(1) }
+  const scores = loadJsonArray(SCORES)
+  const cands = scores.filter((s) => !s.round && s.slug === slug && s.winner === undefined)
+  if (cands.length < 2) {
+    console.error(`ERROR: need >=2 graded candidates for "${slug}" (found ${cands.length}). Grade the slate first, then select.`)
+    process.exit(1)
+  }
+  const ranked = [...cands].sort(candRank)
+  const winner = ranked[0]
+  cands.forEach((c) => { c.winner = c === winner })
+  writeJsonArray(SCORES, scores)
+
+  const poolScore = cands.reduce((a, c) => a + c.score, 0)
+  const poolMax = cands.length * MAX_SCORE
+  const runnerUp = ranked[1]
+  console.log(JSON.stringify({
+    slug,
+    candidates: ranked.map((c) => ({ id: c.id, score: `${c.score}/${MAX_SCORE}`, failed: [
+      ...RUBRIC.det.filter((k) => !c.det[k]),
+      ...RUBRIC.vision.filter((k) => !c.vision[k] && !(k === 'nobrand' && c.target === 'inline')),
+    ] })),
+    poolScore: `${poolScore}/${poolMax}`,
+    winner: { id: winner.id, score: `${winner.score}/${MAX_SCORE}` },
+    gap: runnerUp ? winner.score - runnerUp.score : null,
+    nextStep: `save ${winner.id} ${slug}`,
+  }, null, 2))
+}
+
+// Close a round: assign every un-rounded score to this round, summarize, and
+// name the weakest criterion (lowest pass-rate) — that's the rule to improve
+// before the next round. Append to eval/rounds.json for the growth chart.
+//   round [--label R2] [--note "what rule I changed this round"]
+function cmdRound(positional, flags) {
+  const scores = loadJsonArray(SCORES)
+  const rounds = loadJsonArray(ROUNDS)
+  const pending = scores.filter((s) => !s.round)
+  if (!pending.length) {
+    console.error('No un-rounded scores. Grade some images first, then close the round.')
+    process.exit(1)
+  }
+  const label = flags.label || positional[0] || `R${rounds.length + 1}`
+  pending.forEach((s) => { s.round = label })
+  writeJsonArray(SCORES, scores)
+
+  // The round metric measures the images we ACTUALLY use: slate winners
+  // (winner === true) plus any solo picks that never went through select
+  // (winner === undefined). Losing candidates (winner === false) are archived
+  // but excluded from the average, so a bad candidate you rejected can't drag
+  // the score of what shipped.
+  const used = pending.filter((s) => s.winner !== false)
+  const losers = pending.filter((s) => s.winner === false)
+  const n = used.length
+  const totalScore = used.reduce((a, s) => a + s.score, 0)
+  const avgScore = n ? totalScore / n : 0
+  // Per-criterion pass-rate over used images (nobrand skips inline).
+  const perCriterion = {}
+  for (const k of [...RUBRIC.det, ...RUBRIC.vision]) {
+    let pass = 0, total = 0
+    for (const s of used) {
+      if (k === 'nobrand' && s.target === 'inline') continue
+      const val = RUBRIC.det.includes(k) ? s.det[k] : s.vision[k]
+      total++
+      if (val) pass++
+    }
+    perCriterion[k] = { pass, total, rate: total ? +(pass / total).toFixed(3) : null }
+  }
+  const ranked = Object.entries(perCriterion).filter(([, v]) => v.total > 0).sort((a, b) => a[1].rate - b[1].rate)
+  const weakest = ranked.length ? ranked[0][0] : null
+
+  const summary = {
+    label,
+    ts: new Date().toISOString(),
+    n,
+    candidatesGraded: pending.length,
+    losersRejected: losers.length,
+    avgScore: +avgScore.toFixed(2),
+    avgPct: +((avgScore / MAX_SCORE) * 100).toFixed(1),
+    perCriterion,
+    weakest,
+    note: flags.note || '',
+  }
+  rounds.push(summary)
+  writeJsonArray(ROUNDS, rounds)
+  console.log(JSON.stringify({ ...summary, improveNext: weakest, historyTo: 'eval/rounds.json' }, null, 2))
+}
+
 const [cmd, ...rest] = process.argv.slice(2)
 const { flags, positional } = parseFlags(rest)
 
-const run = { suggest: cmdSuggest, search: cmdSearch, save: cmdSave }[cmd]
+const run = { suggest: cmdSuggest, search: cmdSearch, save: cmdSave, grade: cmdGrade, select: cmdSelect, round: cmdRound }[cmd]
 if (!run) {
-  console.error('usage: image-tool.mjs <suggest|search|save> ...')
+  console.error('usage: image-tool.mjs <suggest|search|grade|select|round|save> ...')
   process.exit(1)
 }
 Promise.resolve(run(positional, flags)).catch((err) => {

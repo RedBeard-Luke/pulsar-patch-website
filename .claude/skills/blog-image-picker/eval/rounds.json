@@ -1,0 +1,58 @@
+[
+  {
+    "label": "R1",
+    "ts": "2026-07-18T21:34:46.948Z",
+    "n": 4,
+    "avgScore": 8.5,
+    "avgPct": 94.4,
+    "perCriterion": {
+      "horizontal": {
+        "pass": 4,
+        "total": 4,
+        "rate": 1
+      },
+      "hiRes": {
+        "pass": 4,
+        "total": 4,
+        "rate": 1
+      },
+      "peopleOK": {
+        "pass": 4,
+        "total": 4,
+        "rate": 1
+      },
+      "subject": {
+        "pass": 4,
+        "total": 4,
+        "rate": 1
+      },
+      "light": {
+        "pass": 2,
+        "total": 4,
+        "rate": 0.5
+      },
+      "color": {
+        "pass": 4,
+        "total": 4,
+        "rate": 1
+      },
+      "nobrand": {
+        "pass": 3,
+        "total": 3,
+        "rate": 1
+      },
+      "clean": {
+        "pass": 4,
+        "total": 4,
+        "rate": 1
+      },
+      "small": {
+        "pass": 4,
+        "total": 4,
+        "rate": 1
+      }
+    },
+    "weakest": "light",
+    "note": "Baseline: 4 hand-picked images graded under current rules."
+  }
+]
