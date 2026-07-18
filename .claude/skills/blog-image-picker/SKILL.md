@@ -30,34 +30,67 @@ looks up `heroImg` from blogData by id).
 
 ## Steps
 
-1. **Understand the post.** Read its title, category, `targetKeyword` (if present),
-   and body. Identify the single most photographable subject (e.g. "grapefruit
-   spritz in a wine glass", "friends toasting at a rooftop bar", "morning light in
-   a bedroom"). Note the category: RECIPES → the drink/food; LIFESTYLE → people/
-   scenes; SCIENCE → clean abstract/lifestyle, NOT clinical/medical stock.
+1. **Pick the image subject — follow this BINARY rule in order. Do NOT invent a
+   scene from scratch.**
 
-2. **Form 2–3 search queries.** Concrete and visual. Lead with the subject, add a
-   mood/setting word. Examples: `grapefruit spritz cocktail`, `non alcoholic
-   cocktail garnish`, `bright bar drinks summer`. Avoid brand names and generic
-   filler ("lifestyle", "wellness").
-
-3. **Search + preview.** For each query run:
+   **a. Is there a concrete, nameable thing in the TITLE** — a specific food,
+   drink, object, or place? → **Use it.** Get a starting query from `suggest`,
+   then refine to the real noun (`margarita` → `margarita cocktail` to dodge the
+   Margherita-pizza homonym; "Fasted Old Fashioned For After Work" → `old
+   fashioned cocktail`). This covers most RECIPES. Stop here — don't freelance.
    ```
-   node .claude/skills/blog-image-picker/image-tool.mjs search "<query>" --per 12
+   node .claude/skills/blog-image-picker/image-tool.mjs suggest "<blog title>"
    ```
-   It downloads preview thumbnails and prints JSON candidates (index, id,
-   photographer, `alt`, size, `previewPath`). **Read the previewPath images** (the
-   Read tool shows them) and actually LOOK — don't pick on alt text alone.
 
-4. **Pick the best — and apply the guardrails. REJECT a candidate if it:**
-   - shows an identifiable **brand/logo** or a real **alcohol-brand label**,
-   - reads **clinical/medical** (pills, hospitals, lab coats) — off-brand,
-   - is **text-heavy**, watermarked, low-res, or heavily filtered,
-   - doesn't genuinely match the post's subject.
-   Prefer bright, clean, natural-light, real-moment photos that fit Pulsar's vibe
-   (casual, fun, a good night / better morning). Landscape only; the tool already
-   requests `orientation=landscape` and `size=large`. If nothing clears the bar,
-   run another query rather than settling.
+   **b. No concrete thing in the title?** Then the post is about a FEELING (e.g.
+   "Hangovers Aren't Inevitable", "Weekend Plans, Monday Energy"). You MUST pick
+   **exactly one row** from the **Feeling Library** below and use its query
+   verbatim — do not make up your own scene. Choose the single row whose "Use for"
+   best matches the post's core beat. **When unsure, or for any hangover-recovery
+   / "feel better" / most SCIENCE posts, use the DEFAULT row ("Fresh
+   morning-after").** This is the rule that removes the guesswork.
+
+   ### Feeling Library — closed list; pick ONE, use its query verbatim
+   | Feeling / beat | Use for | Query | People |
+   |---|---|---|---|
+   | **Fresh morning-after** *(DEFAULT)* | recovery, "feel better", waking up clear, most SCIENCE | `sunny bedroom morning light window` | no-people |
+   | Hydration / reset | water, cleansing, health basics | `glass of water fresh sunlight table` | no-people |
+   | Cozy slow morning | rest, slowing down, easy weekend | `cozy morning coffee sunlight window` | no-people |
+   | Focus / fresh start | Monday, energy, planning, productivity | `bright tidy desk morning sunlight` | no-people |
+   | Active / outdoors | movement, hikes, fresh air | `sunny morning hike trail nature` | no-people |
+   | Night out / social | celebration, going out, friends | `friends celebrating rooftop evening` | people OK |
+
+   The Library's "People" column decides step 2 for feeling-based picks (add rows
+   here as the blog grows — but keep it a fixed list, never freeform).
+
+2. **Decide people vs no-people by category.**
+   - **RECIPES / any food & drink post → no people.** Pass `--no-people`. The
+     Pexels API has no people filter, so the tool drops photos whose description
+     implies people (hands, person, etc.) — you still confirm visually in step 4.
+   - **LIFESTYLE → people are fine** (often wanted). Omit `--no-people`.
+   - **SCIENCE → clean/bright lifestyle or object shots**, NOT clinical/medical
+     stock. Usually `--no-people` too.
+
+3. **Search + preview.** Horizontal is the default. Example for a recipe:
+   ```
+   node .claude/skills/blog-image-picker/image-tool.mjs search "margarita cocktail" --no-people
+   ```
+   **Dedup is automatic** — the tool keeps a ledger (`used-pexels-ids.json`) of
+   every photo already saved and excludes them, and `save` appends to it. So no
+   photo is ever picked twice; you don't pass anything. (`--exclude-ids id,id`
+   still exists for one-offs; `--no-dedup` bypasses the ledger if ever needed.)
+   The tool prints candidates (id, `alt`, `likelyPeople`, `previewPath`) and
+   downloads preview thumbnails; `droppedDup` shows how many the ledger skipped.
+   **Read the previewPath images and actually LOOK** — don't judge on alt alone.
+
+4. **Pick the best — apply the guardrails. REJECT a candidate if it:**
+   - **shows people** (any person, face, or hands) on a food/drink post,
+   - **doesn't match the title's subject** (wrong drink/food/thing),
+   - isn't **horizontal**, or is too vertical to crop to a wide hero,
+   - shows an identifiable **brand/logo** or real **alcohol-brand label**,
+   - reads **clinical/medical**, or is **text-heavy / watermarked / low-res**.
+   Prefer bright, clean, natural-light shots that fit Pulsar's vibe. If nothing
+   clears the bar, run another query (a close synonym) rather than settling.
 
 5. **Save + optimize.** With the chosen candidate's `id`:
    ```

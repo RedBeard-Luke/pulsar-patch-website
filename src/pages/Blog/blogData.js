@@ -9,6 +9,8 @@ import imgMorningBed from '../../assets/blog/morning-bed.jpg'
 import imgPatchArm from '../../assets/blog/patch-arm.jpg'
 import imgMondayCoffee from '../../assets/blog/monday-coffee.jpg'
 import imgGinger from '../../assets/blog/ginger.jpg'
+import imgLowCalorieMargarita from '../../assets/blog/low-calorie-margarita.jpg'
+import imgHangoversArentInevitable from '../../assets/blog/hangovers-arent-inevitable.jpg'
 
 /* ── Blog post content with sources ── */
 
@@ -427,7 +429,9 @@ export const blogPosts = {
     category: 'SCIENCE',
     tagColor: 'bg-pulsar-pink',
     date: 'MAY 8',
-    heroImg: imgFriendsBar,
+    heroImg: imgHangoversArentInevitable,
+    heroAlt: 'A bright, airy modern bedroom with morning light coming through a large window',
+    heroImgCredit: { photographer: 'Max Vakhtbovych', url: 'https://www.pexels.com/photo/cozy-bedroom-with-modern-furniture-and-decorative-elements-6890413/' },
     heroDescription: "For years we've accepted hangovers as the price of a good time. But the science says otherwise. Here's why you don't have to settle for feeling terrible.",
     content: [
       {
@@ -484,7 +488,9 @@ export const blogPosts = {
     category: 'RECIPES',
     tagColor: 'bg-[#FFA700]',
     date: 'MAY 8',
-    heroImg: imgMargarita,
+    heroImg: imgLowCalorieMargarita,
+    heroAlt: 'Two light margarita cocktails over ice with fresh lime and lemon on a wooden serving tray',
+    heroImgCredit: { photographer: 'alleksana', url: 'https://www.pexels.com/photo/photo-of-glasses-on-wooden-tray-4051401/' },
     heroDescription: "All the flavor of a classic margarita without the calorie guilt. This simple recipe keeps things light, fresh, and perfect for warm nights.",
     content: [
       {
