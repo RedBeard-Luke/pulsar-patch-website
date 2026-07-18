@@ -353,6 +353,40 @@ export async function fetchWholesaleApproved(token) {
   }
 }
 
+// Email marketing consent (the "Email Notifications" toggle). Kept as its OWN
+// guarded query — separate from GET_CUSTOMER — so if `acceptsMarketing` isn't
+// available on this API version/scope, it can NEVER break login. Returns the
+// boolean, or null when it can't be read (caller keeps its default).
+const GET_EMAIL_OPTIN = `query emailOptIn($token: String!) {
+  customer(customerAccessToken: $token) { acceptsMarketing }
+}`
+export async function fetchEmailOptIn(token) {
+  if (!token) return null
+  try {
+    const data = await storefrontQuery(GET_EMAIL_OPTIN, { token })
+    const v = data?.customer?.acceptsMarketing
+    return typeof v === 'boolean' ? v : null
+  } catch {
+    return null
+  }
+}
+
+// Write email marketing consent to Shopify. Throws on failure so the UI can
+// revert the toggle and show a message.
+const SET_EMAIL_OPTIN = `mutation setEmailOptIn($token: String!, $accepts: Boolean!) {
+  customerUpdate(customerAccessToken: $token, customer: { acceptsMarketing: $accepts }) {
+    customer { acceptsMarketing }
+    customerUserErrors { code field message }
+  }
+}`
+export async function setEmailOptIn(token, accepts) {
+  const data = await storefrontQuery(SET_EMAIL_OPTIN, { token, accepts })
+  const err = firstError(data?.customerUpdate?.customerUserErrors)
+  if (err) throw new Error(err)
+  const v = data?.customerUpdate?.customer?.acceptsMarketing
+  return typeof v === 'boolean' ? v : accepts
+}
+
 // Renew a token nearing expiry. Returns { token, expiresAt } or null.
 export async function renew(token) {
   try {

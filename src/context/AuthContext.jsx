@@ -8,13 +8,17 @@ const TOKEN_KEY = 'pulsar-customer-v1'    // real Shopify customer token
 
 const shopifyEnabled = shopifyCustomer.isConfigured()
 
-// Fetch the customer and merge in wholesale-approval (its own guarded query, so
-// it can't break the login if the tags scope isn't enabled).
+// Fetch the customer and merge in wholesale-approval + email-marketing consent.
+// Both are their OWN guarded queries (separate from fetchCustomer), so neither
+// can break login if a field/scope isn't available.
 async function loadCustomer(token) {
   const mapped = await shopifyCustomer.fetchCustomer(token)
   if (!mapped) return null
-  const wholesaleApproved = await shopifyCustomer.fetchWholesaleApproved(token)
-  return { ...mapped, wholesaleApproved }
+  const [wholesaleApproved, emailOptIn] = await Promise.all([
+    shopifyCustomer.fetchWholesaleApproved(token),
+    shopifyCustomer.fetchEmailOptIn(token),
+  ])
+  return { ...mapped, wholesaleApproved, emailOptIn: emailOptIn ?? mapped.emailOptIn }
 }
 
 /* ── persistence helpers ── */
@@ -166,9 +170,26 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
-  /* Local-only patch (prefs, subscription toggles — not Shopify-backed). */
+  /* Local-only patch (avatar, subscription toggles — not Shopify-backed). */
   const updateUser = useCallback((updates) => {
     setUser(prev => prev ? { ...prev, ...updates } : null)
+  }, [])
+
+  /* Email marketing consent — persists to Shopify (acceptsMarketing) when a
+     customer is signed in; optimistic with revert on failure. Falls back to a
+     local-only update in demo mode. */
+  const updateEmailOptIn = useCallback(async (next) => {
+    setUser(prev => prev ? { ...prev, emailOptIn: next } : prev) // optimistic
+    const t = tokenRef.current
+    if (!shopifyEnabled || !t) return { ok: true } // demo/local
+    try {
+      const saved = await shopifyCustomer.setEmailOptIn(t.token, next)
+      setUser(prev => prev ? { ...prev, emailOptIn: saved } : prev)
+      return { ok: true }
+    } catch (err) {
+      setUser(prev => prev ? { ...prev, emailOptIn: !next } : prev) // revert
+      return { ok: false, error: err.message || 'Could not update email preferences.' }
+    }
   }, [])
 
   /* Profile save — persists to Shopify when enabled, else local. */
@@ -244,6 +265,7 @@ export function AuthProvider({ children }) {
       resetPassword,  // real (from reset email)
       logout,
       updateUser,
+      updateEmailOptIn,
       saveProfile,
       addAddress,
       removeAddress,

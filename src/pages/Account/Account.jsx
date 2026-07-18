@@ -579,8 +579,18 @@ function Row({ k, v }) {
    ════════════════════════════════════════════════════════════════════════ */
 
 function PersonalDashboard({ user, logout }) {
-  const { updateUser, saveProfile, addAddress, removeAddress } = useAuth()
+  const { updateUser, updateEmailOptIn, saveProfile, addAddress, removeAddress } = useAuth()
   const [activeTab, setActiveTab] = useState('profile')
+
+  const [emailPrefBusy, setEmailPrefBusy] = useState(false)
+  const [emailPrefError, setEmailPrefError] = useState('')
+  async function handleEmailToggle() {
+    setEmailPrefBusy(true)
+    setEmailPrefError('')
+    const res = await updateEmailOptIn(!user.emailOptIn)
+    if (!res?.ok) setEmailPrefError(res?.error || 'Could not save. Please try again.')
+    setEmailPrefBusy(false)
+  }
 
   const [profileSaved, setProfileSaved] = useState(false)
   const [profileError, setProfileError] = useState('')
@@ -836,22 +846,37 @@ function PersonalDashboard({ user, logout }) {
         <div className="max-w-[600px]">
           <h2 className="font-futura font-bold text-[24px] text-pulsar-blue uppercase tracking-wide mb-8">Notification Preferences</h2>
           <div className="flex flex-col gap-6">
-            <div className="flex items-center justify-between py-4 border-b border-gray-100">
-              <div>
-                <span className="font-futura font-bold text-[14px] text-pulsar-dark uppercase tracking-wide block">SMS Notifications</span>
-                <span className="font-inter text-[13px] text-gray-500">Deals, updates, and hangover tips via text</span>
+            {/* Email — persists to Shopify marketing consent */}
+            <div className="py-4 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="font-futura font-bold text-[14px] text-pulsar-dark uppercase tracking-wide block">Email Notifications</span>
+                  <span className="font-inter text-[13px] text-gray-500">Promotions, new products, and hangover tips by email</span>
+                </div>
+                <button
+                  onClick={handleEmailToggle}
+                  disabled={emailPrefBusy}
+                  aria-pressed={!!user.emailOptIn}
+                  className={`w-[50px] h-[28px] rounded-full transition-colors relative disabled:opacity-60 ${user.emailOptIn ? 'bg-pulsar-pink' : 'bg-gray-300'}`}
+                >
+                  <div className={`w-[22px] h-[22px] bg-white rounded-full absolute top-[3px] transition-all ${user.emailOptIn ? 'left-[25px]' : 'left-[3px]'}`}></div>
+                </button>
               </div>
-              <button onClick={() => updateUser({ smsOptIn: !user.smsOptIn })} className={`w-[50px] h-[28px] rounded-full transition-colors relative ${user.smsOptIn ? 'bg-pulsar-pink' : 'bg-gray-300'}`}>
-                <div className={`w-[22px] h-[22px] bg-white rounded-full absolute top-[3px] transition-all ${user.smsOptIn ? 'left-[25px]' : 'left-[3px]'}`}></div>
-              </button>
+              {emailPrefError && <p className="font-inter text-[12px] text-pulsar-pink mt-2">{emailPrefError}</p>}
+              <p className="font-inter text-[11px] text-gray-400 mt-2">Order and shipping updates are always sent and aren't affected by this.</p>
             </div>
-            <div className="flex items-center justify-between py-4 border-b border-gray-100">
+
+            {/* SMS — no SMS provider wired yet, so this is honestly "coming soon" */}
+            <div className="flex items-center justify-between py-4 border-b border-gray-100 opacity-60">
               <div>
-                <span className="font-futura font-bold text-[14px] text-pulsar-dark uppercase tracking-wide block">Email Notifications</span>
-                <span className="font-inter text-[13px] text-gray-500">Order updates, promotions, and new products</span>
+                <span className="font-futura font-bold text-[14px] text-pulsar-dark uppercase tracking-wide block flex items-center gap-2">
+                  SMS Notifications
+                  <span className="font-inter font-[600] text-[10px] normal-case tracking-normal bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full">Coming soon</span>
+                </span>
+                <span className="font-inter text-[13px] text-gray-500">Deals and updates via text, launching soon</span>
               </div>
-              <button onClick={() => updateUser({ emailOptIn: !user.emailOptIn })} className={`w-[50px] h-[28px] rounded-full transition-colors relative ${user.emailOptIn ? 'bg-pulsar-pink' : 'bg-gray-300'}`}>
-                <div className={`w-[22px] h-[22px] bg-white rounded-full absolute top-[3px] transition-all ${user.emailOptIn ? 'left-[25px]' : 'left-[3px]'}`}></div>
+              <button disabled aria-disabled="true" className="w-[50px] h-[28px] rounded-full bg-gray-200 relative cursor-not-allowed">
+                <div className="w-[22px] h-[22px] bg-white rounded-full absolute top-[3px] left-[3px]"></div>
               </button>
             </div>
           </div>
