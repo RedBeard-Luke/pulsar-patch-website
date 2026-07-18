@@ -11,6 +11,7 @@ import imgMondayCoffee from '../../assets/blog/monday-coffee.jpg'
 import imgGinger from '../../assets/blog/ginger.jpg'
 import imgLowCalorieMargarita from '../../assets/blog/low-calorie-margarita.jpg'
 import imgHangoversArentInevitable from '../../assets/blog/hangovers-arent-inevitable.jpg'
+import imgFastedOldFashion from '../../assets/blog/fasted-old-fashion.jpg'
 
 /* ── Blog post content with sources ── */
 
@@ -542,7 +543,9 @@ export const blogPosts = {
     category: 'RECIPES',
     tagColor: 'bg-[#FFA700]',
     date: 'MAY 8',
-    heroImg: imgOldFashioned,
+    heroImg: imgFastedOldFashion,
+    heroAlt: 'An Old Fashioned cocktail with a large ice cube and orange peel in a rocks glass on a dark marble surface',
+    heroImgCredit: { photographer: 'Dextar Vision', url: 'https://www.pexels.com/photo/alcohol-beverage-in-glass-16444385/' },
     heroDescription: "A stripped-down, no-nonsense Old Fashioned that's perfect for unwinding after a long day. No syrup, no fuss, just a clean cocktail done right.",
     content: [
       {
