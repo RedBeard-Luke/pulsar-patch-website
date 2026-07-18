@@ -250,8 +250,11 @@ export default function Product() {
                     <p className="font-futura font-[900] text-[13px] text-pulsar-dark uppercase tracking-wide mt-1">One-Time Purchase</p>
                     <p className="font-inter font-[700] text-[20px] text-pulsar-pink mt-1">${product.price.toFixed(2)}</p>
                   </div>
-                  {/* Option 2 — Subscribe & save */}
-                  <div className="flex-1 rounded-2xl border-2 border-pulsar-blue bg-pulsar-light-blue-bg/40 p-4 relative">
+                  {/* Option 2 — Subscribe & save (whole card is a link) */}
+                  <Link
+                    to="/subscription"
+                    className="group flex-1 block rounded-2xl border-2 border-pulsar-blue bg-pulsar-light-blue-bg/40 p-4 relative transition-all duration-200 hover:bg-pulsar-light-blue-bg/70 hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pulsar-blue focus-visible:ring-offset-2"
+                  >
                     <span className="absolute top-3 right-3 bg-pulsar-blue text-white font-futura font-[900] text-[9px] uppercase tracking-wide px-2 py-0.5 rounded-full">Save 15%</span>
                     <span className="font-futura font-[800] text-[10px] text-gray-400 uppercase tracking-widest">Option 2</span>
                     <p className="font-futura font-[900] text-[13px] text-pulsar-dark uppercase tracking-wide mt-1">Subscribe &amp; Save</p>
@@ -259,8 +262,8 @@ export default function Product() {
                       <p className="font-inter font-[700] text-[20px] text-pulsar-blue">${(product.price * 0.85).toFixed(2)}</p>
                       <span className="font-inter text-[12px] text-gray-400 line-through">${product.price.toFixed(2)}</span>
                     </div>
-                    <Link to="/subscription" className="inline-block font-futura font-[800] text-[10px] text-pulsar-blue uppercase tracking-widest mt-2 hover:text-pulsar-pink">See plans →</Link>
-                  </div>
+                    <span className="inline-block font-futura font-[800] text-[10px] text-pulsar-blue uppercase tracking-widest mt-2 transition-colors group-hover:text-pulsar-pink">See plans →</span>
+                  </Link>
                 </div>
               </div>
             )}
