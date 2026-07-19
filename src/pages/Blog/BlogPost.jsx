@@ -49,8 +49,16 @@ export default function BlogPost() {
         <div className="max-w-[1920px] mx-auto px-5 sm:px-8 lg:px-16 xl:px-[140px]">
           <article className="max-w-[800px] mx-auto">
 
-            {/* Category tag + Date */}
-            <div className="flex items-center gap-4 mb-6">
+            {/* Back to blog + Category tag + Date */}
+            <div className="flex items-center flex-wrap gap-3 sm:gap-4 mb-6">
+              <Link
+                to="/blog"
+                aria-label="Back to all blog posts"
+                className="group inline-flex items-center gap-1.5 border border-gray-300 text-gray-500 font-futura font-bold text-[11px] uppercase tracking-widest px-3.5 py-1.5 rounded-full hover:border-pulsar-blue hover:text-pulsar-blue transition-colors"
+              >
+                <span aria-hidden="true" className="transition-transform group-hover:-translate-x-0.5">&larr;</span>
+                ALL POSTS
+              </Link>
               <span className={`${post.tagColor} text-white font-futura font-bold text-[11px] uppercase tracking-widest px-4 py-1.5 rounded-full`}>
                 {post.category}
               </span>
