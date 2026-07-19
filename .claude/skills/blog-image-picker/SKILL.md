@@ -48,9 +48,11 @@ looks up `heroImg` from blogData by id).
    their AI-created abstract science renders (molecules, DNA, neurons, cells). They
    read science-forward WITHOUT the clinical-lab-stock feel we ban. Do it with:
    ```
-   node .claude/skills/blog-image-picker/image-tool.mjs search "neuron" --photographer "Google DeepMind" --no-people
+   node .claude/skills/blog-image-picker/image-tool.mjs search --topic deepmind-science --photographer "Google DeepMind" --no-people
    ```
-   `neuron`, `dna`, `molecule`, `cell` surface the most DeepMind results; try a few.
+   The `deepmind-science` topic rotates `neuron`/`dna`/`molecule`/`cell`/… (which
+   surface the most DeepMind results); auto-pagination helps here since the pool per
+   query is thin. You can also pass a single query directly instead of `--topic`.
    Grade the slate with **`--category science-abstract`** so a dark-but-vivid render
    isn't docked on `light` (it's judged vivid+clean, not daylight-bright). Prefer
    bright/pink renders when available (on-brand). If DeepMind has nothing
@@ -59,24 +61,30 @@ looks up `heroImg` from blogData by id).
    **b. No concrete thing in the title (and not heavy-science)?** Then the post is
    about a FEELING (e.g.
    "Hangovers Aren't Inevitable", "Weekend Plans, Monday Energy"). You MUST pick
-   **exactly one row** from the **Feeling Library** below and use its query
-   verbatim — do not make up your own scene. Choose the single row whose "Use for"
-   best matches the post's core beat. **When unsure, or for any hangover-recovery
-   / "feel better" / most SCIENCE posts, use the DEFAULT row ("Fresh
-   morning-after").** This is the rule that removes the guesswork.
+   **exactly one row** from the **Feeling Library** below and search its topic key
+   (`search --topic <key>`) — do not make up your own scene. Choose the single row whose "Use for"
+   best matches the post's core beat. **Priority: if "hangover" is in the TITLE →
+   the "Hangover" row** (show the drinking/social side, not a morning shot).
+   Otherwise, when unsure or for "feel better" / light-science posts, use the
+   DEFAULT row ("Fresh morning / active outdoors"). This is the rule that removes
+   the guesswork.
 
-   ### Feeling Library — closed list; pick ONE, use its query verbatim
-   | Feeling / beat | Use for | Query | People |
+   ### Feeling Library — closed list; pick ONE row, search its topic
+   | Feeling / beat | Use for | Topic key (`--topic`) | People |
    |---|---|---|---|
-   | **Fresh morning-after** *(DEFAULT)* | recovery, "feel better", waking up clear, most SCIENCE | `sunny bedroom morning light window` | no-people |
-   | Hydration / reset | water, cleansing, health basics | `glass of water fresh sunlight table` | no-people |
-   | Cozy slow morning | rest, slowing down, easy weekend | `cozy morning coffee sunlight window` | no-people |
-   | Focus / fresh start | Monday, energy, planning, productivity | `bright tidy desk morning sunlight` | no-people |
-   | Active / outdoors | movement, hikes, fresh air | `sunny morning hike trail nature` | no-people |
-   | Night out / social | celebration, going out, friends | `friends celebrating rooftop evening` | people OK |
+   | **Fresh morning / active outdoors** *(DEFAULT)* | recovery, "feel better", waking up clear, most light SCIENCE, movement, hikes, fresh air | `fresh-morning-active` | people OK |
+   | **Hangover (in the title)** | a feeling post with **"hangover" in the title** — show the drinking / social side, NOT a cocktail: beer, people cheersing, bar community, a flight of beer, wine glasses together, people having a drink. Brands/labels OK. | `hangover` | people OK |
+   | Hydration / reset | water, cleansing, health basics | `hydration-reset` | no-people |
+   | Cozy slow morning | rest, slowing down, easy weekend | `cozy-morning` | people OK |
+   | Focus / fresh start | Monday, energy, planning, productivity | `focus-fresh-start` | no-people |
+   | Night out / social | celebration, going out, friends | `night-out-social` | people OK |
 
-   The Library's "People" column decides step 2 for feeling-based picks (add rows
-   here as the blog grows — but keep it a fixed list, never freeform).
+   Pick the row, then **`search --topic <key>`** — the tool rotates the least-recently
+   -used query variant from `query-bank.json` so repeat topics don't return the same
+   photos as the ledger thins the pool (inspect with `variants <key>`). The "People"
+   column decides `--no-people`. The **Hangover** row also allows brand labels on the
+   hero — grade it with `--brands-ok` (exempts `nobrand`). Add rows/variants as the
+   blog grows — but keep them fixed lists, never freeform.
 
 2. **Decide people vs no-people by category.**
    - **RECIPES / any food & drink post → no people.** Pass `--no-people`. The
@@ -86,10 +94,19 @@ looks up `heroImg` from blogData by id).
    - **SCIENCE → clean/bright lifestyle or object shots**, NOT clinical/medical
      stock. Usually `--no-people` too.
 
-3. **Search + preview.** Horizontal is the default. Example for a recipe:
+3. **Search + preview.** Horizontal is the default. Give a query directly, or use
+   a Feeling Library topic (which rotates variants):
    ```
    node .claude/skills/blog-image-picker/image-tool.mjs search "margarita cocktail" --no-people
+   node .claude/skills/blog-image-picker/image-tool.mjs search --topic fresh-morning-active   # rotates a variant
    ```
+   **Query variants + pagination (fix #6).** `--topic <key>` pulls the least-recently
+   -used query from `query-bank.json` and logs it, so the next run rotates to a
+   different variant (see `variants <key>`). Search also **auto-paginates**: if a page
+   is thin after dedup it pulls the next page (up to `--max-pages`, default 4), so a
+   full slate stays available even for topics you've used a lot — the response shows
+   `pagesPulled`. Recurring recipe subjects have topics too (`old-fashioned`,
+   `margarita`, `mojito`, `negroni`, `spritz`).
    **Dedup is automatic** — the tool keeps a ledger (`used-pexels-ids.json`) of
    every photo already saved and excludes them, and `save` appends to it. So no
    photo is ever picked twice; you don't pass anything. (`--exclude-ids id,id`
@@ -215,7 +232,7 @@ becomes best-of-3.
    that fits the cocktail community. Pass `--category` so this is applied + audited.
    *Fix #1: `light` used to punish on-brand moody cocktail shots.*
 6. `color` — cohesive, doesn't clash with Pulsar blue/pink
-7. `nobrand` — no brand/logo *(hero only; `--inline` auto-passes it)*
+7. `nobrand` — no brand/logo *(hero only; `--inline` or `--brands-ok` auto-passes it — e.g. the Hangover social row allows beer/wine labels)*
 8. `clean` — not clinical / text-heavy / watermarked
 9. `small` — subject legible at thumbnail + OG size
 

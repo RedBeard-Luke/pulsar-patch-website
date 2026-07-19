@@ -1,0 +1,88 @@
+{
+  "note": "Query variants per topic (fix #6). The tool rotates least-recently-used first so repeat topics don't keep returning the same photos as the dedup ledger thins the pool. Use `variants <topic>` to see the rotation, or `search --topic <topic>` to auto-pick the LRU variant. The `deepmind-science` topic must be paired with `--photographer \"Google DeepMind\"`. Keys map to the Feeling Library rows plus common recurring recipe subjects; add rows/variants freely, keep them as fixed lists.",
+  "topics": {
+    "fresh-morning-active": [
+      "morning hike",
+      "sunrise trail nature",
+      "person walking trail morning",
+      "mountain path morning light",
+      "jogging outdoors sunrise",
+      "fresh air morning walk forest"
+    ],
+    "hangover": [
+      "friends cheersing beer bar",
+      "beer flight tasting",
+      "friends toasting drinks pub",
+      "wine glasses cheers table",
+      "group toasting beer rooftop",
+      "cold beer bottles on bar",
+      "people clinking glasses celebration"
+    ],
+    "hydration-reset": [
+      "glass of water fresh sunlight table",
+      "pouring water into glass",
+      "water glass lemon window light",
+      "still life water glass bright",
+      "carafe of water morning light"
+    ],
+    "cozy-morning": [
+      "cozy morning coffee sunlight window",
+      "coffee cup blanket morning",
+      "warm mug morning window",
+      "slow morning coffee steam",
+      "reading in bed morning light"
+    ],
+    "focus-fresh-start": [
+      "bright tidy desk morning sunlight",
+      "clean minimal workspace daylight",
+      "notebook coffee planning desk",
+      "organized desk plant window",
+      "laptop notebook bright desk"
+    ],
+    "night-out-social": [
+      "friends celebrating rooftop evening",
+      "night out friends city lights",
+      "people dancing party",
+      "celebration drinks toast evening",
+      "friends laughing bar night"
+    ],
+    "deepmind-science": [
+      "neuron",
+      "dna",
+      "molecule",
+      "cell",
+      "protein structure",
+      "biology abstract",
+      "synapse network",
+      "genome helix"
+    ],
+    "old-fashioned": [
+      "old fashioned cocktail",
+      "whiskey rocks glass garnish",
+      "bourbon cocktail orange peel",
+      "whiskey cocktail dark bar",
+      "rocks glass amber cocktail"
+    ],
+    "margarita": [
+      "margarita cocktail",
+      "margarita glass lime salt rim",
+      "frozen margarita glass",
+      "margarita cocktail fresh lime"
+    ],
+    "mojito": [
+      "mojito cocktail mint",
+      "mojito glass lime mint",
+      "fresh mojito highball"
+    ],
+    "negroni": [
+      "negroni cocktail orange",
+      "negroni glass ice orange peel",
+      "red negroni cocktail bar"
+    ],
+    "spritz": [
+      "aperol spritz glass",
+      "spritz cocktail orange",
+      "spritz wine glass patio"
+    ]
+  }
+}

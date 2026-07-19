@@ -79,6 +79,39 @@ function truthy(v) {
   return ['1', 'true', 'y', 'yes', 'pass'].includes(String(v).toLowerCase())
 }
 
+// ── Query variants + rotation (fix #6) ──────────────────────────────────────
+// Each topic has several equivalent queries; the tool rotates the least-recently
+// -used one first so repeat topics don't keep returning the same photos as the
+// dedup ledger thins the pool. Usage is logged to eval/query-usage.json.
+const QUERY_BANK = join(__dirname, 'query-bank.json')
+const QUERY_USAGE = join(EVAL_DIR, 'query-usage.json')
+function loadBank() {
+  try { return JSON.parse(readFileSync(QUERY_BANK, 'utf8')) || { topics: {} } } catch { return { topics: {} } }
+}
+function recordQueryUse(topic, query) {
+  const u = loadJsonArray(QUERY_USAGE)
+  u.push({ topic: topic || null, query, ts: new Date().toISOString() })
+  writeJsonArray(QUERY_USAGE, u)
+}
+// Order a topic's variants least-recently-used first (never-used come first).
+function rankVariants(topic) {
+  const bank = loadBank()
+  const variants = (bank.topics && bank.topics[topic]) || null
+  if (!variants) return null
+  const usage = loadJsonArray(QUERY_USAGE)
+  const lastUsed = {}
+  for (const rec of usage) {
+    if (rec.topic === topic && variants.includes(rec.query)) {
+      if (!lastUsed[rec.query] || rec.ts > lastUsed[rec.query]) lastUsed[rec.query] = rec.ts
+    }
+  }
+  const ordered = [...variants].sort((a, b) => {
+    const ta = lastUsed[a] || '', tb = lastUsed[b] || ''
+    return ta < tb ? -1 : ta > tb ? 1 : 0
+  })
+  return { variants, ordered, lastUsed }
+}
+
 const API_KEY = process.env.PEXELS_API_KEY
 // Only the Pexels-hitting commands need the key; `suggest` doesn't.
 function requireKey() {
@@ -137,6 +170,28 @@ function cmdSuggest(positional) {
   console.log(JSON.stringify({ title, suggestedQuery: titleToQuery(title) }, null, 2))
 }
 
+// Inspect the query bank: `variants` lists all topics; `variants <topic>` shows
+// its queries ordered least-recently-used first (the `suggested` one is what
+// `search --topic <topic>` would use next).
+function cmdVariants(positional) {
+  const bank = loadBank()
+  const topic = positional[0]
+  if (!topic) {
+    console.log(JSON.stringify({ topics: Object.keys(bank.topics || {}) }, null, 2))
+    return
+  }
+  const r = rankVariants(topic)
+  if (!r) {
+    console.error(`ERROR: unknown topic "${topic}". Known: ${Object.keys(bank.topics || {}).join(', ')}`)
+    process.exit(1)
+  }
+  console.log(JSON.stringify({
+    topic,
+    suggested: r.ordered[0],
+    orderedLeastRecentFirst: r.ordered.map((q) => ({ query: q, lastUsed: r.lastUsed[q] || null })),
+  }, null, 2))
+}
+
 async function pexels(path) {
   const res = await fetch(`https://api.pexels.com/v1/${path}`, {
     headers: { Authorization: API_KEY },
@@ -157,10 +212,22 @@ async function download(url, dest) {
 
 async function cmdSearch(positional, flags) {
   requireKey()
-  // Query may be given directly, or derived from a blog title via --title.
-  const query = positional[0] || (flags.title ? titleToQuery(flags.title) : '')
+  // Query resolution priority: explicit positional > --title > --topic (rotates a
+  // least-recently-used variant from query-bank.json so repeat topics vary).
+  const topic = flags.topic ? String(flags.topic) : ''
+  let query = positional[0] || (flags.title ? titleToQuery(flags.title) : '')
+  let variantInfo = null
+  if (!query && topic) {
+    variantInfo = rankVariants(topic)
+    if (!variantInfo) {
+      const known = Object.keys(loadBank().topics || {}).join(', ')
+      console.error(`ERROR: unknown --topic "${topic}". Known topics: ${known}\n(list them anytime: node image-tool.mjs variants)`)
+      process.exit(1)
+    }
+    query = variantInfo.ordered[0] // least-recently-used variant
+  }
   if (!query) {
-    console.error('usage: search "<query>" [--title "<blog title>"] [--no-people] [--orientation landscape] [--per 30] [--max-previews 8] [--exclude-ids id,id] [--out <dir>]')
+    console.error('usage: search "<query>" | --topic <key> | --title "<blog title>"  [--no-people] [--photographer "Google DeepMind"] [--page 1] [--max-pages 4] [--per 30] [--max-previews 8] [--exclude-ids id,id] [--no-dedup] [--out <dir>]')
     process.exit(1)
   }
   const orientation = flags.orientation || 'landscape' // horizontal
@@ -170,7 +237,7 @@ async function cmdSearch(positional, flags) {
   // posts: `--photographer "Google DeepMind"` (or `--photographer deepmind`).
   const photographer = flags.photographer ? String(flags.photographer).toLowerCase() : ''
   // Fetch extra when filtering so we still end up with enough candidates.
-  const per = flags.per || (photographer ? '80' : noPeople ? '50' : '30')
+  const per = parseInt(flags.per || (photographer ? '80' : noPeople ? '50' : '30'), 10)
   const maxPreviews = parseInt(flags['max-previews'] || '8', 10)
   // Auto-dedup: exclude everything already used (the ledger) plus any explicit
   // --exclude-ids. Pass --no-dedup to ignore the ledger (rarely needed).
@@ -182,19 +249,29 @@ async function cmdSearch(positional, flags) {
   const outDir = flags.out || join(tmpdir(), 'pulsar-image-picker')
   mkdirSync(outDir, { recursive: true })
 
-  const data = await pexels(
-    `search?query=${encodeURIComponent(query)}&orientation=${orientation}&per_page=${per}&size=large`,
-  )
-  const returned = data.photos || []
-  let droppedPeople = 0
-  let droppedDup = 0
-  let droppedPhotographer = 0
-  const filtered = returned.filter((p) => {
-    if (excludeIds.has(String(p.id))) { droppedDup++; return false }
-    if (photographer && !(`${p.photographer || ''} ${p.photographer_url || ''}`.toLowerCase().includes(photographer))) { droppedPhotographer++; return false }
-    if (noPeople && hasPeople(p.alt)) { droppedPeople++; return false }
-    return true
-  })
+  // Pagination (fix #6): start at --page and keep pulling deeper pages until we
+  // have enough candidates after dedup/people/photographer filtering, hit the page
+  // cap, or Pexels runs out. Keeps a full slate available even when the ledger has
+  // eaten the early pages, and surfaces more of thin pools (e.g. DeepMind).
+  const startPage = Math.max(1, parseInt(flags.page || '1', 10))
+  const maxPages = Math.max(1, parseInt(flags['max-pages'] || '4', 10))
+  let droppedPeople = 0, droppedDup = 0, droppedPhotographer = 0, returnedTotal = 0, pagesPulled = 0
+  const filtered = []
+  for (let page = startPage; filtered.length < maxPreviews && pagesPulled < maxPages; page++) {
+    const data = await pexels(
+      `search?query=${encodeURIComponent(query)}&orientation=${orientation}&per_page=${per}&size=large&page=${page}`,
+    )
+    const returned = data.photos || []
+    returnedTotal += returned.length
+    pagesPulled++
+    for (const p of returned) {
+      if (excludeIds.has(String(p.id))) { droppedDup++; continue }
+      if (photographer && !(`${p.photographer || ''} ${p.photographer_url || ''}`.toLowerCase().includes(photographer))) { droppedPhotographer++; continue }
+      if (noPeople && hasPeople(p.alt)) { droppedPeople++; continue }
+      filtered.push(p)
+    }
+    if (returned.length < per) break // reached the last page of results
+  }
 
   const candidates = []
   for (let i = 0; i < filtered.length && candidates.length < maxPreviews; i++) {
@@ -221,9 +298,11 @@ async function cmdSearch(positional, flags) {
       previewPath,
     })
   }
+  // Log the query use so --topic rotation advances to a different variant next time.
+  if (topic) recordQueryUse(topic, query)
   console.log(
     JSON.stringify(
-      { query, orientation, noPeople, photographer: photographer || undefined, returned: returned.length, droppedPeople, droppedDup, droppedPhotographer, kept: candidates.length, previewDir: outDir, candidates },
+      { query, topic: topic || undefined, variantRotation: variantInfo ? variantInfo.ordered : undefined, orientation, noPeople, photographer: photographer || undefined, pagesPulled, returned: returnedTotal, droppedPeople, droppedDup, droppedPhotographer, kept: candidates.length, previewDir: outDir, candidates },
       null,
       2,
     ),
@@ -305,7 +384,7 @@ async function cmdGrade(positional, flags) {
   const photoId = positional[0]
   const slug = flags.slug || positional[1]
   if (!photoId || !slug) {
-    console.error('usage: grade <photoId> --slug <slug> --category <recipe|cocktail|science|lifestyle> --has-people 0|1 [--inline] [--people-ok] [--eval] --subject 1 --light 1 --color 1 --nobrand 1 --clean 1 --small 1')
+    console.error('usage: grade <photoId> --slug <slug> --category <recipe|cocktail|science|science-abstract|lifestyle> --has-people 0|1 [--inline] [--people-ok] [--brands-ok] [--eval] --subject 1 --light 1 --color 1 --nobrand 1 --clean 1 --small 1')
     process.exit(1)
   }
   const target = flags.inline === true ? 'inline' : 'hero'
@@ -346,7 +425,7 @@ async function cmdGrade(positional, flags) {
 
   const vision = {}
   for (const k of RUBRIC.vision) {
-    if (k === 'nobrand' && target === 'inline') { vision[k] = true; continue } // brands OK inline
+    if (k === 'nobrand' && (target === 'inline' || flags['brands-ok'] === true)) { vision[k] = true; continue } // brands OK on inline, or hero rows that allow labels (e.g. the Hangover social row)
     if (flags[k] === undefined) {
       console.error(`ERROR: missing --${k} (pass 1 or 0). All 6 vision criteria must be graded: ${RUBRIC.vision.join(', ')}`)
       process.exit(1)
@@ -486,9 +565,9 @@ function cmdRound(positional, flags) {
 const [cmd, ...rest] = process.argv.slice(2)
 const { flags, positional } = parseFlags(rest)
 
-const run = { suggest: cmdSuggest, search: cmdSearch, save: cmdSave, grade: cmdGrade, select: cmdSelect, round: cmdRound }[cmd]
+const run = { suggest: cmdSuggest, variants: cmdVariants, search: cmdSearch, save: cmdSave, grade: cmdGrade, select: cmdSelect, round: cmdRound }[cmd]
 if (!run) {
-  console.error('usage: image-tool.mjs <suggest|search|grade|select|round|save> ...')
+  console.error('usage: image-tool.mjs <suggest|variants|search|grade|select|round|save> ...')
   process.exit(1)
 }
 Promise.resolve(run(positional, flags)).catch((err) => {

@@ -54,5 +54,63 @@
     },
     "weakest": "light",
     "note": "Baseline: 4 hand-picked images graded under current rules."
+  },
+  {
+    "label": "R2",
+    "ts": "2026-07-19T02:47:12.081Z",
+    "n": 5,
+    "candidatesGraded": 15,
+    "losersRejected": 10,
+    "avgScore": 9,
+    "avgPct": 100,
+    "perCriterion": {
+      "horizontal": {
+        "pass": 5,
+        "total": 5,
+        "rate": 1
+      },
+      "hiRes": {
+        "pass": 5,
+        "total": 5,
+        "rate": 1
+      },
+      "peopleOK": {
+        "pass": 5,
+        "total": 5,
+        "rate": 1
+      },
+      "subject": {
+        "pass": 5,
+        "total": 5,
+        "rate": 1
+      },
+      "light": {
+        "pass": 5,
+        "total": 5,
+        "rate": 1
+      },
+      "color": {
+        "pass": 5,
+        "total": 5,
+        "rate": 1
+      },
+      "nobrand": {
+        "pass": 3,
+        "total": 3,
+        "rate": 1
+      },
+      "clean": {
+        "pass": 5,
+        "total": 5,
+        "rate": 1
+      },
+      "small": {
+        "pass": 5,
+        "total": 5,
+        "rate": 1
+      }
+    },
+    "weakest": "horizontal",
+    "note": "Fixes: light category-aware + peopleOK vision-confirmed; added 3-candidate slates (/27), Google DeepMind hero path for heavy-science, and revised Feeling Library (hangover->beer row, morning hike default)."
   }
 ]

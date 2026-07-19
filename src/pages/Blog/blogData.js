@@ -11,6 +11,7 @@ import imgMondayCoffee from '../../assets/blog/monday-coffee.jpg'
 import imgScienceBehindPulsarGinger from '../../assets/blog/science-behind-pulsar-ginger.jpg'
 import imgLowCalorieMargarita from '../../assets/blog/low-calorie-margarita.jpg'
 import imgHangoversArentInevitable from '../../assets/blog/hangovers-arent-inevitable.jpg'
+import imgHangoversArentInevitableRecover from '../../assets/blog/hangovers-arent-inevitable-recover.jpg'
 import imgFastedOldFashion from '../../assets/blog/fasted-old-fashion.jpg'
 import imgFastedOldFashionWhiskey from '../../assets/blog/fasted-old-fashion-whiskey.jpg'
 import imgScienceBehindPulsar from '../../assets/blog/science-behind-pulsar.jpg'
@@ -436,8 +437,8 @@ export const blogPosts = {
     tagColor: 'bg-pulsar-pink',
     date: 'MAY 8',
     heroImg: imgHangoversArentInevitable,
-    heroAlt: 'A bright, airy modern bedroom with morning light coming through a large window',
-    heroImgCredit: { photographer: 'Max Vakhtbovych', url: 'https://www.pexels.com/photo/cozy-bedroom-with-modern-furniture-and-decorative-elements-6890413/' },
+    heroAlt: 'Two friends clinking light and dark beer steins in a bright outdoor toast',
+    heroImgCredit: { photographer: 'Atlantic Ambience', url: 'https://www.pexels.com/photo/men-holding-glass-beer-steins-12940784/' },
     heroDescription: "For years we've accepted hangovers as the price of a good time. But the science says otherwise. Here's why you don't have to settle for feeling terrible.",
     content: [
       {
@@ -458,8 +459,9 @@ export const blogPosts = {
       },
       {
         type: 'image',
-        img: imgPatchArm,
-        source: 'Photo by Unsplash'
+        img: imgHangoversArentInevitableRecover,
+        alt: 'An abstract 3D render of a translucent, iridescent molecular structure on a soft blue background',
+        source: 'Photo via Pexels'
       },
       {
         type: 'heading',
