@@ -165,8 +165,12 @@ async function cmdSearch(positional, flags) {
   }
   const orientation = flags.orientation || 'landscape' // horizontal
   const noPeople = flags['no-people'] === true
+  // Keep only a specific photographer/studio (substring match on name + profile
+  // URL). Used to pull Google DeepMind's abstract science renders for heavy-science
+  // posts: `--photographer "Google DeepMind"` (or `--photographer deepmind`).
+  const photographer = flags.photographer ? String(flags.photographer).toLowerCase() : ''
   // Fetch extra when filtering so we still end up with enough candidates.
-  const per = flags.per || (noPeople ? '50' : '30')
+  const per = flags.per || (photographer ? '80' : noPeople ? '50' : '30')
   const maxPreviews = parseInt(flags['max-previews'] || '8', 10)
   // Auto-dedup: exclude everything already used (the ledger) plus any explicit
   // --exclude-ids. Pass --no-dedup to ignore the ledger (rarely needed).
@@ -184,8 +188,10 @@ async function cmdSearch(positional, flags) {
   const returned = data.photos || []
   let droppedPeople = 0
   let droppedDup = 0
+  let droppedPhotographer = 0
   const filtered = returned.filter((p) => {
     if (excludeIds.has(String(p.id))) { droppedDup++; return false }
+    if (photographer && !(`${p.photographer || ''} ${p.photographer_url || ''}`.toLowerCase().includes(photographer))) { droppedPhotographer++; return false }
     if (noPeople && hasPeople(p.alt)) { droppedPeople++; return false }
     return true
   })
@@ -217,7 +223,7 @@ async function cmdSearch(positional, flags) {
   }
   console.log(
     JSON.stringify(
-      { query, orientation, noPeople, returned: returned.length, droppedPeople, droppedDup, kept: candidates.length, previewDir: outDir, candidates },
+      { query, orientation, noPeople, photographer: photographer || undefined, returned: returned.length, droppedPeople, droppedDup, droppedPhotographer, kept: candidates.length, previewDir: outDir, candidates },
       null,
       2,
     ),
@@ -309,9 +315,14 @@ async function cmdGrade(positional, flags) {
   // (as long as it's not murky/underexposed). Category is recorded so we can audit
   // the light pass-rate per category. See SKILL.md "Scoring & the self-improving loop".
   const category = String(flags.category || '').toLowerCase()
-  const MOODY_OK = category === 'cocktail' || category === 'night-out'
+  // `light` standard by category: cocktail/night-out accept warm/moody; the
+  // DeepMind abstract-science renders (science-abstract) are often dark but vivid,
+  // so they're judged on "vivid + clean + well-exposed", not daylight brightness.
+  let lightRule = 'bright-required'
+  if (category === 'cocktail' || category === 'night-out') lightRule = 'moody-ok'
+  else if (category === 'science-abstract') lightRule = 'vivid-ok'
   if (!category) {
-    console.error('ERROR: pass --category <recipe|cocktail|science|lifestyle>. `light` is graded category-aware (moody is OK for cocktail/night-out).')
+    console.error('ERROR: pass --category <recipe|cocktail|science|science-abstract|lifestyle>. `light` is graded category-aware (moody OK for cocktail; vivid-dark OK for science-abstract/DeepMind).')
     process.exit(1)
   }
 
@@ -351,7 +362,7 @@ async function cmdGrade(positional, flags) {
     slug,
     target,
     category,
-    lightRule: MOODY_OK ? 'moody-ok' : 'bright-required',
+    lightRule,
     peopleSource,
     isEval: flags.eval === true,
     det,

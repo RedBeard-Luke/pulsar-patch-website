@@ -42,7 +42,22 @@ looks up `heroImg` from blogData by id).
    node .claude/skills/blog-image-picker/image-tool.mjs suggest "<blog title>"
    ```
 
-   **b. No concrete thing in the title?** Then the post is about a FEELING (e.g.
+   **a2. Is it a HEAVY SCIENCE / mechanism post** — how the patch works, ingredient
+   breakdowns, transdermal delivery, "The Science Behind ..."? → **Pull the hero
+   from Google DeepMind's Pexels gallery** (https://www.pexels.com/@googledeepmind/):
+   their AI-created abstract science renders (molecules, DNA, neurons, cells). They
+   read science-forward WITHOUT the clinical-lab-stock feel we ban. Do it with:
+   ```
+   node .claude/skills/blog-image-picker/image-tool.mjs search "neuron" --photographer "Google DeepMind" --no-people
+   ```
+   `neuron`, `dna`, `molecule`, `cell` surface the most DeepMind results; try a few.
+   Grade the slate with **`--category science-abstract`** so a dark-but-vivid render
+   isn't docked on `light` (it's judged vivid+clean, not daylight-bright). Prefer
+   bright/pink renders when available (on-brand). If DeepMind has nothing
+   landscape+usable after a few queries, fall back to the Feeling Library (b).
+
+   **b. No concrete thing in the title (and not heavy-science)?** Then the post is
+   about a FEELING (e.g.
    "Hangovers Aren't Inevitable", "Weekend Plans, Monday Energy"). You MUST pick
    **exactly one row** from the **Feeling Library** below and use its query
    verbatim — do not make up your own scene. Choose the single row whose "Use for"
@@ -152,6 +167,13 @@ differences:
 - **No repeats — automatic.** The dedup ledger already excludes the hero and every
   other used photo, so a normal `search` can never return them. Use a *different
   query* than the hero to guarantee a different look, not just a different ID.
+- **Ingredient posts → use the real ingredient as the inline image.** If a section
+  names a specific ingredient (ginger, glutathione source, a botanical, etc.), the
+  inline image under that subhead should BE that ingredient — e.g.
+  `search "fresh ginger root" --no-people`. Put it under the MATCHING heading: a
+  ginger photo belongs under "GINGER EXTRACT", not floating under the NAC section.
+  This pairs well with a DeepMind abstract hero (a2): abstract science up top, a
+  concrete real ingredient in the body.
 - **Brand labels are OK on inline images** (unlike the hero). A whiskey bottle with
   a visible brand is fine here. Still avoid people (unless the section calls for
   it), text overlays/watermarks, and low-res.

@@ -8,11 +8,12 @@ import imgCocktailsBar from '../../assets/blog/cocktails-bar.jpg'
 import imgMorningBed from '../../assets/blog/morning-bed.jpg'
 import imgPatchArm from '../../assets/blog/patch-arm.jpg'
 import imgMondayCoffee from '../../assets/blog/monday-coffee.jpg'
-import imgGinger from '../../assets/blog/ginger.jpg'
+import imgScienceBehindPulsarGinger from '../../assets/blog/science-behind-pulsar-ginger.jpg'
 import imgLowCalorieMargarita from '../../assets/blog/low-calorie-margarita.jpg'
 import imgHangoversArentInevitable from '../../assets/blog/hangovers-arent-inevitable.jpg'
 import imgFastedOldFashion from '../../assets/blog/fasted-old-fashion.jpg'
 import imgFastedOldFashionWhiskey from '../../assets/blog/fasted-old-fashion-whiskey.jpg'
+import imgScienceBehindPulsar from '../../assets/blog/science-behind-pulsar.jpg'
 
 /* ── Blog post content with sources ── */
 
@@ -348,7 +349,9 @@ export const blogPosts = {
     category: 'SCIENCE',
     tagColor: 'bg-pulsar-pink',
     date: 'MAY 8',
-    heroImg: imgScienceLab,
+    heroImg: imgScienceBehindPulsar,
+    heroAlt: 'An abstract 3D render of a DNA double helix wrapped in green vines and pink flowers on a pale background',
+    heroImgCredit: { photographer: 'Google DeepMind', url: 'https://www.pexels.com/photo/an-artist-s-illustration-of-artificial-intelligence-ai-this-image-depicts-how-ai-could-assist-in-genomic-studies-and-its-applications-it-was-created-by-artist-nidia-dias-as-part-of-the-18069422/' },
     heroDescription: "We don't hide behind proprietary blends or vague claims. Here's a breakdown of every ingredient in a Pulsar Patch and what the research says.",
     content: [
       {
@@ -376,11 +379,6 @@ export const blogPosts = {
         body: "NAC (N-Acetylcysteine) is a precursor to Glutathione, meaning your body uses it to produce more of that critical antioxidant. A randomized trial published in Scientific Reports examined NAC's role in hangover prevention. The study found that NAC, as a glutathione donor, has the potential to decrease oxidative stress on the liver during ethanol degradation. Animal studies within the same research showed that subjects pretreated with NAC prior to ethanol ingestion had measurably decreased oxidative stress on the liver."
       },
       {
-        type: 'image',
-        img: imgGinger,
-        source: 'Photo by Unsplash'
-      },
-      {
         type: 'heading',
         body: "B VITAMINS: REPLENISHING WHAT ALCOHOL TAKES"
       },
@@ -399,6 +397,12 @@ export const blogPosts = {
       {
         type: 'text',
         body: "Ginger has been used for centuries to combat nausea and support digestion. A systematic review published in the European Review for Medical and Pharmacological Sciences confirmed ginger's effectiveness for treating nausea across multiple contexts. Separate research published in the Journal of Applied Pharmaceutical Sciences found that ginger rhizome extract validated the traditional use of ginger as a hangover remedy, showing it reduced withdrawal-induced deficits and decreased learned preference to ethanol by 53% at therapeutic doses."
+      },
+      {
+        type: 'image',
+        img: imgScienceBehindPulsarGinger,
+        alt: 'Fresh ginger root, sliced ginger, and a tin of ground ginger powder on a light background',
+        source: 'Photo via Pexels'
       },
       {
         type: 'heading',
