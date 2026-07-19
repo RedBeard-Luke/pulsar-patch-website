@@ -29,6 +29,15 @@ export const isAdminEmail = (email) =>
 // is null and callers fall back to the existing demo behavior.
 export const supabase = isSupabaseConfigured()
   ? createClient(url, anonKey, {
-      auth: { persistSession: true, autoRefreshToken: true },
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        // Store the admin session in sessionStorage, NOT the default localStorage.
+        // sessionStorage is wiped when the browser tab is closed, so re-opening
+        // /admin in a new tab always requires signing in again. It still survives
+        // page reloads and navigation within the same tab, so admins aren't logged
+        // out mid-session. (Falls back to default storage in any non-browser env.)
+        storage: typeof window !== 'undefined' ? window.sessionStorage : undefined,
+      },
     })
   : null

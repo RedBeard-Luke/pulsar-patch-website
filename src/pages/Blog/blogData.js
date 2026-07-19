@@ -3,7 +3,8 @@ import imgMargarita from '../../assets/blog/margarita.jpg'
 import imgOldFashioned from '../../assets/blog/old-fashioned.jpg'
 import imgWineDinner from '../../assets/blog/wine-dinner.jpg'
 import imgScienceLab from '../../assets/blog/science-lab.jpg'
-import imgFriendsBar from '../../assets/blog/friends-bar.jpg'
+import imgHowOftenUsePulsar from '../../assets/blog/how-often-use-pulsar.jpg'
+import imgHowOftenUsePulsarStayin from '../../assets/blog/how-often-use-pulsar-stayin.jpg'
 import imgCocktailsBar from '../../assets/blog/cocktails-bar.jpg'
 import imgMorningBed from '../../assets/blog/morning-bed.jpg'
 import imgPatchArm from '../../assets/blog/patch-arm.jpg'
@@ -143,7 +144,9 @@ export const blogPosts = {
     category: 'LIFESTYLE',
     tagColor: 'bg-pulsar-blue',
     date: 'MAY 8',
-    heroImg: imgFriendsBar,
+    heroImg: imgHowOftenUsePulsar,
+    heroAlt: 'Three friends smiling and toasting drinks on a city rooftop in bright evening light',
+    heroImgCredit: { photographer: 'Ketut Subiyanto', url: 'https://www.pexels.com/photo/a-group-of-friends-toasting-drinks-while-having-conversation-5054604/' },
     heroDescription: "One of the most common questions we get is about frequency. Can you wear a Pulsar Patch every weekend? What about back-to-back nights? Here's what you need to know.",
     content: [
       {
@@ -160,8 +163,9 @@ export const blogPosts = {
       },
       {
         type: 'image',
-        img: imgPatchArm,
-        source: 'Photo by Unsplash'
+        img: imgHowOftenUsePulsarStayin,
+        alt: 'A single cup of coffee on a saucer by a sunlit window on a calm morning',
+        source: 'Photo via Pexels'
       },
       {
         type: 'heading',

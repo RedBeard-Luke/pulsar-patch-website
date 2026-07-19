@@ -505,5 +505,173 @@
     "round": "R2",
     "note": "DeepMind brain, off-subject for liver/metabolism",
     "winner": false
+  },
+  {
+    "ts": "2026-07-19T03:07:17.314Z",
+    "id": "5054604",
+    "slug": "how-often-use-pulsar",
+    "target": "hero",
+    "category": "night-out",
+    "lightRule": "moody-ok",
+    "peopleSource": "allowed",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": true,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 9,
+    "max": 9,
+    "round": null,
+    "note": "night-out: friends toast rooftop + city, bright",
+    "winner": true
+  },
+  {
+    "ts": "2026-07-19T03:07:17.625Z",
+    "id": "6427711",
+    "slug": "how-often-use-pulsar",
+    "target": "hero",
+    "category": "night-out",
+    "lightRule": "moody-ok",
+    "peopleSource": "allowed",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": true,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 9,
+    "max": 9,
+    "round": null,
+    "note": "night-out: hands toasting colorful drinks",
+    "winner": false
+  },
+  {
+    "ts": "2026-07-19T03:07:17.894Z",
+    "id": "6210604",
+    "slug": "how-often-use-pulsar",
+    "target": "hero",
+    "category": "night-out",
+    "lightRule": "moody-ok",
+    "peopleSource": "allowed",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": true,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 9,
+    "max": 9,
+    "round": null,
+    "note": "night-out: friends posed golden hour wine",
+    "winner": false
+  },
+  {
+    "ts": "2026-07-19T03:09:23.704Z",
+    "id": "35452847",
+    "slug": "how-often-use-pulsar-stayin",
+    "target": "inline",
+    "category": "lifestyle",
+    "lightRule": "bright-required",
+    "peopleSource": "vision",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": true,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 9,
+    "max": 9,
+    "round": null,
+    "note": "cozy stay-in: sunlit coffee by window",
+    "winner": true
+  },
+  {
+    "ts": "2026-07-19T03:09:24.177Z",
+    "id": "15569230",
+    "slug": "how-often-use-pulsar-stayin",
+    "target": "inline",
+    "category": "lifestyle",
+    "lightRule": "bright-required",
+    "peopleSource": "vision",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": true
+    },
+    "vision": {
+      "subject": true,
+      "light": true,
+      "color": true,
+      "nobrand": true,
+      "clean": false,
+      "small": true
+    },
+    "score": 8,
+    "max": 9,
+    "round": null,
+    "note": "text sticky note fails clean",
+    "winner": false
+  },
+  {
+    "ts": "2026-07-19T03:09:24.438Z",
+    "id": "13262525",
+    "slug": "how-often-use-pulsar-stayin",
+    "target": "inline",
+    "category": "lifestyle",
+    "lightRule": "bright-required",
+    "peopleSource": "vision",
+    "isEval": false,
+    "det": {
+      "horizontal": true,
+      "hiRes": true,
+      "peopleOK": false
+    },
+    "vision": {
+      "subject": true,
+      "light": false,
+      "color": true,
+      "nobrand": true,
+      "clean": true,
+      "small": true
+    },
+    "score": 7,
+    "max": 9,
+    "round": null,
+    "note": "person present + dark/warm",
+    "winner": false
   }
 ]
